@@ -19,6 +19,7 @@
 | Sprint 1 단위 테스트 | 완료 | 상태 관리, 입력, 루프 진행, 충돌/게임오버 테스트 확장 |
 | 테스트 실행 환경 | 완료 | `npm install`, Vitest, Playwright Chromium 설치 완료 |
 | 테스트 실행 리포트 | 완료 | `docs/test-report.md`에 Sprint 1 실행 결과 기록 |
+| 테스트 수행 가드레일 | 완료 | 제품 코드, 기대결과, assertion 변경 금지와 실패 분류 기준 문서화 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -37,6 +38,8 @@
 | `tests/e2e/runner.spec.js` | 브라우저 E2E 테스트 |
 | `docs/harness-engineering.md` | 하네스와 루프 엔지니어링 전략 |
 | `docs/test-classification.md` | 테스트 대분류와 Sprint 1 범위 |
+| `docs/test-guardrails.md` | 테스트 수행 원칙과 실패 분류 기준 |
+| `docs/test-report.md` | 마지막 테스트 실행 결과 |
 
 ## 현재 자동화 구조
 
@@ -83,7 +86,6 @@
 
 ## 아직 하지 않은 작업
 
-- 테스트 리포트 작성
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
 - GitHub Actions 또는 CI 구성
@@ -94,9 +96,10 @@
 2. 이 문서에서 현재 진행상황을 확인한다.
 3. `docs/test-classification.md`에서 Sprint 1 범위를 확인한다.
 4. `docs/harness-engineering.md`에서 추가 예정 하네스 API를 확인한다.
-5. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
-6. `npm audit` 결과를 기준으로 의존성 업그레이드를 검토한다.
-7. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
+5. 테스트 실행 전 `docs/test-guardrails.md`를 확인한다.
+6. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
+7. `npm audit` 결과를 기준으로 의존성 업그레이드를 검토한다.
+8. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
 
 ## 마지막 확인 상태
 

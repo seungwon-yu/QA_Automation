@@ -31,6 +31,7 @@ npm run serve
 - `docs/test-plan.md`: 현재 테스트 목적, 범위, 시작 조건, 완료 조건
 - `docs/test-cases.md`: 현재 세부 테스트 케이스
 - `docs/risk-analysis.md`: 제품 리스크와 테스트 대응
+- `docs/test-guardrails.md`: 테스트 수행 중 지켜야 할 가드레일
 - `docs/test-report.md`: 테스트 실행 결과와 남은 작업
 
 ## 테스트 명령

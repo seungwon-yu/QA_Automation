@@ -15,8 +15,9 @@
 5. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
 6. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`를 확인한다.
 7. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
-8. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
-9. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
+8. 테스트를 실행하기 전에 `docs/test-guardrails.md`를 확인한다.
+9. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
+10. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
 
 ## 저장소 지도
 - `index.html`: 브라우저 진입점.
@@ -29,6 +30,7 @@
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트.
 - `docs/project-status.md`: 진행상황과 다음 작업 기록.
 - `docs/test-report.md`: 마지막 테스트 실행 결과.
+- `docs/test-guardrails.md`: 테스트 수행 가드레일.
 - `docs/`: QA와 프로젝트 지식 문서.
 
 ## 아키텍처 규칙
@@ -97,9 +99,13 @@
 한 커밋에는 하나의 개념적 변경만 담는다.
 
 ## 검증 규칙
-엔진 변경 후에는 집중 스모크 테스트를 실행한다.
-하네스나 루프 변경 후에는 단위 테스트를 실행한다.
-브라우저 통합 변경 후에는 E2E 테스트를 실행한다.
+테스트 중 제품 코드, 요구사항, 기대결과, assertion, PASS/FAIL 기준을 임의로 변경하지 않는다.
+동일 조건 재시도는 최대 3회까지만 허용한다.
+FAIL 발생 시 screenshot, log, state를 저장한다.
+원인이 불명확하면 BUG로 단정하지 않고 `REVIEW_REQUIRED`로 종료한다.
+테스트 환경 오류는 `PRODUCT_FAIL`과 구분한다.
+상세 기준은 `docs/test-guardrails.md`를 따른다.
+엔진 변경 후에는 스모크 테스트, 하네스 변경 후에는 단위 테스트, 브라우저 통합 변경 후에는 E2E 테스트를 실행한다.
 실행하지 못한 테스트는 문서화한다.
 
 ## 문서 규칙
