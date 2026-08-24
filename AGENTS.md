@@ -28,6 +28,7 @@
 - `src/main.js`: 브라우저 조립과 QA API 노출.
 - `tests/harness/gameHarness.js`: 엔진 제어 하네스.
 - `tests/agent/`: Agent Loop 실패 처리 파이프라인.
+- `tests/agent/fixtures/`: 실패 분류 검증용 샘플 명령.
 - `tests/unit/gameEngine.test.js`: 하네스 기반 루프 테스트.
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트.
 - `docs/project-status.md`: 진행상황과 다음 작업 기록.

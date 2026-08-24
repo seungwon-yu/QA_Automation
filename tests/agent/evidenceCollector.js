@@ -19,6 +19,14 @@ export class EvidenceCollector {
       stderr: context.stderr ?? "",
       collectedAt: new Date().toISOString()
     };
+    const consoleLog = {
+      stdout: context.stdout ?? "",
+      stderr: context.stderr ?? ""
+    };
+    const screenshot = context.screenshot ?? {
+      available: false,
+      reason: "브라우저 실행 컨텍스트가 아니므로 screenshot이 제공되지 않음"
+    };
 
     const state = context.state ?? {
       available: false,
@@ -31,6 +39,8 @@ export class EvidenceCollector {
     };
 
     await writeJson(path.join(evidenceDir, "command-log.json"), commandLog);
+    await writeJson(path.join(evidenceDir, "console-log.json"), consoleLog);
+    await writeJson(path.join(evidenceDir, "screenshot.json"), screenshot);
     await writeJson(path.join(evidenceDir, "state.json"), state);
     await writeJson(path.join(evidenceDir, "timeline.json"), timeline);
 
@@ -38,6 +48,8 @@ export class EvidenceCollector {
       evidenceDir,
       files: {
         commandLog: path.join(evidenceDir, "command-log.json"),
+        consoleLog: path.join(evidenceDir, "console-log.json"),
+        screenshot: path.join(evidenceDir, "screenshot.json"),
         state: path.join(evidenceDir, "state.json"),
         timeline: path.join(evidenceDir, "timeline.json")
       }

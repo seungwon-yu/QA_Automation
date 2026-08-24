@@ -144,6 +144,7 @@ Agent는 제품 코드, 요구사항, 기대결과, assertion을 변경할 수 �
 - `DecisionLogger`
 - `AgentLoopRunner`
 - 실패 처리 파이프라인 문서화
+- 실패 fixture 기반 분류와 결정 흐름 검증
 
 ### 이번 단계에서 하지 않을 것
 
@@ -152,6 +153,19 @@ Agent는 제품 코드, 요구사항, 기대결과, assertion을 변경할 수 �
 - 기존 assertion 완화
 - LLM 기반 자동 판단 연결
 - GitHub Actions 연결
+
+## 실패 fixture
+
+Agent Loop 실패 경로 검증을 위해 제품 코드와 분리된 fixture를 사용한다.
+
+| fixture | 목적 | 기대 분류 |
+| --- | --- | --- |
+| `tests/agent/fixtures/envFailCommand.js` | 브라우저 실행 파일 없음과 같은 환경 오류 샘플 | `ENV_FAIL` |
+| `tests/agent/fixtures/testFailCommand.js` | locator strict mode와 같은 테스트 코드 오류 샘플 | `TEST_FAIL` |
+| `tests/agent/fixtures/productFailCommand.js` | 제품 기대 동작 불일치 샘플 | `PRODUCT_FAIL` |
+| `tests/agent/fixtures/reviewRequiredCommand.js` | 근거가 부족한 assertion 실패 샘플 | `REVIEW_REQUIRED` |
+
+fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드나 실제 요구사항을 변경하지 않는다.
 
 ## 가드레일 연결
 

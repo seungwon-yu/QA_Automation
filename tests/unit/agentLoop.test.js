@@ -5,6 +5,8 @@ import path from "node:path";
 import { DecisionEngine } from "../agent/decisionEngine.js";
 import { EvidenceCollector } from "../agent/evidenceCollector.js";
 import { FailureClassifier } from "../agent/failureClassifier.js";
+import { AgentLoopRunner } from "../agent/agentLoopRunner.js";
+import { DecisionLogger } from "../agent/decisionLogger.js";
 import { CLASSIFICATION, DECISION, RESULT } from "../agent/failureTypes.js";
 
 describe("QA Agent Loop failure handling", () => {
@@ -92,13 +94,116 @@ describe("QA Agent Loop failure handling", () => {
     });
 
     const commandLog = JSON.parse(await readFile(evidence.files.commandLog, "utf8"));
+    const consoleLog = JSON.parse(await readFile(evidence.files.consoleLog, "utf8"));
+    const screenshot = JSON.parse(await readFile(evidence.files.screenshot, "utf8"));
     const state = JSON.parse(await readFile(evidence.files.state, "utf8"));
     const timeline = JSON.parse(await readFile(evidence.files.timeline, "utf8"));
 
     expect(commandLog.testId).toBe("TC-AGENT-001");
+    expect(consoleLog.stderr).toBe("stderr sample");
+    expect(screenshot.available).toBe(false);
     expect(state.status).toBe("gameOver");
     expect(timeline).toHaveLength(1);
 
     await rm(baseDir, { recursive: true, force: true });
   });
+
+  it("ENV_FAIL은 최대 재시도 횟수까지 증거를 저장하고 STOP으로 종료한다", async () => {
+    const baseDir = await mkdtemp(path.join(tmpdir(), "qa-agent-env-"));
+    const runner = createRunner({
+      baseDir,
+      maxRetries: 3,
+      stderr: "browserType.launch: Executable doesn't exist"
+    });
+
+    const summary = await runner.run({
+      testId: "TC-ENV-FAIL",
+      command: "fixture env fail"
+    });
+
+    expect(summary.finalClassification).toBe(CLASSIFICATION.ENV_FAIL);
+    expect(summary.finalDecision).toBe(DECISION.STOP);
+    expect(summary.attempts).toHaveLength(3);
+    expect(summary.attempts[0].decision).toBe(DECISION.RETRY);
+    expect(summary.attempts[2].decision).toBe(DECISION.STOP);
+    expect(summary.attempts.every((attempt) => attempt.evidenceDir)).toBe(true);
+
+    await rm(baseDir, { recursive: true, force: true });
+  });
+
+  it("TEST_FAIL은 재시도하지 않고 STOP으로 종료한다", async () => {
+    const baseDir = await mkdtemp(path.join(tmpdir(), "qa-agent-test-"));
+    const runner = createRunner({
+      baseDir,
+      stderr: "locator.click: Error: strict mode violation"
+    });
+
+    const summary = await runner.run({
+      testId: "TC-TEST-FAIL",
+      command: "fixture test fail"
+    });
+
+    expect(summary.finalClassification).toBe(CLASSIFICATION.TEST_FAIL);
+    expect(summary.finalDecision).toBe(DECISION.STOP);
+    expect(summary.attempts).toHaveLength(1);
+
+    await rm(baseDir, { recursive: true, force: true });
+  });
+
+  it("PRODUCT_FAIL은 재현성 확인 후 최대 재시도에서 STOP으로 종료한다", async () => {
+    const baseDir = await mkdtemp(path.join(tmpdir(), "qa-agent-product-"));
+    const runner = createRunner({
+      baseDir,
+      maxRetries: 2,
+      stderr: "PRODUCT_ASSERTION: Expected game state gameOver but received running"
+    });
+
+    const summary = await runner.run({
+      testId: "TC-PRODUCT-FAIL",
+      command: "fixture product fail"
+    });
+
+    expect(summary.finalClassification).toBe(CLASSIFICATION.PRODUCT_FAIL);
+    expect(summary.finalDecision).toBe(DECISION.STOP);
+    expect(summary.attempts).toHaveLength(2);
+    expect(summary.attempts[0].decision).toBe(DECISION.RETRY);
+
+    await rm(baseDir, { recursive: true, force: true });
+  });
+
+  it("REVIEW_REQUIRED는 재시도하지 않고 REVIEW로 종료한다", async () => {
+    const baseDir = await mkdtemp(path.join(tmpdir(), "qa-agent-review-"));
+    const runner = createRunner({
+      baseDir,
+      stderr: "AssertionError: expected true to be false"
+    });
+
+    const summary = await runner.run({
+      testId: "TC-REVIEW-REQUIRED",
+      command: "fixture review required"
+    });
+
+    expect(summary.finalClassification).toBe(CLASSIFICATION.REVIEW_REQUIRED);
+    expect(summary.finalDecision).toBe(DECISION.REVIEW);
+    expect(summary.attempts).toHaveLength(1);
+
+    await rm(baseDir, { recursive: true, force: true });
+  });
 });
+
+function createRunner({ baseDir, maxRetries = 3, stderr }) {
+  return new AgentLoopRunner({
+    maxRetries,
+    evidenceCollector: new EvidenceCollector({
+      baseDir: path.join(baseDir, "evidence")
+    }),
+    decisionLogger: new DecisionLogger({
+      logDir: path.join(baseDir, "agent")
+    }),
+    commandExecutor: async () => ({
+      exitCode: 1,
+      stdout: "",
+      stderr
+    })
+  });
+}

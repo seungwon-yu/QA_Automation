@@ -16,6 +16,7 @@ export class AgentLoopRunner {
     this.failureClassifier = options.failureClassifier ?? new FailureClassifier();
     this.decisionEngine = options.decisionEngine ?? new DecisionEngine({ maxRetries: this.maxRetries });
     this.decisionLogger = options.decisionLogger ?? new DecisionLogger();
+    this.commandExecutor = options.commandExecutor ?? executeCommand;
   }
 
   async run(options = {}) {
@@ -24,7 +25,7 @@ export class AgentLoopRunner {
     const attempts = [];
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt += 1) {
-      const execution = await executeCommand(command);
+      const execution = await this.commandExecutor(command, attempt);
       const classification = this.failureClassifier.classify(execution);
       const evidence = execution.exitCode === 0
         ? null
@@ -81,7 +82,7 @@ export class AgentLoopRunner {
   }
 }
 
-function executeCommand(command) {
+export function executeCommand(command) {
   return new Promise((resolve) => {
     const child = spawn(command, {
       shell: true,

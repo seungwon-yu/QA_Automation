@@ -22,7 +22,8 @@
 | 테스트 수행 가드레일 | 완료 | 제품 코드, 기대결과, assertion 변경 금지와 실패 분류 기준 문서화 |
 | Agent Loop 설계 | 완료 | `docs/agent-loop-design.md`에 실패 처리 파이프라인 정의 |
 | Agent Loop 기본 모듈 | 진행 중 | Evidence, Classification, Decision, Log, Runner 기본 구조 추가 |
-| Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진 테스트 7개 통과 |
+| Agent Loop 실패 fixture | 완료 | ENV, TEST, PRODUCT, REVIEW_REQUIRED 실패 샘플 추가 |
+| Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진, 실패 경로 테스트 11개 통과 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -45,6 +46,7 @@
 | `docs/test-report.md` | 마지막 테스트 실행 결과 |
 | `docs/agent-loop-design.md` | Sprint 2 QA Agent Loop 설계 |
 | `tests/agent/` | 실패 처리 파이프라인 기본 모듈 |
+| `tests/agent/fixtures/` | 실패 분류 검증용 샘플 명령 |
 | `tests/unit/agentLoop.test.js` | Agent Loop 분류와 결정 단위 테스트 |
 
 ## 현재 자동화 구조
@@ -64,15 +66,24 @@
 
 ## 다음 작업 우선순위
 
-### 1순위: Agent Loop 실사용 검증
+### 1순위: Playwright 실패 증거 연동
 
 필요 작업:
 
-- `npm run test:agent -- npm test` 실행 결과 확인
-- 실패 테스트 샘플을 별도로 만들어 Evidence 저장 구조 검증
+- Playwright 실패 시 실제 screenshot 파일 저장
+- browser console log 수집
+- `window.__QA_AUTOMATION__.getState()` state 저장
+- 필요하면 timeline 저장 구조와 연결
+
+### 2순위: Agent Loop 실사용 검증
+
+필요 작업:
+
+- `npm run test:agent -- npm test`를 정기 실행 경로로 정리
+- 실패 fixture 실행 결과를 문서 예시로 정리
 - Decision Log가 면접 설명에 쓸 수 있을 정도로 읽히는지 확인
 
-### 2순위: 의존성 취약점 대응
+### 3순위: 의존성 취약점 대응
 
 필요 작업:
 
@@ -81,7 +92,7 @@
 - breaking change가 있는 경우 별도 브랜치 또는 별도 커밋으로 처리
 - 업그레이드 후 `npm test`와 `npm run test:e2e` 재실행
 
-### 3순위: Sprint 2 기능 테스트 후보 선정
+### 4순위: Sprint 2 기능 테스트 후보 선정
 
 필요 작업:
 
@@ -90,7 +101,7 @@
 - 리그레션 플로우 반복 테스트 추가
 - 브라우저 E2E 테스트 확장
 
-### 4순위: CI 구성
+### 5순위: CI 구성
 
 필요 작업:
 
@@ -130,7 +141,8 @@
 | Vitest 실제 실행 | 통과 |
 | Playwright 실제 실행 | 통과 |
 | Agent Loop PASS 경로 | 통과 |
-| Agent Loop 실패 경로 | 미검증 |
+| Agent Loop 실패 경로 | 통과 |
+| Playwright 실제 screenshot 증거 | 미구현 |
 
 ## 다음 추천 커밋
 

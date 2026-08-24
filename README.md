@@ -20,6 +20,7 @@ npm run serve
 - `src/gameEngine.js`: 결정 가능한 게임 규칙
 - `tests/harness/gameHarness.js`: 루프와 상태 제어를 담당하는 하네스
 - `tests/unit/gameEngine.test.js`: 하네스 기반 단위 테스트
+- `tests/unit/agentLoop.test.js`: Agent Loop 실패 처리 단위 테스트
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트
 
 ## 프로젝트 문서

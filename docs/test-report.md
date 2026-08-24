@@ -5,7 +5,7 @@
 | 항목 | 결과 |
 | --- | --- |
 | 실행 날짜 | 2026-08-25 |
-| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 기본 모듈, 브라우저 E2E 기본 흐름 |
+| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, 브라우저 E2E 기본 흐름 |
 | 단위 테스트 | 통과 |
 | E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
@@ -16,10 +16,11 @@
 | 명령 | 결과 | 비고 |
 | --- | --- | --- |
 | `npm test` | 통과 | `tests/unit/gameEngine.test.js` 13개 테스트 통과 |
-| `npm test` | 통과 | `tests/unit/agentLoop.test.js` 7개 테스트 통과 |
-| `npm test` | 통과 | 전체 단위 테스트 20개 통과 |
+| `npm test` | 통과 | `tests/unit/agentLoop.test.js` 11개 테스트 통과 |
+| `npm test` | 통과 | 전체 단위 테스트 24개 통과 |
 | `npm run test:e2e` | 통과 | `tests/e2e/runner.spec.js` 1개 테스트 통과 |
 | `npm run test:agent -- npm test` | 통과 | PASS 상황에서 `STOP` 결정과 Decision Log 기록 확인 |
+| `npm run test:agent -- node tests/agent/fixtures/testFailCommand.js` | 의도된 실패 | `TEST_FAIL`로 분류하고 재시도 없이 `STOP`, evidence 저장 확인 |
 | `npm audit --audit-level=moderate` | 실패 상태 반환 | 취약점 5개 확인, 자동 수정은 breaking change 가능 |
 
 ## Sprint 1 검증 내용
@@ -44,9 +45,9 @@
 
 | 모듈 | 구현 상태 | 대표 검증 |
 | --- | --- | --- |
-| `EvidenceCollector` | 기본 구현 | 실패 시 command log, state, timeline 저장 구조 테스트 통과 |
-| `FailureClassifier` | 기본 구현 | 환경 오류, 테스트 오류, 판단 보류 분류 테스트 통과 |
-| `DecisionEngine` | 기본 구현 | PASS, RETRY, REVIEW 결정 테스트 통과 |
+| `EvidenceCollector` | 기본 구현 | 실패 시 command log, console log, screenshot placeholder, state, timeline 저장 테스트 통과 |
+| `FailureClassifier` | 기본 구현 | 환경 오류, 테스트 오류, 제품 실패 의심, 판단 보류 분류 테스트 통과 |
+| `DecisionEngine` | 기본 구현 | PASS, RETRY, STOP, REVIEW 결정 테스트 통과 |
 | `DecisionLogger` | 기본 구현 | Decision Log와 요약 파일 저장 구조 추가 |
 | `AgentLoopRunner` | 기본 구현 | 명령 실행 결과에 따라 분류, 결정, 로그 기록 수행 |
 
@@ -54,7 +55,9 @@
 
 현재 Agent Loop는 PASS 상황과 분류/결정 단위 테스트를 검증한 초기 구조이다.
 
-아직 의도적으로 실패하는 테스트 샘플을 이용해 screenshot, log, state, timeline 증거가 모두 저장되는지는 검증하지 않았다. 다음 단계에서는 실패 샘플을 별도로 만들어 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED` 흐름을 확인해야 한다.
+의도적으로 실패하는 fixture를 이용해 `ENV_FAIL`, `TEST_FAIL`, `PRODUCT_FAIL`, `REVIEW_REQUIRED` 분류와 Retry/Stop/Review 결정 흐름을 단위 테스트로 검증했다.
+
+현재 screenshot은 브라우저 실패 컨텍스트가 아닌 경우 `screenshot.json` placeholder로 저장한다. 다음 단계에서는 Playwright 실패와 연결해 실제 screenshot 파일 저장을 검증해야 한다.
 
 ## 의존성 보안 메모
 
@@ -68,6 +71,6 @@
 
 Sprint 1의 핵심 목표인 하네스 기능 강화와 루프 실행 기반 테스트 케이스 확장은 완료되었다.
 
-Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 모듈을 추가했다.
+Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 모듈과 실패 경로 검증을 추가했다.
 
 현재 자동화 테스트는 단위 테스트, 브라우저 E2E, Agent Loop PASS 경로 모두 통과한다.
