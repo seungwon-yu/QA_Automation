@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>QA_Automation</title>
+    <link rel="stylesheet" href="./src/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="game-area" aria-label="Game runner automation target">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Game QA Portfolio</p>
+            <h1>QA_Automation Harness Runner</h1>
+          </div>
+          <div class="scoreboard" aria-live="polite">
+            <span>Score</span>
+            <strong id="score">0</strong>
+            <span>Best</span>
+            <strong id="best-score">0</strong>
+          </div>
+        </div>
+
+        <canvas id="game" width="960" height="360" aria-label="Runner game canvas"></canvas>
+
+        <div class="controls">
+          <button id="start-button" type="button">Start</button>
+          <button id="jump-button" type="button">Jump</button>
+          <button id="restart-button" type="button">Restart</button>
+        </div>
+      </section>
+
+      <aside class="qa-panel" aria-label="QA status">
+        <h2>Test Signals</h2>
+        <dl>
+          <div>
+            <dt>State</dt>
+            <dd id="state">ready</dd>
+          </div>
+          <div>
+            <dt>Velocity</dt>
+            <dd id="velocity">0</dd>
+          </div>
+          <div>
+            <dt>Obstacles</dt>
+            <dd id="obstacles">0</dd>
+          </div>
+        </dl>
+      </aside>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
