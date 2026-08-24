@@ -17,11 +17,12 @@
 | --- | --- | --- |
 | `npm test` | 통과 | `tests/unit/gameEngine.test.js` 13개 테스트 통과 |
 | `npm test` | 통과 | `tests/unit/agentLoop.test.js` 11개 테스트 통과 |
-| `npm test` | 통과 | 전체 단위 테스트 24개 통과 |
+| `npm test` | 통과 | 전체 단위 테스트 25개 통과 |
 | `npm run test:e2e` | 통과 | `tests/e2e/runner.spec.js` 1개 테스트 통과 |
 | `npm run test:agent -- npm test` | 통과 | PASS 상황에서 `STOP` 결정과 Decision Log 기록 확인 |
 | `npm run test:agent -- node tests/agent/fixtures/testFailCommand.js` | 의도된 실패 | `TEST_FAIL`로 분류하고 재시도 없이 `STOP`, evidence 저장 확인 |
 | `npm run test:e2e:evidence` | 의도된 실패 | Playwright 실패 시 screenshot, console log, QA state 저장 확인 |
+| `npm run test:agent:evidence` | 의도된 실패 분석 | 최신 Playwright evidence를 읽어 `REVIEW_REQUIRED`와 `REVIEW` 결정 기록 |
 | `npm audit --audit-level=moderate` | 실패 상태 반환 | 취약점 5개 확인, 자동 수정은 breaking change 가능 |
 
 ## Sprint 1 검증 내용
@@ -78,4 +79,6 @@ Sprint 1의 핵심 목표인 하네스 기능 강화와 루프 실행 기반 테
 
 Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 모듈, 실패 경로 검증, Playwright 실패 증거 저장을 추가했다.
 
-현재 자동화 테스트는 단위 테스트, 브라우저 E2E, Agent Loop PASS 경로 모두 통과한다.
+이후 Playwright evidence를 `FailureClassifier`, `DecisionEngine`, `DecisionLogger`와 연결했다.
+
+현재 자동화 테스트는 단위 테스트, 브라우저 E2E, Agent Loop PASS 경로 모두 통과한다. 의도된 실패 샘플은 실패 증거 저장과 evidence 기반 판단 연결을 검증하기 위해 별도 명령으로 실행한다.

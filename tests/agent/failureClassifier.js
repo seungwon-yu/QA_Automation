@@ -38,7 +38,7 @@ export class FailureClassifier {
       };
     }
 
-    const output = `${context.stdout ?? ""}\n${context.stderr ?? ""}`;
+    const output = `${context.stdout ?? ""}\n${context.stderr ?? ""}\n${extractEvidenceText(context.evidence)}`;
 
     if (matchesAny(output, ENV_PATTERNS)) {
       return buildFail(CLASSIFICATION.ENV_FAIL, "실행 환경 오류 패턴이 발견됨", output, ENV_PATTERNS);
@@ -52,6 +52,18 @@ export class FailureClassifier {
       return buildFail(CLASSIFICATION.PRODUCT_FAIL, "제품 기대 동작 불일치 패턴이 발견됨", output, PRODUCT_PATTERNS);
     }
 
+    if (context.evidence?.testInfo?.status === "failed") {
+      return {
+        result: RESULT.FAIL,
+        classification: CLASSIFICATION.REVIEW_REQUIRED,
+        observations: [
+          "Playwright 실패 evidence가 있지만 제품, 테스트, 환경 오류로 단정할 패턴이 부족함",
+          `evidenceDir=${context.evidence.evidenceDir}`
+        ],
+        reason: "저장된 screenshot, console log, state를 사람 또는 상위 Agent가 검토해야 함"
+      };
+    }
+
     return {
       result: RESULT.FAIL,
       classification: CLASSIFICATION.REVIEW_REQUIRED,
@@ -59,6 +71,22 @@ export class FailureClassifier {
       reason: "추가 증거 또는 사람의 리뷰가 필요함"
     };
   }
+}
+
+function extractEvidenceText(evidence) {
+  if (!evidence) {
+    return "";
+  }
+
+  const consoleText = Array.isArray(evidence.consoleLog)
+    ? evidence.consoleLog.map((message) => message.text).join("\n")
+    : "";
+  const stateText = evidence.state?.available
+    ? JSON.stringify(evidence.state.value)
+    : JSON.stringify(evidence.state ?? {});
+  const testInfoText = JSON.stringify(evidence.testInfo ?? {});
+
+  return `${consoleText}\n${stateText}\n${testInfoText}`;
 }
 
 function buildFail(classification, reason, output, patterns) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { DecisionEngine } from "../agent/decisionEngine.js";
@@ -7,6 +7,8 @@ import { EvidenceCollector } from "../agent/evidenceCollector.js";
 import { FailureClassifier } from "../agent/failureClassifier.js";
 import { AgentLoopRunner } from "../agent/agentLoopRunner.js";
 import { DecisionLogger } from "../agent/decisionLogger.js";
+import { PlaywrightEvidenceAnalyzer } from "../agent/playwrightEvidenceAnalyzer.js";
+import { PlaywrightEvidenceReader } from "../agent/playwrightEvidenceReader.js";
 import { CLASSIFICATION, DECISION, RESULT } from "../agent/failureTypes.js";
 
 describe("QA Agent Loop failure handling", () => {
@@ -189,6 +191,50 @@ describe("QA Agent Loop failure handling", () => {
 
     await rm(baseDir, { recursive: true, force: true });
   });
+
+  it("Playwright evidence를 읽어 REVIEW_REQUIRED 판단과 Decision Log를 남긴다", async () => {
+    const baseDir = await mkdtemp(path.join(tmpdir(), "qa-playwright-evidence-"));
+    const evidenceDir = path.join(baseDir, "evidence", "sample");
+    await mkdir(evidenceDir, { recursive: true });
+    await writeJson(path.join(evidenceDir, "console-log.json"), [
+      {
+        type: "log",
+        text: "QA_EVIDENCE_SAMPLE_LOG"
+      }
+    ]);
+    await writeJson(path.join(evidenceDir, "state.json"), {
+      available: true,
+      value: {
+        status: "ready"
+      }
+    });
+    await writeJson(path.join(evidenceDir, "test-info.json"), {
+      title: "sample evidence failure",
+      status: "failed",
+      expectedStatus: "passed",
+      retry: 0,
+      screenshotPath: path.join(evidenceDir, "screenshot.png")
+    });
+    await writeFile(path.join(evidenceDir, "screenshot.png"), "fake screenshot", "utf8");
+
+    const analyzer = new PlaywrightEvidenceAnalyzer({
+      reader: new PlaywrightEvidenceReader(),
+      decisionLogger: new DecisionLogger({
+        logDir: path.join(baseDir, "agent")
+      })
+    });
+
+    const entry = await analyzer.analyze({
+      evidenceDir
+    });
+
+    expect(entry.classification).toBe(CLASSIFICATION.REVIEW_REQUIRED);
+    expect(entry.decision).toBe(DECISION.REVIEW);
+    expect(entry.evidenceDir).toBe(evidenceDir);
+    expect(entry.screenshotPath).toContain("screenshot.png");
+
+    await rm(baseDir, { recursive: true, force: true });
+  });
 });
 
 function createRunner({ baseDir, maxRetries = 3, stderr }) {
@@ -206,4 +252,8 @@ function createRunner({ baseDir, maxRetries = 3, stderr }) {
       stderr
     })
   });
+}
+
+async function writeJson(filePath, value) {
+  await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }

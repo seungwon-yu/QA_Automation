@@ -23,8 +23,9 @@
 | Agent Loop 설계 | 완료 | `docs/agent-loop-design.md`에 실패 처리 파이프라인 정의 |
 | Agent Loop 기본 모듈 | 진행 중 | Evidence, Classification, Decision, Log, Runner 기본 구조 추가 |
 | Agent Loop 실패 fixture | 완료 | ENV, TEST, PRODUCT, REVIEW_REQUIRED 실패 샘플 추가 |
-| Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진, 실패 경로 테스트 11개 통과 |
+| Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진, 실패 경로, evidence 분석 테스트 12개 통과 |
 | Playwright 실패 증거 | 완료 | 실패 시 screenshot, console log, QA state, test info 저장 확인 |
+| Evidence 기반 판단 연결 | 완료 | 최신 Playwright evidence를 읽어 분류, 결정, Decision Log 기록 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -51,6 +52,8 @@
 | `tests/unit/agentLoop.test.js` | Agent Loop 분류와 결정 단위 테스트 |
 | `tests/e2e/evidenceTest.js` | Playwright 실패 증거 수집 fixture |
 | `tests/e2e/evidence.spec.js` | Playwright 증거 저장 검증용 의도된 실패 샘플 |
+| `tests/agent/playwrightEvidenceReader.js` | 저장된 Playwright evidence 읽기 |
+| `tests/agent/playwrightEvidenceAnalyzer.js` | evidence 기반 분류와 결정 연결 |
 
 ## 현재 자동화 구조
 
@@ -69,12 +72,13 @@
 
 ## 다음 작업 우선순위
 
-### 1순위: Playwright 실패 증거와 Agent Loop 통합
+### 1순위: Evidence 기반 판단 고도화
 
 필요 작업:
 
-- Playwright 실패 결과를 `FailureClassifier` 입력으로 연결
-- Playwright evidence 경로를 Decision Log에 함께 기록
+- 제품 실패 판단에 필요한 expected/actual 메타데이터 구조 정의
+- E2E 실패에서 assertion 정보와 test case ID를 evidence에 포함
+- `PRODUCT_FAIL`로 분류 가능한 실제 브라우저 실패 샘플 추가
 - 필요하면 timeline 저장 구조와 연결
 
 ### 2순위: Agent Loop 실사용 검증
@@ -147,6 +151,7 @@
 | Playwright 실제 screenshot 증거 | 통과 |
 | Playwright QA state 증거 | 통과 |
 | Playwright console log 증거 | 통과 |
+| Evidence 기반 Decision Log | 통과 |
 
 ## 다음 추천 커밋
 

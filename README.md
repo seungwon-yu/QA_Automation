@@ -43,6 +43,8 @@ npm run serve
 npm test
 npm run test:e2e
 npm run test:e2e:evidence
+npm run test:agent:evidence
 ```
 
 `npm run test:e2e:evidence`는 실패 증거 저장을 확인하기 위한 의도된 실패 명령입니다.
+`npm run test:agent:evidence`는 저장된 Playwright evidence를 읽어 실패 분류와 다음 행동 결정을 기록합니다.

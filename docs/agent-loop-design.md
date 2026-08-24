@@ -192,6 +192,22 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
 
 `npm run test:e2e:evidence`는 증거 저장을 검증하기 위한 의도된 실패 명령이다. 따라서 종료 코드 1이 발생하는 것이 정상이며, PASS/FAIL 기준을 완화하기 위한 명령이 아니다.
 
+## Evidence 기반 판단 연결
+
+`tests/agent/playwrightEvidenceReader.js`는 저장된 Playwright evidence 디렉터리에서 `console-log.json`, `state.json`, `test-info.json`, `screenshot.png` 경로를 읽는다.
+
+`tests/agent/playwrightEvidenceAnalyzer.js`는 읽은 evidence를 `FailureClassifier`와 `DecisionEngine`에 전달하고, 판단 결과를 `DecisionLogger`에 기록한다.
+
+실행 명령:
+
+```bash
+npm run test:agent:evidence
+```
+
+이 명령은 가장 최근의 `artifacts/playwright-evidence/` 디렉터리를 읽어 실패 분류와 다음 행동 결정을 수행한다.
+
+현재 의도된 실패 샘플은 제품/테스트/환경 오류로 단정할 근거가 부족하므로 `REVIEW_REQUIRED`로 분류하고 `REVIEW`로 종료한다.
+
 ## 가드레일 연결
 
 상세한 테스트 수행 제한은 `docs/test-guardrails.md`를 따른다.
