@@ -1,10 +1,10 @@
-# Test Cases
+# 테스트 케이스
 
-| ID | Objective | Preconditions | Steps | Expected Result |
+| ID | 테스트 목적 | 사전 조건 | 절차 | 기대 결과 |
 | --- | --- | --- | --- | --- |
-| TC-001 | Verify initial state | Page loaded | Inspect engine state | Status is `ready`, score is `0` |
-| TC-002 | Verify game start | Initial state | Click Start | Status changes to `running` |
-| TC-003 | Verify jump | Game running | Press Space | Player y-position decreases and grounded is false |
-| TC-004 | Verify collision | Game running | Place obstacle at player position and tick loop | Status changes to `gameOver` |
-| TC-005 | Verify scoring | Game running | Advance loop for 120 frames | Score is greater than `0` |
-| TC-006 | Verify restart | Game over or running | Click Restart | Status is `running`, score is `0` |
+| TC-001 | 초기 상태 확인 | 페이지 또는 엔진 로드 완료 | 엔진 상태를 확인한다. | 상태는 `ready`, 점수는 `0`이다. |
+| TC-002 | 게임 시작 확인 | 초기 상태 | Start 버튼을 클릭하거나 `start()`를 호출한다. | 상태가 `running`으로 변경된다. |
+| TC-003 | 점프 확인 | 게임 실행 중 | Space 키를 누르거나 `pressJump()`를 호출한다. | 플레이어 y좌표가 감소하고 공중 상태가 된다. |
+| TC-004 | 충돌 확인 | 게임 실행 중 | 플레이어 위치에 장애물을 배치하고 루프를 진행한다. | 상태가 `gameOver`로 변경된다. |
+| TC-005 | 점수 증가 확인 | 게임 실행 중 | 120프레임 동안 루프를 진행한다. | 점수가 `0`보다 커진다. |
+| TC-006 | 재시작 확인 | 게임오버 또는 게임 실행 중 | Restart 버튼을 클릭하거나 `restart()`를 호출한다. | 상태가 `running`이 되고 점수는 `0`으로 초기화된다. |

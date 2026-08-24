@@ -1,37 +1,37 @@
 # QA_Automation
 
-Automation test portfolio project built around a runner game and game QA harness.
+러너 게임과 게임 QA 하네스를 중심으로 만든 자동화 테스트 포트폴리오 프로젝트입니다.
 
-The project separates game logic from rendering so automated tests can control the game loop through a harness.
+이 프로젝트는 게임 로직과 렌더링을 분리해, 자동화 테스트가 하네스를 통해 게임 루프를 제어할 수 있도록 구성합니다.
 
-## Run Locally
+## 로컬 실행
 
-Open `index.html` directly in a browser, or run:
+`index.html`을 브라우저에서 직접 열거나 아래 명령으로 실행합니다.
 
 ```bash
 npm install
 npm run serve
 ```
 
-Then visit `http://127.0.0.1:4173`.
+그 다음 `http://127.0.0.1:4173`에 접속합니다.
 
-## Automation Focus
+## 자동화 핵심
 
-- `src/gameEngine.js`: deterministic game rules
-- `tests/harness/gameHarness.js`: loop and state-control harness
-- `tests/unit/gameEngine.test.js`: unit-level harness tests
-- `tests/e2e/runner.spec.js`: browser-level Playwright test
+- `src/gameEngine.js`: 결정 가능한 게임 규칙
+- `tests/harness/gameHarness.js`: 루프와 상태 제어를 담당하는 하네스
+- `tests/unit/gameEngine.test.js`: 하네스 기반 단위 테스트
+- `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트
 
-## Project Docs
+## 프로젝트 문서
 
-- `AGENTS.md`: project map for future agents and contributors
-- `docs/harness-engineering.md`: harness and loop engineering strategy
-- `docs/test-classification.md`: large test groups and Sprint 1 scope
-- `docs/test-plan.md`: current test objective, scope, entry criteria, and exit criteria
-- `docs/test-cases.md`: current detailed test cases
-- `docs/risk-analysis.md`: product risks and test responses
+- `AGENTS.md`: 이후 작업자와 에이전트를 위한 프로젝트 지도
+- `docs/harness-engineering.md`: 하네스와 루프 엔지니어링 전략
+- `docs/test-classification.md`: 테스트 대분류와 Sprint 1 범위
+- `docs/test-plan.md`: 현재 테스트 목적, 범위, 시작 조건, 완료 조건
+- `docs/test-cases.md`: 현재 세부 테스트 케이스
+- `docs/risk-analysis.md`: 제품 리스크와 테스트 대응
 
-## Test Commands
+## 테스트 명령
 
 ```bash
 npm test

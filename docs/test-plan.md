@@ -1,32 +1,32 @@
-# QA_Automation Harness Runner Test Plan
+# 테스트 계획서
 
-## Test Objective
+## 테스트 목적
 
-Verify that the runner game core loop behaves correctly and can be controlled by an automation harness.
+러너 게임의 핵심 루프가 정상적으로 동작하고, 자동화 하네스를 통해 제어 가능한지 검증한다.
 
-## Test Basis
+## 테스트 베이시스
 
-- Game rules in `src/gameEngine.js`
-- Browser behavior in `index.html` and `src/main.js`
-- QA harness API exposed as `window.__QA_AUTOMATION__`
+- `src/gameEngine.js`에 구현된 게임 규칙
+- `index.html`과 `src/main.js`의 브라우저 동작
+- `window.__QA_AUTOMATION__`으로 노출된 QA 하네스 API
 
-## Scope
+## 테스트 범위
 
-- Initial state
-- Start and restart
-- Jump state transition
-- Obstacle spawning and collision
-- Score progression
-- Browser control through Playwright
+- 초기 상태
+- 시작과 재시작
+- 점프 상태 전이
+- 장애물 생성과 충돌
+- 점수 증가
+- Playwright를 통한 브라우저 제어
 
-## Entry Criteria
+## 시작 조건
 
-- Game loads in a browser
-- Canvas and control buttons are visible
-- Game engine can expose state through `getState()`
+- 게임이 브라우저에서 로드된다.
+- 캔버스와 조작 버튼이 표시된다.
+- `getState()`를 통해 게임 엔진 상태를 확인할 수 있다.
 
-## Exit Criteria
+## 완료 조건
 
-- Core harness tests pass
-- E2E start and jump flow passes
-- Any observed defect has a reproducible report
+- 핵심 하네스 테스트가 통과한다.
+- 브라우저에서 시작과 점프 흐름이 통과한다.
+- 발견한 결함은 재현 가능한 형태로 보고된다.

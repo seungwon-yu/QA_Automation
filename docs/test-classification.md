@@ -1,14 +1,14 @@
-# Test Classification
+# 테스트 분류
 
-## Purpose
+## 목적
 
-This document defines the large test groups before adding many detailed test cases.
+이 문서는 세부 테스트 케이스를 많이 추가하기 전에 테스트 대분류를 먼저 정의한다.
 
-The goal is to make automation work traceable from QA intent to harness capability and test code.
+목표는 QA 의도, 하네스 기능, 테스트 코드가 서로 추적 가능하도록 만드는 것이다.
 
-## Group Overview
+## 대분류 개요
 
-| Group ID | Large Category | Priority | Main Technique |
+| 그룹 ID | 대분류 | 우선순위 | 주요 기법 |
 | --- | --- | --- | --- |
 | TC-GROUP-01 | 초기화 및 상태 관리 | High | 상태 전이 테스팅 |
 | TC-GROUP-02 | 입력 및 플레이어 동작 | High | 상태 전이, 동등 분할 |
@@ -19,140 +19,140 @@ The goal is to make automation work traceable from QA intent to harness capabili
 | TC-GROUP-07 | 리그레션 플로우 | Medium | 확인 테스팅, 리그레션 |
 | TC-GROUP-08 | 브라우저 E2E | Low | 시스템 테스트 |
 
-## TC-GROUP-01 Initialization And State Management
+## TC-GROUP-01 초기화 및 상태 관리
 
-### Purpose
+### 목적
 
-Verify that the game starts, stops, and resets through valid state transitions.
+게임이 유효한 상태 전이에 따라 시작, 종료, 초기화되는지 검증한다.
 
-### Candidate Test Cases
+### 후보 테스트 케이스
 
-| Test ID | Scenario | Expected Result |
+| 테스트 ID | 시나리오 | 기대 결과 |
 | --- | --- | --- |
-| TC-001-01 | Create game engine | Status is `ready` and score is `0`. |
-| TC-001-02 | Start game | Status changes from `ready` to `running`. |
-| TC-001-03 | Restart game | Score resets and status becomes `running`. |
-| TC-001-04 | Game over state | Status remains `gameOver` after collision. |
+| TC-001-01 | 게임 엔진 생성 | 상태는 `ready`, 점수는 `0`이다. |
+| TC-001-02 | 게임 시작 | 상태가 `ready`에서 `running`으로 변경된다. |
+| TC-001-03 | 게임 재시작 | 점수가 초기화되고 상태가 `running`이 된다. |
+| TC-001-04 | 게임오버 상태 | 충돌 후 상태가 `gameOver`로 유지된다. |
 
-## TC-GROUP-02 Input And Player Behavior
+## TC-GROUP-02 입력 및 플레이어 동작
 
-### Purpose
+### 목적
 
-Verify player input and movement rules.
+플레이어 입력과 이동 규칙을 검증한다.
 
-### Candidate Test Cases
+### 후보 테스트 케이스
 
-| Test ID | Scenario | Expected Result |
+| 테스트 ID | 시나리오 | 기대 결과 |
 | --- | --- | --- |
-| TC-002-01 | Jump from ground | Player moves upward and becomes airborne. |
-| TC-002-02 | Jump while airborne | Second jump is rejected. |
-| TC-002-03 | Landing after jump | Player returns to ground after enough loop frames. |
-| TC-002-04 | Jump after landing | Player can jump again after landing. |
+| TC-002-01 | 지상에서 점프 | 플레이어가 위로 이동하고 공중 상태가 된다. |
+| TC-002-02 | 공중에서 점프 | 두 번째 점프가 거부된다. |
+| TC-002-03 | 점프 후 착지 | 충분한 루프 진행 후 플레이어가 지면으로 돌아온다. |
+| TC-002-04 | 착지 후 재점프 | 착지 후 다시 점프할 수 있다. |
 
-## TC-GROUP-03 Game Loop Progression
+## TC-GROUP-03 게임 루프 진행
 
-### Purpose
+### 목적
 
-Verify behavior that depends on repeated frame updates.
+반복 프레임 업데이트에 의존하는 동작을 검증한다.
 
-### Candidate Test Cases
+### 후보 테스트 케이스
 
-| Test ID | Scenario | Expected Result |
+| 테스트 ID | 시나리오 | 기대 결과 |
 | --- | --- | --- |
-| TC-003-01 | Run for fixed frames | Elapsed state changes predictably. |
-| TC-003-02 | Run for seconds | Score increases according to simulated time. |
-| TC-003-03 | Long loop run | Game remains stable without invalid state. |
-| TC-003-04 | Loop after game over | Score and movement do not continue unexpectedly. |
+| TC-003-01 | 고정 프레임 진행 | 경과 상태가 예측 가능하게 변경된다. |
+| TC-003-02 | 초 단위 진행 | 시뮬레이션 시간에 따라 점수가 증가한다. |
+| TC-003-03 | 장시간 루프 진행 | 잘못된 상태 없이 안정적으로 유지된다. |
+| TC-003-04 | 게임오버 후 루프 진행 | 점수와 이동이 의도치 않게 계속되지 않는다. |
 
-## TC-GROUP-04 Obstacle Spawn And Movement
+## TC-GROUP-04 장애물 생성 및 이동
 
-### Purpose
+### 목적
 
-Verify obstacle creation, movement, cleanup, and deterministic random behavior.
+장애물 생성, 이동, 제거, 랜덤 고정 동작을 검증한다.
 
-### Candidate Test Cases
+### 후보 테스트 케이스
 
-| Test ID | Scenario | Expected Result |
+| 테스트 ID | 시나리오 | 기대 결과 |
 | --- | --- | --- |
-| TC-004-01 | Force obstacle creation | Obstacle is added to state. |
-| TC-004-02 | Run loop after obstacle creation | Obstacle moves left. |
-| TC-004-03 | Obstacle exits screen | Obstacle is removed from state. |
-| TC-004-04 | Fixed random source | Generated obstacle dimensions are predictable. |
+| TC-004-01 | 장애물 강제 생성 | 상태에 장애물이 추가된다. |
+| TC-004-02 | 장애물 생성 후 루프 진행 | 장애물이 왼쪽으로 이동한다. |
+| TC-004-03 | 장애물이 화면 밖으로 이동 | 상태에서 장애물이 제거된다. |
+| TC-004-04 | 고정 랜덤 소스 사용 | 생성된 장애물 크기를 예측할 수 있다. |
 
-## TC-GROUP-05 Collision And Game Over
+## TC-GROUP-05 충돌 및 게임오버
 
-### Purpose
+### 목적
 
-Verify collision detection and game-over state transitions.
+충돌 판정과 게임오버 상태 전이를 검증한다.
 
-### Candidate Test Cases
+### 후보 테스트 케이스
 
-| Test ID | Scenario | Expected Result |
+| 테스트 ID | 시나리오 | 기대 결과 |
 | --- | --- | --- |
-| TC-005-01 | Obstacle intersects player | Status changes to `gameOver`. |
-| TC-005-02 | Obstacle does not intersect player | Status remains `running`. |
-| TC-005-03 | Collision boundary overlap | Boundary behavior matches the collision rule. |
-| TC-005-04 | Restart after collision | Status becomes `running` and score resets. |
+| TC-005-01 | 장애물이 플레이어와 겹침 | 상태가 `gameOver`로 변경된다. |
+| TC-005-02 | 장애물이 플레이어와 겹치지 않음 | 상태가 `running`으로 유지된다. |
+| TC-005-03 | 충돌 경계값 겹침 | 경계 조건이 충돌 규칙과 일치한다. |
+| TC-005-04 | 충돌 후 재시작 | 상태가 `running`이 되고 점수가 초기화된다. |
 
-## TC-GROUP-06 Score And Record
+## TC-GROUP-06 점수 및 기록
 
-### Purpose
+### 목적
 
-Verify score progression and best score behavior.
+점수 증가와 최고 기록 동작을 검증한다.
 
-### Candidate Test Cases
+### 후보 테스트 케이스
 
-| Test ID | Scenario | Expected Result |
+| 테스트 ID | 시나리오 | 기대 결과 |
 | --- | --- | --- |
-| TC-006-01 | Survive for one second | Score increases. |
-| TC-006-02 | Game over after scoring | Best score is updated. |
-| TC-006-03 | Restart after best score | Best score remains. |
-| TC-006-04 | Lower second score | Best score does not decrease. |
+| TC-006-01 | 1초 생존 | 점수가 증가한다. |
+| TC-006-02 | 점수 획득 후 게임오버 | 최고 기록이 갱신된다. |
+| TC-006-03 | 최고 기록 후 재시작 | 최고 기록이 유지된다. |
+| TC-006-04 | 두 번째 점수가 낮음 | 최고 기록이 감소하지 않는다. |
 
-## TC-GROUP-07 Regression Flow
+## TC-GROUP-07 리그레션 플로우
 
-### Purpose
+### 목적
 
-Verify core gameplay flows repeatedly after changes.
+변경 이후 핵심 게임 플로우가 반복적으로 정상 동작하는지 검증한다.
 
-### Candidate Test Cases
+### 후보 테스트 케이스
 
-| Test ID | Scenario | Expected Result |
+| 테스트 ID | 시나리오 | 기대 결과 |
 | --- | --- | --- |
-| TC-007-01 | Start, jump, land, score | Flow completes without game over. |
-| TC-007-02 | Collision, restart, replay | Restarted session behaves normally. |
-| TC-007-03 | Repeat core flow multiple times | State remains stable across repetitions. |
+| TC-007-01 | 시작, 점프, 착지, 점수 증가 | 게임오버 없이 플로우가 완료된다. |
+| TC-007-02 | 충돌, 재시작, 재플레이 | 재시작된 세션이 정상 동작한다. |
+| TC-007-03 | 핵심 플로우 여러 번 반복 | 반복 실행 중 상태가 안정적으로 유지된다. |
 
-## TC-GROUP-08 Browser E2E
+## TC-GROUP-08 브라우저 E2E
 
-### Purpose
+### 목적
 
-Verify that browser UI controls are connected to the engine and displayed state.
+브라우저 UI 조작이 엔진과 화면 상태에 연결되어 있는지 검증한다.
 
-### Candidate Test Cases
+### 후보 테스트 케이스
 
-| Test ID | Scenario | Expected Result |
+| 테스트 ID | 시나리오 | 기대 결과 |
 | --- | --- | --- |
-| TC-008-01 | Page load | Canvas and controls are visible. |
-| TC-008-02 | Start button | QA state panel shows `running`. |
-| TC-008-03 | Space key jump | Player y-position decreases. |
-| TC-008-04 | Restart button | Score resets and state returns to `running`. |
+| TC-008-01 | 페이지 로드 | 캔버스와 조작 버튼이 표시된다. |
+| TC-008-02 | Start 버튼 클릭 | QA 상태 패널이 `running`을 표시한다. |
+| TC-008-03 | Space 키로 점프 | 플레이어 y좌표가 감소한다. |
+| TC-008-04 | Restart 버튼 클릭 | 점수가 초기화되고 상태가 `running`이 된다. |
 
-## Sprint 1 Scope
+## Sprint 1 범위
 
-The first automation expansion should cover:
+첫 번째 자동화 확장은 다음 그룹을 대상으로 한다.
 
-- TC-GROUP-01 Initialization And State Management
-- TC-GROUP-02 Input And Player Behavior
-- TC-GROUP-03 Game Loop Progression
-- TC-GROUP-05 Collision And Game Over
+- TC-GROUP-01 초기화 및 상태 관리
+- TC-GROUP-02 입력 및 플레이어 동작
+- TC-GROUP-03 게임 루프 진행
+- TC-GROUP-05 충돌 및 게임오버
 
-## Harness Features Needed For Sprint 1
+## Sprint 1에 필요한 하네스 기능
 
-| Feature | Supports |
+| 기능 | 지원하는 검증 |
 | --- | --- |
-| `runForFrames(frames)` | Frame-based loop tests |
-| `runForSeconds(seconds, fps)` | Time-based loop tests |
-| `runUntil(condition, maxFrames)` | Landing and state transition tests |
-| `placeObstacleAtPlayer()` | Collision tests |
-| `getTimeline()` | Loop observation and debugging |
+| `runForFrames(frames)` | 프레임 기반 루프 테스트 |
+| `runForSeconds(seconds, fps)` | 시간 기반 루프 테스트 |
+| `runUntil(condition, maxFrames)` | 착지와 상태 전이 테스트 |
+| `placeObstacleAtPlayer()` | 충돌 테스트 |
+| `getTimeline()` | 루프 관찰과 디버깅 |

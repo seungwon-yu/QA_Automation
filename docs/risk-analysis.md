@@ -1,8 +1,8 @@
-# Risk Analysis
+# 리스크 분석
 
-| Risk | Likelihood | Impact | Test Response |
+| 리스크 | 발생 가능성 | 영향도 | 테스트 대응 |
 | --- | --- | --- | --- |
-| Jump state breaks after physics changes | Medium | High | Harness loop validates y-position and grounded state |
-| Collision detection misses edge cases | Medium | High | Forced obstacle placement validates intersection behavior |
-| Score continues after game over | Low | Medium | Add regression test for score freeze after collision |
-| Browser controls drift from engine behavior | Medium | Medium | Playwright verifies real page controls and exposed state |
+| 물리 값 변경 후 점프 상태가 깨질 수 있음 | Medium | High | 하네스 루프 테스트로 y좌표와 지면 상태를 검증한다. |
+| 충돌 판정이 경계 조건을 놓칠 수 있음 | Medium | High | 장애물을 강제로 배치해 충돌과 비충돌 조건을 검증한다. |
+| 게임오버 이후에도 점수가 증가할 수 있음 | Low | Medium | 게임오버 후 루프 진행 시 점수가 유지되는지 리그레션 테스트를 추가한다. |
+| 브라우저 조작과 엔진 동작이 어긋날 수 있음 | Medium | Medium | Playwright로 실제 버튼, 키 입력, QA 상태 패널을 검증한다. |

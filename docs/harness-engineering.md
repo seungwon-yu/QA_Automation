@@ -1,100 +1,100 @@
-# Harness Engineering Strategy
+# 하네스 엔지니어링 전략
 
-## Purpose
+## 목적
 
-This project uses harness engineering as the main automation structure.
+이 프로젝트는 하네스 엔지니어링을 게임 QA 자동화의 중심 구조로 사용한다.
 
-The harness exists so tests can control the game without depending only on manual play or visual observation. It gives automated tests a stable way to start the game, inject inputs, advance time, place obstacles, and inspect game state.
+하네스는 테스트가 수동 플레이나 화면 관찰에만 의존하지 않고 게임을 제어할 수 있도록 만든 테스트용 제어 계층이다. 테스트는 하네스를 통해 게임 시작, 입력 주입, 시간 진행, 장애물 배치, 상태 확인을 안정적으로 수행한다.
 
-## Relationship Between Harness And Loop Engineering
+## 하네스 엔지니어링과 루프 엔지니어링의 관계
 
-Harness engineering is the outer structure.
+하네스 엔지니어링은 바깥 구조이다.
 
-Loop engineering is placed inside the harness.
+루프 엔지니어링은 하네스 내부에 들어간다.
 
 ```text
-Harness Engineering
-└─ Loop Engineering
-   ├─ Frame stepping
-   ├─ Time simulation
-   ├─ State observation
-   ├─ Input injection
-   └─ Repeated behavior verification
+하네스 엔지니어링
+└─ 루프 엔지니어링
+   ├─ 프레임 진행
+   ├─ 시간 시뮬레이션
+   ├─ 상태 관찰
+   ├─ 입력 주입
+   └─ 반복 동작 검증
 ```
 
-In this project, `tests/harness/gameHarness.js` controls `src/gameEngine.js`. The harness can run the game loop by calling engine ticks directly. This lets tests verify behavior across many frames without waiting for the browser animation loop.
+이 프로젝트에서는 `tests/harness/gameHarness.js`가 `src/gameEngine.js`를 제어한다. 하네스는 엔진의 `tick`을 직접 호출해 게임 루프를 진행한다. 이를 통해 브라우저 애니메이션 루프를 기다리지 않고도 여러 프레임에 걸친 동작을 검증할 수 있다.
 
-## Harness Responsibilities
+## 하네스의 책임
 
-- Create an isolated `GameEngine` instance.
-- Make random behavior deterministic when needed.
-- Start, restart, and control the game.
-- Inject player inputs such as jump.
-- Place obstacles in controlled positions.
-- Advance the game loop by frames or seconds.
-- Return current state for assertions.
-- Record state timelines when loop behavior needs deeper analysis.
+- 격리된 `GameEngine` 인스턴스를 생성한다.
+- 필요한 경우 랜덤 동작을 결정 가능하게 만든다.
+- 게임 시작, 재시작, 입력을 제어한다.
+- 점프와 같은 플레이어 입력을 주입한다.
+- 장애물을 원하는 위치에 배치한다.
+- 프레임 또는 초 단위로 게임 루프를 진행한다.
+- 검증에 필요한 현재 상태를 반환한다.
+- 루프 동작 분석이 필요할 때 상태 타임라인을 기록한다.
 
-## Loop Engineering Responsibilities
+## 루프 엔지니어링의 책임
 
-- Advance the game by a fixed number of frames.
-- Simulate seconds by converting time into frame ticks.
-- Continue running until a target condition is met.
-- Stop when a maximum frame count is reached.
-- Compare state before, during, and after loop execution.
-- Detect unintended changes after game over or restart.
+- 고정된 프레임 수만큼 게임을 진행한다.
+- 초 단위 시간을 프레임 진행으로 변환한다.
+- 목표 조건을 만족할 때까지 루프를 진행한다.
+- 최대 프레임 수에 도달하면 루프를 중단한다.
+- 루프 실행 전, 실행 중, 실행 후 상태를 비교한다.
+- 게임오버나 재시작 이후 의도하지 않은 상태 변화를 감지한다.
 
-## Why This Matters For Game QA
+## 게임 QA에서 중요한 이유
 
-Game defects often appear over time instead of at a single input moment. Jump arcs, collision timing, score progression, speed increases, obstacle cleanup, and game-over behavior all depend on repeated loop updates.
+게임 결함은 단일 입력 순간보다 시간 흐름 속에서 드러나는 경우가 많다. 점프 궤적, 충돌 타이밍, 점수 증가, 속도 증가, 장애물 제거, 게임오버 처리는 모두 반복적인 루프 업데이트에 의존한다.
 
-Manual testing can observe these behaviors, but it is slow and hard to reproduce exactly. A harness with loop engineering makes these checks repeatable, deterministic, and suitable for regression testing.
+수동 테스트로도 이런 동작을 확인할 수 있지만 느리고 재현성이 낮다. 루프 엔지니어링을 포함한 하네스는 이 검증을 반복 가능하고 결정적이며 리그레션 테스트에 적합하게 만든다.
 
-## ISTQB Mapping
+## ISTQB 기준 매핑
 
-| Harness Activity | ISTQB Connection |
+| 하네스 활동 | ISTQB 연결 |
 | --- | --- |
-| Controlled input injection | Test implementation and execution |
-| Deterministic random values | Test data control |
-| Frame-based loop execution | Test procedure and repeatability |
-| State inspection | Test result evaluation |
-| Collision and restart checks | State transition testing |
-| Repeated game flow checks | Regression testing |
-| Risk-focused scenario selection | Risk-based testing |
+| 제어된 입력 주입 | 테스트 구현과 실행 |
+| 결정 가능한 랜덤 값 | 테스트 데이터 제어 |
+| 프레임 기반 루프 실행 | 테스트 절차와 반복 가능성 |
+| 상태 확인 | 테스트 결과 평가 |
+| 충돌과 재시작 검증 | 상태 전이 테스팅 |
+| 반복 게임 플로우 검증 | 리그레션 테스팅 |
+| 리스크 중심 시나리오 선택 | 리스크 기반 테스팅 |
 
-## Current Harness API
+## 현재 하네스 API
 
-| Method | Purpose |
+| 메서드 | 목적 |
 | --- | --- |
-| `start()` | Start the game from ready state. |
-| `pressJump()` | Inject a jump command. |
-| `restart()` | Reset and start the game again. |
-| `tick(frames, fps)` | Advance the game loop by frame count. |
-| `placeObstacleAtPlayer()` | Force a collision scenario. |
-| `getState()` | Return current game state. |
+| `start()` | 준비 상태에서 게임을 시작한다. |
+| `pressJump()` | 점프 명령을 주입한다. |
+| `restart()` | 게임을 초기화하고 다시 시작한다. |
+| `tick(frames, fps)` | 프레임 수만큼 게임 루프를 진행한다. |
+| `placeObstacleAtPlayer()` | 충돌 시나리오를 강제로 만든다. |
+| `getState()` | 현재 게임 상태를 반환한다. |
 
-## Planned Harness API
+## 추가 예정 하네스 API
 
-| Method | Purpose |
+| 메서드 | 목적 |
 | --- | --- |
-| `runForFrames(frames)` | Advance a fixed number of frames. |
-| `runForSeconds(seconds, fps)` | Advance simulated time. |
-| `runUntil(condition, maxFrames)` | Loop until a state condition is met. |
-| `placeObstacleAhead(distance)` | Place an obstacle at a controlled distance. |
-| `getTimeline()` | Return recorded frame snapshots. |
-| `clearTimeline()` | Reset recorded loop history. |
+| `runForFrames(frames)` | 고정 프레임 수만큼 진행한다. |
+| `runForSeconds(seconds, fps)` | 시뮬레이션 시간을 진행한다. |
+| `runUntil(condition, maxFrames)` | 상태 조건을 만족할 때까지 루프를 진행한다. |
+| `placeObstacleAhead(distance)` | 플레이어 앞 특정 거리에 장애물을 배치한다. |
+| `getTimeline()` | 기록된 프레임 상태를 반환한다. |
+| `clearTimeline()` | 기록된 루프 히스토리를 초기화한다. |
 
-## Design Principle
+## 설계 원칙
 
-The harness should express test intent clearly.
+하네스는 테스트 의도가 읽히도록 작성한다.
 
-Prefer this:
+권장 방식:
 
 ```js
 harness.start().pressJump().runForSeconds(1);
 ```
 
-Over this:
+피하고 싶은 방식:
 
 ```js
 for (let i = 0; i < 60; i += 1) {
@@ -102,4 +102,4 @@ for (let i = 0; i < 60; i += 1) {
 }
 ```
 
-The second example is still useful internally, but tests should read like QA scenarios.
+두 번째 방식은 하네스 내부 구현에는 사용할 수 있지만, 테스트 코드에서는 QA 시나리오처럼 읽히는 표현을 우선한다.
