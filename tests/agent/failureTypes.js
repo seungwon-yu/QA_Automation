@@ -1,0 +1,17 @@
+export const RESULT = {
+  PASS: "PASS",
+  FAIL: "FAIL"
+};
+
+export const CLASSIFICATION = {
+  PRODUCT_FAIL: "PRODUCT_FAIL",
+  TEST_FAIL: "TEST_FAIL",
+  ENV_FAIL: "ENV_FAIL",
+  REVIEW_REQUIRED: "REVIEW_REQUIRED"
+};
+
+export const DECISION = {
+  RETRY: "RETRY",
+  STOP: "STOP",
+  REVIEW: "REVIEW"
+};

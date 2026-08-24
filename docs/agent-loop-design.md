@@ -1,0 +1,160 @@
+# QA Agent Loop 설계
+
+## 목적
+
+Sprint 2의 목표는 테스트 실패가 발생했을 때 무조건 제품 결함으로 단정하지 않고, 하네스 가드레일 안에서 증거 수집, 실패 분류, 다음 행동 결정을 수행하는 실패 처리 파이프라인을 구축하는 것이다.
+
+Sprint 1은 테스트를 신뢰성 있게 실행할 수 있는 기반을 만들었다.
+
+Sprint 2는 실패를 신뢰성 있게 다루는 기반을 만든다.
+
+## Sprint 1과 Sprint 2의 구분
+
+```text
+Sprint 1
+"테스트를 신뢰성 있게 실행할 수 있는가?"
+
+Game
+ ↓
+GameHarness
+ ↓
+Unit Test / E2E
+ ↓
+PASS / FAIL
+```
+
+```text
+Sprint 2
+"실패가 발생했을 때 어떻게 처리할 것인가?"
+
+FAIL
+ ↓
+Evidence
+ ↓
+Classification
+ ↓
+Decision
+ ↓
+Retry / Stop / Review
+ ↓
+Decision Log
+```
+
+현재 프로젝트의 루프 상태는 `Loop Engineering 완료`가 아니라 `Loop 실행 기반 구축 완료`로 표현한다. `runForFrames`, `runForSeconds`, `runUntil`은 게임 루프를 결정론적으로 실행하는 기반이며, Agent Loop는 Sprint 2에서 별도로 구축한다.
+
+## 실패 처리 파이프라인
+
+```text
+Test Execution
+      │
+┌─────▼─────┐
+│   PASS?   │
+└─────┬─────┘
+      │ FAIL
+      ▼
+┌───────────────────┐
+│ EvidenceCollector │
+└─────────┬─────────┘
+          ▼
+  screenshot / log / state / timeline
+          ▼
+┌───────────────────┐
+│ FailureClassifier │
+└─────────┬─────────┘
+          ▼
+ PRODUCT_FAIL / TEST_FAIL / ENV_FAIL / REVIEW_REQUIRED
+          ▼
+┌───────────────────┐
+│  DecisionEngine   │
+└─────────┬─────────┘
+          ▼
+ RETRY / STOP / REVIEW
+          │
+    RETRY └──────────↺
+
+모든 판단은 DecisionLog에 기록한다.
+```
+
+## 책임 분리
+
+### Deterministic 영역
+
+이 영역은 AI 판단에 맡기지 않는다.
+
+- 테스트 실행
+- assertion 판정
+- 상태 수집
+- screenshot, log, state 저장
+- 최대 재시도 횟수 제한
+- PASS/FAIL 원본 결과 보존
+
+### Agent 영역
+
+이 영역은 수집된 증거 안에서만 판단한다.
+
+- 실패 증거 요약
+- 실패 유형 분류 보조
+- 재시도, 중단, 리뷰 요청 판단 보조
+- Decision Log의 판단 사유 작성
+
+Agent는 제품 코드, 요구사항, 기대결과, assertion을 변경할 수 없다.
+
+## 실패 분류
+
+| 분류 | 의미 | 예시 |
+| --- | --- | --- |
+| `PRODUCT_FAIL` | 제품 동작이 기대결과를 만족하지 못한 것으로 판단할 근거가 충분한 경우 | 충돌이 발생했지만 게임 상태가 `running`으로 유지됨 |
+| `TEST_FAIL` | 테스트 코드, locator, fixture, 하네스 사용 방식의 문제 | Playwright locator strict mode violation |
+| `ENV_FAIL` | 실행 환경 문제 | 브라우저 실행 파일 없음, 로컬 서버 연결 실패 |
+| `REVIEW_REQUIRED` | 근거가 부족해 단정할 수 없음 | assertion 실패는 있으나 state와 log가 부족함 |
+
+## 결정 유형
+
+| 결정 | 의미 |
+| --- | --- |
+| `RETRY` | 동일 조건으로 재시도한다. 최대 3회까지만 허용한다. |
+| `STOP` | 재시도하지 않고 종료한다. |
+| `REVIEW` | 사람이 검토해야 하므로 `REVIEW_REQUIRED`로 종료한다. |
+
+## Decision Log 예시
+
+```json
+{
+  "testId": "TC-COLLISION-003",
+  "attempt": 2,
+  "result": "FAIL",
+  "classification": "PRODUCT_FAIL",
+  "observations": [
+    "collision=true",
+    "gameState=running"
+  ],
+  "decision": "RETRY",
+  "reason": "제품 실패 가능성이 있으나 동일 조건 재현 확인이 필요함",
+  "nextAction": "동일 초기 상태로 테스트를 재실행한다"
+}
+```
+
+## Sprint 2 구현 범위
+
+### 이번 단계에서 구현할 것
+
+- `EvidenceCollector`
+- `FailureClassifier`
+- `DecisionEngine`
+- `DecisionLogger`
+- `AgentLoopRunner`
+- 실패 처리 파이프라인 문서화
+
+### 이번 단계에서 하지 않을 것
+
+- 게임 제품 코드 수정
+- 기존 기대결과 변경
+- 기존 assertion 완화
+- LLM 기반 자동 판단 연결
+- GitHub Actions 연결
+
+## 가드레일 연결
+
+상세한 테스트 수행 제한은 `docs/test-guardrails.md`를 따른다.
+
+Agent Loop는 가드레일을 우회하기 위한 구조가 아니라, 가드레일 안에서 실패를 안전하게 다루기 위한 구조이다.

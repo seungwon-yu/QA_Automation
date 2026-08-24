@@ -4,7 +4,7 @@
 
 `QA_Automation`은 게임 QA 자동화 포트폴리오를 위한 러너 게임 프로젝트이다.
 
-현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. 다음 핵심 작업은 의존성 취약점 대응과 Sprint 2 테스트 범위 선정이다.
+현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인 구축을 시작했다.
 
 ## 완료된 작업
 
@@ -20,6 +20,9 @@
 | 테스트 실행 환경 | 완료 | `npm install`, Vitest, Playwright Chromium 설치 완료 |
 | 테스트 실행 리포트 | 완료 | `docs/test-report.md`에 Sprint 1 실행 결과 기록 |
 | 테스트 수행 가드레일 | 완료 | 제품 코드, 기대결과, assertion 변경 금지와 실패 분류 기준 문서화 |
+| Agent Loop 설계 | 완료 | `docs/agent-loop-design.md`에 실패 처리 파이프라인 정의 |
+| Agent Loop 기본 모듈 | 진행 중 | Evidence, Classification, Decision, Log, Runner 기본 구조 추가 |
+| Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진 테스트 7개 통과 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -40,6 +43,9 @@
 | `docs/test-classification.md` | 테스트 대분류와 Sprint 1 범위 |
 | `docs/test-guardrails.md` | 테스트 수행 원칙과 실패 분류 기준 |
 | `docs/test-report.md` | 마지막 테스트 실행 결과 |
+| `docs/agent-loop-design.md` | Sprint 2 QA Agent Loop 설계 |
+| `tests/agent/` | 실패 처리 파이프라인 기본 모듈 |
+| `tests/unit/agentLoop.test.js` | Agent Loop 분류와 결정 단위 테스트 |
 
 ## 현재 자동화 구조
 
@@ -58,7 +64,15 @@
 
 ## 다음 작업 우선순위
 
-### 1순위: 의존성 취약점 대응
+### 1순위: Agent Loop 실사용 검증
+
+필요 작업:
+
+- `npm run test:agent -- npm test` 실행 결과 확인
+- 실패 테스트 샘플을 별도로 만들어 Evidence 저장 구조 검증
+- Decision Log가 면접 설명에 쓸 수 있을 정도로 읽히는지 확인
+
+### 2순위: 의존성 취약점 대응
 
 필요 작업:
 
@@ -67,7 +81,7 @@
 - breaking change가 있는 경우 별도 브랜치 또는 별도 커밋으로 처리
 - 업그레이드 후 `npm test`와 `npm run test:e2e` 재실행
 
-### 2순위: Sprint 2 후보 선정
+### 3순위: Sprint 2 기능 테스트 후보 선정
 
 필요 작업:
 
@@ -76,7 +90,7 @@
 - 리그레션 플로우 반복 테스트 추가
 - 브라우저 E2E 테스트 확장
 
-### 3순위: CI 구성
+### 4순위: CI 구성
 
 필요 작업:
 
@@ -88,6 +102,7 @@
 
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
+- Agent Loop와 Playwright 실패 증거 연동
 - GitHub Actions 또는 CI 구성
 
 ## 이어받는 방법
@@ -97,9 +112,10 @@
 3. `docs/test-classification.md`에서 Sprint 1 범위를 확인한다.
 4. `docs/harness-engineering.md`에서 추가 예정 하네스 API를 확인한다.
 5. 테스트 실행 전 `docs/test-guardrails.md`를 확인한다.
-6. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
-7. `npm audit` 결과를 기준으로 의존성 업그레이드를 검토한다.
-8. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
+6. `docs/agent-loop-design.md`에서 실패 처리 파이프라인을 확인한다.
+7. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
+8. `npm run test:agent -- npm test`로 Agent Loop 기본 동작을 확인한다.
+9. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
 
 ## 마지막 확인 상태
 
@@ -113,6 +129,8 @@
 | Sprint 1 코드 구현 | 완료 |
 | Vitest 실제 실행 | 통과 |
 | Playwright 실제 실행 | 통과 |
+| Agent Loop PASS 경로 | 통과 |
+| Agent Loop 실패 경로 | 미검증 |
 
 ## 다음 추천 커밋
 
