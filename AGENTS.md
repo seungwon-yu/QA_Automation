@@ -9,13 +9,14 @@
 
 ## 읽는 순서
 1. `README.md`에서 프로젝트 요약을 확인한다.
-2. `docs/harness-engineering.md`에서 자동화 전략을 확인한다.
-3. `docs/test-classification.md`에서 테스트 대분류를 확인한다.
-4. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
-5. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`를 확인한다.
-6. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
-7. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
-8. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
+2. `docs/project-status.md`에서 현재 진행상황과 다음 작업을 확인한다.
+3. `docs/harness-engineering.md`에서 자동화 전략을 확인한다.
+4. `docs/test-classification.md`에서 테스트 대분류를 확인한다.
+5. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
+6. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`를 확인한다.
+7. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
+8. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
+9. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
 
 ## 저장소 지도
 - `index.html`: 브라우저 진입점.
@@ -26,6 +27,7 @@
 - `tests/harness/gameHarness.js`: 엔진 제어 하네스.
 - `tests/unit/gameEngine.test.js`: 하네스 기반 루프 테스트.
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트.
+- `docs/project-status.md`: 진행상황과 다음 작업 기록.
 - `docs/`: QA와 프로젝트 지식 문서.
 
 ## 아키텍처 규칙
@@ -104,4 +106,5 @@
 이 파일은 짧은 지도 역할로 유지한다.
 상세 설명은 `docs/`에 둔다.
 테스트 전략이 바뀌면 문서도 함께 갱신한다.
+작업을 마칠 때 `docs/project-status.md`를 갱신한다.
 구현과 문서가 어긋나지 않게 관리한다.

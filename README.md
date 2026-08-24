@@ -25,6 +25,7 @@ npm run serve
 ## 프로젝트 문서
 
 - `AGENTS.md`: 이후 작업자와 에이전트를 위한 프로젝트 지도
+- `docs/project-status.md`: 현재 진행상황과 다음 작업
 - `docs/harness-engineering.md`: 하네스와 루프 엔지니어링 전략
 - `docs/test-classification.md`: 테스트 대분류와 Sprint 1 범위
 - `docs/test-plan.md`: 현재 테스트 목적, 범위, 시작 조건, 완료 조건
