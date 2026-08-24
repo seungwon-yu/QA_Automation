@@ -1,6 +1,6 @@
 # QA_Automation
 
-Runner game project built for a game QA automation portfolio.
+Automation test portfolio project built around a runner game and game QA harness.
 
 The project separates game logic from rendering so automated tests can control the game loop through a harness.
 
