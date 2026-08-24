@@ -21,6 +21,7 @@
 | `npm run test:e2e` | 통과 | `tests/e2e/runner.spec.js` 1개 테스트 통과 |
 | `npm run test:agent -- npm test` | 통과 | PASS 상황에서 `STOP` 결정과 Decision Log 기록 확인 |
 | `npm run test:agent -- node tests/agent/fixtures/testFailCommand.js` | 의도된 실패 | `TEST_FAIL`로 분류하고 재시도 없이 `STOP`, evidence 저장 확인 |
+| `npm run test:e2e:evidence` | 의도된 실패 | Playwright 실패 시 screenshot, console log, QA state 저장 확인 |
 | `npm audit --audit-level=moderate` | 실패 상태 반환 | 취약점 5개 확인, 자동 수정은 breaking change 가능 |
 
 ## Sprint 1 검증 내용
@@ -57,7 +58,11 @@
 
 의도적으로 실패하는 fixture를 이용해 `ENV_FAIL`, `TEST_FAIL`, `PRODUCT_FAIL`, `REVIEW_REQUIRED` 분류와 Retry/Stop/Review 결정 흐름을 단위 테스트로 검증했다.
 
-현재 screenshot은 브라우저 실패 컨텍스트가 아닌 경우 `screenshot.json` placeholder로 저장한다. 다음 단계에서는 Playwright 실패와 연결해 실제 screenshot 파일 저장을 검증해야 한다.
+Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json`, `state.json`, `test-info.json` 저장을 확인했다.
+
+`state.json`에는 `window.__QA_AUTOMATION__.getState()` 결과가 저장된다.
+
+브라우저 실패 컨텍스트가 아닌 Agent Loop fixture에서는 `screenshot.json` placeholder를 저장한다.
 
 ## 의존성 보안 메모
 
@@ -71,6 +76,6 @@
 
 Sprint 1의 핵심 목표인 하네스 기능 강화와 루프 실행 기반 테스트 케이스 확장은 완료되었다.
 
-Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 모듈과 실패 경로 검증을 추가했다.
+Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 모듈, 실패 경로 검증, Playwright 실패 증거 저장을 추가했다.
 
 현재 자동화 테스트는 단위 테스트, 브라우저 E2E, Agent Loop PASS 경로 모두 통과한다.

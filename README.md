@@ -22,6 +22,7 @@ npm run serve
 - `tests/unit/gameEngine.test.js`: 하네스 기반 단위 테스트
 - `tests/unit/agentLoop.test.js`: Agent Loop 실패 처리 단위 테스트
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트
+- `tests/e2e/evidence.spec.js`: Playwright 실패 증거 저장 검증용 의도된 실패 샘플
 
 ## 프로젝트 문서
 
@@ -41,4 +42,7 @@ npm run serve
 ```bash
 npm test
 npm run test:e2e
+npm run test:e2e:evidence
 ```
+
+`npm run test:e2e:evidence`는 실패 증거 저장을 확인하기 위한 의도된 실패 명령입니다.

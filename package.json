@@ -7,7 +7,8 @@
     "serve": "npx http-server . -p 4173 -c-1",
     "test": "vitest run tests/unit",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test tests/e2e/runner.spec.js",
+    "test:e2e:evidence": "playwright test tests/e2e/evidence.spec.js",
     "test:agent": "node tests/agent/agentLoopRunner.js"
   },
   "devDependencies": {

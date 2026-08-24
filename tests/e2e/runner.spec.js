@@ -1,6 +1,8 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./evidenceTest.js";
 
-test("player can start, jump, and expose QA state", async ({ page }) => {
+test("player can start, jump, and expose QA state", async ({ page, qaEvidence }) => {
+  void qaEvidence;
+
   await page.goto("/");
   await page.getByRole("button", { name: "Start", exact: true }).click();
 

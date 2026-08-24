@@ -167,6 +167,31 @@ Agent Loop 실패 경로 검증을 위해 제품 코드와 분리된 fixture를 
 
 fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드나 실제 요구사항을 변경하지 않는다.
 
+## Playwright 실패 증거 연결
+
+브라우저 E2E 실패 증거는 `tests/e2e/evidenceTest.js`에서 수집한다.
+
+일반 E2E 테스트는 `tests/e2e/runner.spec.js`만 실행한다.
+
+의도된 실패 증거 저장 검증은 `tests/e2e/evidence.spec.js`를 별도로 실행한다.
+
+| 파일 | 역할 |
+| --- | --- |
+| `tests/e2e/evidenceTest.js` | Playwright 커스텀 fixture로 실패 후 증거 저장 |
+| `tests/e2e/evidence.spec.js` | 증거 저장 검증용 의도된 실패 샘플 |
+| `artifacts/playwright-evidence/` | 실패 시 생성되는 브라우저 증거 저장 위치 |
+
+저장되는 증거는 다음과 같다.
+
+- `screenshot.png`
+- `console-log.json`
+- `state.json`
+- `test-info.json`
+
+`state.json`은 브라우저에서 `window.__QA_AUTOMATION__.getState()`를 호출해 저장한다.
+
+`npm run test:e2e:evidence`는 증거 저장을 검증하기 위한 의도된 실패 명령이다. 따라서 종료 코드 1이 발생하는 것이 정상이며, PASS/FAIL 기준을 완화하기 위한 명령이 아니다.
+
 ## 가드레일 연결
 
 상세한 테스트 수행 제한은 `docs/test-guardrails.md`를 따른다.
