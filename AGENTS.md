@@ -28,6 +28,7 @@
 - `tests/unit/gameEngine.test.js`: 하네스 기반 루프 테스트.
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트.
 - `docs/project-status.md`: 진행상황과 다음 작업 기록.
+- `docs/test-report.md`: 마지막 테스트 실행 결과.
 - `docs/`: QA와 프로젝트 지식 문서.
 
 ## 아키텍처 규칙

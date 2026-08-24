@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("player can start, jump, and expose QA state", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Start", exact: true }).click();
 
   await expect(page.locator("#state")).toHaveText("running");
 

@@ -70,19 +70,21 @@
 | `pressJump()` | 점프 명령을 주입한다. |
 | `restart()` | 게임을 초기화하고 다시 시작한다. |
 | `tick(frames, fps)` | 프레임 수만큼 게임 루프를 진행한다. |
-| `placeObstacleAtPlayer()` | 충돌 시나리오를 강제로 만든다. |
-| `getState()` | 현재 게임 상태를 반환한다. |
-
-## 추가 예정 하네스 API
-
-| 메서드 | 목적 |
-| --- | --- |
-| `runForFrames(frames)` | 고정 프레임 수만큼 진행한다. |
-| `runForSeconds(seconds, fps)` | 시뮬레이션 시간을 진행한다. |
+| `runForFrames(frames)` | 고정 프레임 수만큼 게임 루프를 진행한다. |
+| `runForSeconds(seconds, fps)` | 초 단위 시뮬레이션 시간만큼 루프를 진행한다. |
 | `runUntil(condition, maxFrames)` | 상태 조건을 만족할 때까지 루프를 진행한다. |
+| `placeObstacleAtPlayer()` | 충돌 시나리오를 강제로 만든다. |
 | `placeObstacleAhead(distance)` | 플레이어 앞 특정 거리에 장애물을 배치한다. |
 | `getTimeline()` | 기록된 프레임 상태를 반환한다. |
 | `clearTimeline()` | 기록된 루프 히스토리를 초기화한다. |
+| `getState()` | 현재 게임 상태를 반환한다. |
+
+## 추가 검토 중인 하네스 API
+
+| 메서드 | 목적 |
+| --- | --- |
+| `expectState(expected)` | 반복되는 상태 검증 표현을 줄인다. |
+| `repeatFlow(times, scenario)` | 핵심 플로우를 여러 번 반복 실행한다. |
 
 ## 설계 원칙
 
