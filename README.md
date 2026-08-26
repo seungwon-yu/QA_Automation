@@ -6,6 +6,23 @@
 
 현재 목표는 단순히 테스트를 PASS시키는 것이 아니라, 실패가 발생했을 때 `screenshot`, `console log`, `QA state`, `metadata`를 저장하고 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED`로 판단할 수 있는 QA Agent Loop 기반을 만드는 것입니다.
 
+## 프로젝트 목적
+
+이 프로젝트는 QA 자동화 프로젝트를 직접 설계하고 구현해보면서, 게임 QA에서 테스트 기준을 세우고 자동화 구조로 확장하는 과정을 연습하기 위한 학습 프로젝트입니다.
+
+특히 하네스 엔지니어링을 기반으로 게임 상태, 입력, 시간, 프레임, 충돌 조건을 테스트가 제어할 수 있게 만들고, 그 위에 Agent Loop를 연결해 실패 발생 시 증거 수집, 실패 분류, 다음 행동 결정을 수행하는 구조를 구현해보는 것이 핵심 목표입니다.
+
+이 프로젝트에서 연습하는 내용은 다음과 같습니다.
+
+- 게임 QA 관점의 테스트 대분류와 TC 작성
+- ISTQB 흐름에 맞춘 Test Condition, Expected Result, Actual Result 정리
+- 하네스를 통한 게임 상태 제어와 관찰
+- 루프 엔지니어링을 통한 프레임/시간 기반 테스트
+- Playwright 기반 브라우저 E2E 테스트
+- 실패 시 screenshot, log, state, metadata evidence 저장
+- evidence 기반 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED` 분류
+- Decision Log를 통한 판단 과정 기록
+
 ## 로컬 실행
 
 `index.html`을 브라우저에서 직접 열거나 아래 명령으로 실행합니다.
