@@ -27,6 +27,7 @@
 | Playwright 실패 증거 | 완료 | 실패 시 screenshot, console log, QA state, test info 저장 확인 |
 | Evidence 기반 판단 연결 | 완료 | 최신 Playwright evidence를 읽어 분류, 결정, Decision Log 기록 |
 | Evidence 판단 근거 metadata | 완료 | `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
+| TC 상세 기준 문서화 | 완료 | `TC-GROUP-05`, `TC-GROUP-08`의 사전 조건, 절차, 기대 결과, evidence, 실패 분류 근거 정리 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -46,6 +47,7 @@
 | `tests/e2e/server.js` | Playwright E2E 전용 정적 서버 |
 | `docs/harness-engineering.md` | 하네스와 루프 엔지니어링 전략 |
 | `docs/test-classification.md` | 테스트 대분류와 Sprint 1 범위 |
+| `docs/test-cases.md` | 상세 테스트 케이스와 evidence 판단 근거 |
 | `docs/test-guardrails.md` | 테스트 수행 원칙과 실패 분류 기준 |
 | `docs/test-report.md` | 마지막 테스트 실행 결과 |
 | `docs/agent-loop-design.md` | Sprint 2 QA Agent Loop 설계 |
@@ -108,7 +110,6 @@ Decision Log
 
 - `PRODUCT_FAIL`로 분류 가능한 실제 브라우저 실패 샘플 추가
 - 필요하면 timeline 저장 구조와 연결
-- TC-GROUP별 `classificationBasis` 작성 패턴을 문서와 테스트 케이스에 확장
 - E2E 실패에서 assertion error 상세 메시지 자동 추출 검토
 
 ### 2순위: Agent Loop 실사용 검증
@@ -158,14 +159,15 @@ Decision Log
 1. `AGENTS.md`를 먼저 읽는다.
 2. 이 문서에서 현재 진행상황을 확인한다.
 3. `docs/test-classification.md`에서 Sprint 1 범위를 확인한다.
-4. `docs/harness-engineering.md`에서 추가 예정 하네스 API를 확인한다.
-5. 테스트 실행 전 `docs/test-guardrails.md`를 확인한다.
-6. `docs/agent-loop-design.md`에서 실패 처리 파이프라인을 확인한다.
-7. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
-8. `npm run test:agent -- npm test`로 Agent Loop 기본 동작을 확인한다.
-9. `npm run test:e2e:evidence`로 의도된 Playwright 실패 증거 생성을 확인한다.
-10. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
-11. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
+4. `docs/test-cases.md`에서 상세 TC와 evidence 판단 근거를 확인한다.
+5. `docs/harness-engineering.md`에서 추가 예정 하네스 API를 확인한다.
+6. 테스트 실행 전 `docs/test-guardrails.md`를 확인한다.
+7. `docs/agent-loop-design.md`에서 실패 처리 파이프라인을 확인한다.
+8. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
+9. `npm run test:agent -- npm test`로 Agent Loop 기본 동작을 확인한다.
+10. `npm run test:e2e:evidence`로 의도된 Playwright 실패 증거 생성을 확인한다.
+11. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
+12. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
 
 ## 마지막 확인 상태
 
