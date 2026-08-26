@@ -7,7 +7,7 @@
 | 실행 날짜 | 2026-08-27 |
 | 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, 브라우저 E2E 기본 흐름, evidence metadata 판단 근거 |
 | 단위 테스트 | 통과 |
-| E2E 테스트 | 테스트 본문 통과, 프로세스 종료 지연으로 수동 중단 |
+| E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
 | 남은 주요 작업 | 실제 브라우저 PRODUCT_FAIL 샘플, timeline evidence 연결, 의존성 취약점 대응 |
 
@@ -18,7 +18,7 @@
 | `npm test` | 통과 | `tests/unit/gameEngine.test.js` 13개 테스트 통과 |
 | `npm test` | 통과 | `tests/unit/agentLoop.test.js` 13개 테스트 통과 |
 | `npm test` | 통과 | 전체 단위 테스트 26개 통과 |
-| `npm run test:e2e` | 부분 확인 | `tests/e2e/runner.spec.js` 1개 테스트 본문 통과 후 프로세스 종료 지연으로 수동 중단 |
+| `npm run test:e2e` | 통과 | `tests/e2e/runner.spec.js` 1개 테스트 통과, 명령 자동 종료 확인 |
 | `npm run test:agent -- npm test` | 통과 | PASS 상황에서 `STOP` 결정과 Decision Log 기록 확인 |
 | `npm run test:agent -- node tests/agent/fixtures/testFailCommand.js` | 의도된 실패 | `TEST_FAIL`로 분류하고 재시도 없이 `STOP`, evidence 저장 확인 |
 | `npm run test:e2e:evidence` | 의도된 실패 | Playwright 실패 시 screenshot, console log, QA state, metadata 저장 확인 |
@@ -43,7 +43,7 @@
 | Playwright 브라우저 실행 파일이 없음 | `npx playwright install chromium`으로 Chromium 설치 |
 | 1초 점수 증가 검증에서 부동소수점 누적 오차 가능성 확인 | 고정값 대신 허용 범위 검증으로 변경 |
 | 실패 당시 기록만으로 제품 실패를 단정할 근거가 부족함 | `metadata.json`에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
-| `npm run test:e2e`에서 테스트 본문 통과 후 프로세스 종료가 지연됨 | 이번 변경에서는 제품 실패로 보지 않고 후속 환경/실행 안정성 확인 작업으로 남김 |
+| `npm run test:e2e`에서 테스트 본문 통과 후 프로세스 종료가 지연됨 | E2E 전용 정적 서버를 추가하고 idle shutdown으로 서버 프로세스가 남지 않도록 조치 |
 
 ## Sprint 2 초기 검증 내용
 
@@ -56,6 +56,7 @@
 | `AgentLoopRunner` | 기본 구현 | 명령 실행 결과에 따라 분류, 결정, 로그 기록 수행 |
 | `PlaywrightEvidenceReader` | 확장 | `metadata.json`을 읽어 판단 근거를 분류기에 전달 |
 | `PlaywrightEvidenceAnalyzer` | 확장 | Decision Log에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion` 기록 |
+| `tests/e2e/server.js` | 추가 | Playwright E2E용 정적 서버를 직접 실행하고 idle shutdown으로 종료 안정성 확보 |
 
 ## Sprint 2 주의사항
 
@@ -89,4 +90,4 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 
 이후 Playwright evidence를 `FailureClassifier`, `DecisionEngine`, `DecisionLogger`와 연결했다.
 
-현재 단위 테스트와 Agent Loop evidence 분석은 통과한다. 브라우저 E2E 테스트 본문은 통과했지만 Playwright 프로세스 종료가 지연되어 수동 중단했으므로 후속 작업에서 실행 안정성을 확인한다. 의도된 실패 샘플은 실패 증거 저장과 evidence 기반 판단 연결을 검증하기 위해 별도 명령으로 실행한다.
+현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장과 evidence 기반 판단 연결을 검증하기 위해 별도 명령으로 실행한다.

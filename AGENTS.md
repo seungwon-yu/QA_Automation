@@ -33,6 +33,7 @@
 - `tests/unit/gameEngine.test.js`: 하네스 기반 루프 테스트.
 - `tests/e2e/evidenceTest.js`: Playwright 실패 증거 수집 fixture.
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트.
+- `tests/e2e/server.js`: Playwright E2E 전용 정적 서버와 종료 안정성 처리.
 - `docs/project-status.md`: 진행상황과 다음 작업 기록.
 - `docs/test-report.md`: 마지막 테스트 실행 결과.
 - `docs/test-guardrails.md`: 테스트 수행 가드레일.

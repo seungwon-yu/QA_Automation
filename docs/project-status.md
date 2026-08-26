@@ -43,6 +43,7 @@
 | `tests/harness/gameHarness.js` | 자동화 테스트용 하네스 |
 | `tests/unit/gameEngine.test.js` | 하네스 기반 단위 테스트 |
 | `tests/e2e/runner.spec.js` | 브라우저 E2E 테스트 |
+| `tests/e2e/server.js` | Playwright E2E 전용 정적 서버 |
 | `docs/harness-engineering.md` | 하네스와 루프 엔지니어링 전략 |
 | `docs/test-classification.md` | 테스트 대분류와 Sprint 1 범위 |
 | `docs/test-guardrails.md` | 테스트 수행 원칙과 실패 분류 기준 |
@@ -150,7 +151,6 @@ Decision Log
 - Sprint 2 상세 테스트 구현
 - E2E 실패 evidence에 timeline 포함
 - 실제 브라우저 실패를 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`로 더 명확히 분류하는 샘플 확장
-- Playwright 테스트 본문 통과 후 프로세스 종료가 지연되는 현상 확인
 - GitHub Actions 또는 CI 구성
 
 ## 이어받는 방법
