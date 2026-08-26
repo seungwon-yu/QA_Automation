@@ -12,12 +12,17 @@ export class PlaywrightEvidenceReader {
       available: false,
       reason: "test-info.json 파일이 없음"
     });
+    const metadata = await readOptionalJson(path.join(evidenceDir, "metadata.json"), {
+      available: false,
+      reason: "metadata.json 파일이 없음"
+    });
 
     return {
       evidenceDir,
       consoleLog,
       state,
       testInfo,
+      metadata,
       screenshotPath: testInfo.screenshotPath ?? path.join(evidenceDir, "screenshot.png")
     };
   }

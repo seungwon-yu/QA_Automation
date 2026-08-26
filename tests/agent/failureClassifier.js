@@ -52,6 +52,11 @@ export class FailureClassifier {
       return buildFail(CLASSIFICATION.PRODUCT_FAIL, "제품 기대 동작 불일치 패턴이 발견됨", output, PRODUCT_PATTERNS);
     }
 
+    const metadataResult = classifyByMetadata(context.evidence);
+    if (metadataResult) {
+      return metadataResult;
+    }
+
     if (context.evidence?.testInfo?.status === "failed") {
       return {
         result: RESULT.FAIL,
@@ -85,8 +90,9 @@ function extractEvidenceText(evidence) {
     ? JSON.stringify(evidence.state.value)
     : JSON.stringify(evidence.state ?? {});
   const testInfoText = JSON.stringify(evidence.testInfo ?? {});
+  const metadataText = JSON.stringify(evidence.metadata ?? {});
 
-  return `${consoleText}\n${stateText}\n${testInfoText}`;
+  return `${consoleText}\n${stateText}\n${testInfoText}\n${metadataText}`;
 }
 
 function buildFail(classification, reason, output, patterns) {
@@ -100,4 +106,52 @@ function buildFail(classification, reason, output, patterns) {
 
 function matchesAny(output, patterns) {
   return patterns.some((pattern) => output.includes(pattern));
+}
+
+function classifyByMetadata(evidence) {
+  const metadata = evidence?.metadata;
+
+  if (!metadata || metadata.available === false) {
+    return null;
+  }
+
+  const basis = Array.isArray(metadata.classificationBasis)
+    ? metadata.classificationBasis
+    : [];
+  const productBasis = basis.filter((item) => item.supports === CLASSIFICATION.PRODUCT_FAIL);
+
+  if (productBasis.length > 0) {
+    return {
+      result: RESULT.FAIL,
+      classification: CLASSIFICATION.PRODUCT_FAIL,
+      observations: buildMetadataObservations(metadata, productBasis),
+      reason: "metadata의 expected/actual과 대분류별 판단 근거가 제품 기대 동작 불일치를 지지함"
+    };
+  }
+
+  const reviewBasis = basis.filter((item) => item.supports === CLASSIFICATION.REVIEW_REQUIRED);
+
+  if (reviewBasis.length > 0) {
+    return {
+      result: RESULT.FAIL,
+      classification: CLASSIFICATION.REVIEW_REQUIRED,
+      observations: buildMetadataObservations(metadata, reviewBasis),
+      reason: "metadata가 제품, 테스트, 환경 실패로 단정하지 말아야 할 근거를 제공함"
+    };
+  }
+
+  return null;
+}
+
+function buildMetadataObservations(metadata, basis) {
+  const observations = [
+    `testCaseId=${metadata.testCaseId ?? "UNKNOWN"}`,
+    `testGroupId=${metadata.testGroupId ?? "UNKNOWN"}`
+  ];
+
+  for (const item of basis) {
+    observations.push(`${item.basisType ?? "basis"}: ${item.reason ?? "판단 근거 설명 없음"}`);
+  }
+
+  return observations;
 }

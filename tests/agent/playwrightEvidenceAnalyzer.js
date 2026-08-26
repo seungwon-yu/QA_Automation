@@ -28,7 +28,13 @@ export class PlaywrightEvidenceAnalyzer {
       attempt
     });
     const entry = {
-      testId: options.testId ?? evidence.testInfo.title ?? "PLAYWRIGHT-EVIDENCE",
+      testId: options.testId ?? evidence.metadata.testCaseId ?? evidence.testInfo.title ?? "PLAYWRIGHT-EVIDENCE",
+      testTitle: evidence.testInfo.title ?? null,
+      requirementId: evidence.metadata.requirementId ?? null,
+      testGroupId: evidence.metadata.testGroupId ?? null,
+      expected: evidence.metadata.expected ?? null,
+      actual: evidence.metadata.actual ?? null,
+      assertion: evidence.metadata.assertion ?? null,
       attempt,
       result: classification.result,
       classification: classification.classification,

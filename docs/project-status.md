@@ -4,7 +4,7 @@
 
 `QA_Automation`은 게임 QA 자동화 포트폴리오를 위한 러너 게임 프로젝트이다.
 
-현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인과 Playwright 실패 증거 연동까지 구현했다.
+현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장까지 구현했다.
 
 ## 완료된 작업
 
@@ -26,6 +26,7 @@
 | Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진, 실패 경로, evidence 분석 테스트 12개 통과 |
 | Playwright 실패 증거 | 완료 | 실패 시 screenshot, console log, QA state, test info 저장 확인 |
 | Evidence 기반 판단 연결 | 완료 | 최신 Playwright evidence를 읽어 분류, 결정, Decision Log 기록 |
+| Evidence 판단 근거 metadata | 완료 | `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -80,6 +81,7 @@ Evidence Fixture
 screenshot.png
 console-log.json
 state.json
+metadata.json
 test-info.json
        ↓
 Playwright Evidence Reader
@@ -93,16 +95,20 @@ Decision Log
 
 현재 구현된 연결은 실제 브라우저 실패가 발생했을 때 저장된 evidence를 읽고, 해당 증거를 기반으로 실패 유형과 다음 행동을 결정하는 단계까지이다. 판단 근거가 부족한 경우에는 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`와 `REVIEW` 결정으로 종료한다.
 
+`metadata.json`은 모든 테스트 그룹이 공유하는 공통 판단 근거 구조이다. `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`은 공통으로 저장하고, 대분류별 차이는 `classificationBasis`에 추가한다.
+
+현재 실제 Playwright evidence 샘플은 `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용이므로 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. 단위 테스트에서는 `TC-GROUP-05` 충돌 expected/actual 불일치 metadata가 `PRODUCT_FAIL`로 분류되는 경로를 검증했다.
+
 ## 다음 작업 우선순위
 
 ### 1순위: Evidence 기반 판단 고도화
 
 필요 작업:
 
-- 제품 실패 판단에 필요한 expected/actual 메타데이터 구조 정의
-- E2E 실패에서 assertion 정보와 test case ID를 evidence에 포함
 - `PRODUCT_FAIL`로 분류 가능한 실제 브라우저 실패 샘플 추가
 - 필요하면 timeline 저장 구조와 연결
+- TC-GROUP별 `classificationBasis` 작성 패턴을 문서와 테스트 케이스에 확장
+- E2E 실패에서 assertion error 상세 메시지 자동 추출 검토
 
 ### 2순위: Agent Loop 실사용 검증
 
@@ -142,8 +148,9 @@ Decision Log
 
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
-- E2E 실패 evidence에 expected/actual, test case ID, timeline 포함
+- E2E 실패 evidence에 timeline 포함
 - 실제 브라우저 실패를 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`로 더 명확히 분류하는 샘플 확장
+- Playwright 테스트 본문 통과 후 프로세스 종료가 지연되는 현상 확인
 - GitHub Actions 또는 CI 구성
 
 ## 이어받는 방법
@@ -177,14 +184,16 @@ Decision Log
 | Playwright 실제 screenshot 증거 | 통과 |
 | Playwright QA state 증거 | 통과 |
 | Playwright console log 증거 | 통과 |
+| Playwright metadata 증거 | 통과 |
 | Evidence 기반 Decision Log | 통과 |
+| metadata 기반 PRODUCT_FAIL 단위 분류 | 통과 |
 
 ## 다음 추천 커밋
 
 ```text
-Test: E2E 실패 메타데이터 확장
+Test: 브라우저 제품 실패 샘플 추가
 
-- Playwright 실패 evidence에 test case ID와 expected/actual 추가
-- 실패 판단에 필요한 assertion 메타데이터 구조 정리
-- PRODUCT_FAIL 분류가 가능한 브라우저 실패 샘플 추가
+- TC-GROUP-05 또는 TC-GROUP-08 기반 실제 브라우저 실패 샘플 추가
+- expected/actual 불일치 evidence를 PRODUCT_FAIL로 분류
+- timeline과 assertion 상세 메시지를 Decision Log에 연결
 ```

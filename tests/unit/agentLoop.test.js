@@ -45,6 +45,39 @@ describe("QA Agent Loop failure handling", () => {
     expect(result.classification).toBe(CLASSIFICATION.REVIEW_REQUIRED);
   });
 
+  it("metadata의 충돌 판단 근거로 PRODUCT_FAIL을 분류한다", () => {
+    const classifier = new FailureClassifier();
+
+    const result = classifier.classify({
+      exitCode: 1,
+      evidence: {
+        metadata: {
+          testCaseId: "TC-005-01",
+          testGroupId: "TC-GROUP-05",
+          expected: {
+            status: "gameOver"
+          },
+          actual: {
+            status: "running",
+            collision: true
+          },
+          classificationBasis: [
+            {
+              testGroupId: "TC-GROUP-05",
+              basisType: "collisionStateMismatch",
+              supports: CLASSIFICATION.PRODUCT_FAIL,
+              reason: "충돌 조건이 true인데 상태가 gameOver로 전이되지 않음"
+            }
+          ]
+        }
+      }
+    });
+
+    expect(result.classification).toBe(CLASSIFICATION.PRODUCT_FAIL);
+    expect(result.observations).toContain("testCaseId=TC-005-01");
+    expect(result.observations).toContain("testGroupId=TC-GROUP-05");
+  });
+
   it("PASS 결과는 STOP으로 결정한다", () => {
     const engine = new DecisionEngine();
 
@@ -215,6 +248,28 @@ describe("QA Agent Loop failure handling", () => {
       retry: 0,
       screenshotPath: path.join(evidenceDir, "screenshot.png")
     });
+    await writeJson(path.join(evidenceDir, "metadata.json"), {
+      testCaseId: "TC-008-EVIDENCE-001",
+      requirementId: "REQ-EVIDENCE-001",
+      testGroupId: "TC-GROUP-08",
+      expected: {
+        evidenceSaved: true
+      },
+      actual: {
+        evidenceSaved: "실패 이후 fixture에서 확인"
+      },
+      assertion: {
+        name: "Playwright 실패 증거 저장"
+      },
+      classificationBasis: [
+        {
+          testGroupId: "TC-GROUP-08",
+          basisType: "evidenceCollectionSample",
+          supports: CLASSIFICATION.REVIEW_REQUIRED,
+          reason: "의도된 실패 샘플이므로 제품, 테스트, 환경 실패로 단정하지 않음"
+        }
+      ]
+    });
     await writeFile(path.join(evidenceDir, "screenshot.png"), "fake screenshot", "utf8");
 
     const analyzer = new PlaywrightEvidenceAnalyzer({
@@ -230,6 +285,11 @@ describe("QA Agent Loop failure handling", () => {
 
     expect(entry.classification).toBe(CLASSIFICATION.REVIEW_REQUIRED);
     expect(entry.decision).toBe(DECISION.REVIEW);
+    expect(entry.testId).toBe("TC-008-EVIDENCE-001");
+    expect(entry.testGroupId).toBe("TC-GROUP-08");
+    expect(entry.expected).toEqual({
+      evidenceSaved: true
+    });
     expect(entry.evidenceDir).toBe(evidenceDir);
     expect(entry.screenshotPath).toContain("screenshot.png");
 

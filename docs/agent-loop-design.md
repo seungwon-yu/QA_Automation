@@ -186,15 +186,51 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
 - `screenshot.png`
 - `console-log.json`
 - `state.json`
+- `metadata.json`
 - `test-info.json`
 
 `state.json`은 브라우저에서 `window.__QA_AUTOMATION__.getState()`를 호출해 저장한다.
+
+`metadata.json`은 실패 기록에 판단 근거를 연결하기 위해 저장한다.
+
+공통 구조는 다음과 같다.
+
+```json
+{
+  "testCaseId": "TC-008-EVIDENCE-001",
+  "requirementId": "REQ-EVIDENCE-001",
+  "testGroupId": "TC-GROUP-08",
+  "testGroupName": "브라우저 E2E",
+  "assertion": {
+    "name": "Playwright 실패 증거 저장",
+    "message": "의도된 실패가 발생하면 screenshot, console log, QA state, test info, metadata를 저장한다."
+  },
+  "expected": {
+    "evidenceSaved": true
+  },
+  "actual": {
+    "evidenceSaved": "실패 이후 fixture에서 확인"
+  },
+  "classificationBasis": [
+    {
+      "testGroupId": "TC-GROUP-08",
+      "basisType": "evidenceCollectionSample",
+      "supports": "REVIEW_REQUIRED",
+      "reason": "의도된 실패 샘플이므로 제품, 테스트, 환경 실패로 단정하지 않는다."
+    }
+  ]
+}
+```
+
+모든 테스트 그룹을 한 번에 별도 형식으로 만들지 않는다. 대신 공통 필드인 `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`은 공유하고, `classificationBasis`에 대분류별 판단 근거를 추가한다.
+
+예를 들어 충돌 테스트인 `TC-GROUP-05`는 충돌 여부와 게임 상태 전이를 근거로 삼고, 브라우저 E2E인 `TC-GROUP-08`은 UI 조작, 브라우저 로그, QA state 노출 여부를 근거로 삼는다.
 
 `npm run test:e2e:evidence`는 증거 저장을 검증하기 위한 의도된 실패 명령이다. 따라서 종료 코드 1이 발생하는 것이 정상이며, PASS/FAIL 기준을 완화하기 위한 명령이 아니다.
 
 ## Evidence 기반 판단 연결
 
-`tests/agent/playwrightEvidenceReader.js`는 저장된 Playwright evidence 디렉터리에서 `console-log.json`, `state.json`, `test-info.json`, `screenshot.png` 경로를 읽는다.
+`tests/agent/playwrightEvidenceReader.js`는 저장된 Playwright evidence 디렉터리에서 `console-log.json`, `state.json`, `metadata.json`, `test-info.json`, `screenshot.png` 경로를 읽는다.
 
 `tests/agent/playwrightEvidenceAnalyzer.js`는 읽은 evidence를 `FailureClassifier`와 `DecisionEngine`에 전달하고, 판단 결과를 `DecisionLogger`에 기록한다.
 
@@ -206,7 +242,15 @@ npm run test:agent:evidence
 
 이 명령은 가장 최근의 `artifacts/playwright-evidence/` 디렉터리를 읽어 실패 분류와 다음 행동 결정을 수행한다.
 
-현재 의도된 실패 샘플은 제품/테스트/환경 오류로 단정할 근거가 부족하므로 `REVIEW_REQUIRED`로 분류하고 `REVIEW`로 종료한다.
+현재 의도된 실패 샘플은 `TC-GROUP-08` 브라우저 E2E evidence 저장 검증용이다. 제품 요구사항 위반을 검증하는 테스트가 아니므로 `metadata.json`의 판단 근거에 따라 `REVIEW_REQUIRED`로 분류하고 `REVIEW`로 종료한다.
+
+제품 실패 판단은 다음 조건을 만족할 때만 수행한다.
+
+- 환경 오류 패턴이 없어야 한다.
+- 테스트 코드 오류 패턴이 없어야 한다.
+- `testCaseId`와 `testGroupId`가 있어야 한다.
+- `expected`와 `actual`의 차이가 제품 요구사항과 연결되어야 한다.
+- `classificationBasis`가 `PRODUCT_FAIL`을 명시적으로 지지해야 한다.
 
 ## 가드레일 연결
 

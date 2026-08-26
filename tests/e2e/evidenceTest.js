@@ -5,6 +5,9 @@ import path from "node:path";
 export const test = base.extend({
   qaEvidence: async ({ page }, use, testInfo) => {
     const consoleMessages = [];
+    const metadata = {
+      classificationBasis: []
+    };
 
     page.on("console", (message) => {
       consoleMessages.push({
@@ -15,7 +18,13 @@ export const test = base.extend({
     });
 
     await use({
-      consoleMessages
+      consoleMessages,
+      setMetadata(nextMetadata) {
+        Object.assign(metadata, nextMetadata);
+      },
+      addClassificationBasis(nextBasis) {
+        metadata.classificationBasis.push(nextBasis);
+      }
     });
 
     if (testInfo.status === testInfo.expectedStatus) {
@@ -54,6 +63,7 @@ export const test = base.extend({
 
     await writeJson(path.join(evidenceDir, "console-log.json"), consoleMessages);
     await writeJson(path.join(evidenceDir, "state.json"), state);
+    await writeJson(path.join(evidenceDir, "metadata.json"), normalizeMetadata(metadata));
     await writeJson(path.join(evidenceDir, "test-info.json"), {
       title: testInfo.title,
       status: testInfo.status,
@@ -74,4 +84,18 @@ async function writeJson(filePath, value) {
 
 function sanitize(value) {
   return value.replace(/[^a-zA-Z0-9가-힣_-]/g, "_");
+}
+
+function normalizeMetadata(metadata) {
+  return {
+    testCaseId: metadata.testCaseId ?? null,
+    requirementId: metadata.requirementId ?? null,
+    testGroupId: metadata.testGroupId ?? null,
+    testGroupName: metadata.testGroupName ?? null,
+    assertion: metadata.assertion ?? null,
+    expected: metadata.expected ?? null,
+    actual: metadata.actual ?? null,
+    classificationBasis: metadata.classificationBasis ?? [],
+    notes: metadata.notes ?? []
+  };
 }

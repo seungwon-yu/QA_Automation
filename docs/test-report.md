@@ -4,25 +4,25 @@
 
 | 항목 | 결과 |
 | --- | --- |
-| 실행 날짜 | 2026-08-25 |
-| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, 브라우저 E2E 기본 흐름 |
+| 실행 날짜 | 2026-08-27 |
+| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, 브라우저 E2E 기본 흐름, evidence metadata 판단 근거 |
 | 단위 테스트 | 통과 |
-| E2E 테스트 | 통과 |
+| E2E 테스트 | 테스트 본문 통과, 프로세스 종료 지연으로 수동 중단 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | 실패 샘플 기반 Evidence 검증, 의존성 취약점 대응 |
+| 남은 주요 작업 | 실제 브라우저 PRODUCT_FAIL 샘플, timeline evidence 연결, 의존성 취약점 대응 |
 
 ## 실행 명령과 결과
 
 | 명령 | 결과 | 비고 |
 | --- | --- | --- |
 | `npm test` | 통과 | `tests/unit/gameEngine.test.js` 13개 테스트 통과 |
-| `npm test` | 통과 | `tests/unit/agentLoop.test.js` 11개 테스트 통과 |
-| `npm test` | 통과 | 전체 단위 테스트 25개 통과 |
-| `npm run test:e2e` | 통과 | `tests/e2e/runner.spec.js` 1개 테스트 통과 |
+| `npm test` | 통과 | `tests/unit/agentLoop.test.js` 13개 테스트 통과 |
+| `npm test` | 통과 | 전체 단위 테스트 26개 통과 |
+| `npm run test:e2e` | 부분 확인 | `tests/e2e/runner.spec.js` 1개 테스트 본문 통과 후 프로세스 종료 지연으로 수동 중단 |
 | `npm run test:agent -- npm test` | 통과 | PASS 상황에서 `STOP` 결정과 Decision Log 기록 확인 |
 | `npm run test:agent -- node tests/agent/fixtures/testFailCommand.js` | 의도된 실패 | `TEST_FAIL`로 분류하고 재시도 없이 `STOP`, evidence 저장 확인 |
-| `npm run test:e2e:evidence` | 의도된 실패 | Playwright 실패 시 screenshot, console log, QA state 저장 확인 |
-| `npm run test:agent:evidence` | 의도된 실패 분석 | 최신 Playwright evidence를 읽어 `REVIEW_REQUIRED`와 `REVIEW` 결정 기록 |
+| `npm run test:e2e:evidence` | 의도된 실패 | Playwright 실패 시 screenshot, console log, QA state, metadata 저장 확인 |
+| `npm run test:agent:evidence` | 의도된 실패 분석 | 최신 Playwright evidence를 읽어 `TC-GROUP-08`, expected/actual, assertion, `REVIEW_REQUIRED`, `REVIEW` 결정 기록 |
 | `npm audit --audit-level=moderate` | 실패 상태 반환 | 취약점 5개 확인, 자동 수정은 breaking change 가능 |
 
 ## Sprint 1 검증 내용
@@ -42,6 +42,8 @@
 | Playwright가 `Start` 버튼을 찾을 때 `Restart`도 함께 매칭함 | E2E 테스트에서 `exact: true` 옵션을 사용해 정확한 버튼만 선택 |
 | Playwright 브라우저 실행 파일이 없음 | `npx playwright install chromium`으로 Chromium 설치 |
 | 1초 점수 증가 검증에서 부동소수점 누적 오차 가능성 확인 | 고정값 대신 허용 범위 검증으로 변경 |
+| 실패 당시 기록만으로 제품 실패를 단정할 근거가 부족함 | `metadata.json`에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
+| `npm run test:e2e`에서 테스트 본문 통과 후 프로세스 종료가 지연됨 | 이번 변경에서는 제품 실패로 보지 않고 후속 환경/실행 안정성 확인 작업으로 남김 |
 
 ## Sprint 2 초기 검증 내용
 
@@ -52,6 +54,8 @@
 | `DecisionEngine` | 기본 구현 | PASS, RETRY, STOP, REVIEW 결정 테스트 통과 |
 | `DecisionLogger` | 기본 구현 | Decision Log와 요약 파일 저장 구조 추가 |
 | `AgentLoopRunner` | 기본 구현 | 명령 실행 결과에 따라 분류, 결정, 로그 기록 수행 |
+| `PlaywrightEvidenceReader` | 확장 | `metadata.json`을 읽어 판단 근거를 분류기에 전달 |
+| `PlaywrightEvidenceAnalyzer` | 확장 | Decision Log에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion` 기록 |
 
 ## Sprint 2 주의사항
 
@@ -59,9 +63,13 @@
 
 의도적으로 실패하는 fixture를 이용해 `ENV_FAIL`, `TEST_FAIL`, `PRODUCT_FAIL`, `REVIEW_REQUIRED` 분류와 Retry/Stop/Review 결정 흐름을 단위 테스트로 검증했다.
 
-Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json`, `state.json`, `test-info.json` 저장을 확인했다.
+Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json`, `state.json`, `metadata.json`, `test-info.json` 저장을 확인했다.
 
 `state.json`에는 `window.__QA_AUTOMATION__.getState()` 결과가 저장된다.
+
+`metadata.json`에는 실패 판단 근거가 저장된다. 공통 필드는 `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`이며, 대분류별 판단 차이는 `classificationBasis`에 기록한다.
+
+현재 Playwright 의도 실패 샘플은 `TC-GROUP-08` 증거 저장 검증용이므로 제품 요구사항 위반으로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다.
 
 브라우저 실패 컨텍스트가 아닌 Agent Loop fixture에서는 `screenshot.json` placeholder를 저장한다.
 
@@ -81,4 +89,4 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 
 이후 Playwright evidence를 `FailureClassifier`, `DecisionEngine`, `DecisionLogger`와 연결했다.
 
-현재 자동화 테스트는 단위 테스트, 브라우저 E2E, Agent Loop PASS 경로 모두 통과한다. 의도된 실패 샘플은 실패 증거 저장과 evidence 기반 판단 연결을 검증하기 위해 별도 명령으로 실행한다.
+현재 단위 테스트와 Agent Loop evidence 분석은 통과한다. 브라우저 E2E 테스트 본문은 통과했지만 Playwright 프로세스 종료가 지연되어 수동 중단했으므로 후속 작업에서 실행 안정성을 확인한다. 의도된 실패 샘플은 실패 증거 저장과 evidence 기반 판단 연결을 검증하기 위해 별도 명령으로 실행한다.
