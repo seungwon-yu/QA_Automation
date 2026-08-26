@@ -32,7 +32,8 @@ npm run serve
 - `docs/agent-loop-design.md`: Sprint 2 QA Agent Loop 설계
 - `docs/test-classification.md`: 테스트 대분류와 Sprint 1 범위
 - `docs/test-plan.md`: 현재 테스트 목적, 범위, 시작 조건, 완료 조건
-- `docs/test-cases.md`: 현재 세부 테스트 케이스
+- `docs/test-cases.md`: 테스트 케이스 목차와 공통 metadata 기준
+- `docs/test-cases/`: 대분류별 테스트 케이스 상세 문서
 - `docs/risk-analysis.md`: 제품 리스크와 테스트 대응
 - `docs/test-guardrails.md`: 테스트 수행 중 지켜야 할 가드레일
 - `docs/test-report.md`: 테스트 실행 결과와 남은 작업
