@@ -93,12 +93,14 @@ test-info.json
 npm test
 npm run test:e2e
 npm run test:e2e:evidence
+npm run test:e2e:product-fail-evidence
 npm run test:agent:evidence
 ```
 
 `npm test`는 Vitest 기반 단위 테스트를 실행합니다.
 `npm run test:e2e`는 Playwright 기반 정상 브라우저 E2E를 실행합니다.
 `npm run test:e2e:evidence`는 실패 증거 저장을 확인하기 위한 의도된 실패 명령입니다.
+`npm run test:e2e:product-fail-evidence`는 `TC-005-01` 기준 PRODUCT_FAIL evidence 분류를 확인하기 위한 의도된 실패 명령입니다.
 `npm run test:agent:evidence`는 저장된 Playwright evidence를 읽어 실패 분류와 다음 행동 결정을 기록합니다.
 
 ## 현재 TC 문서 구조
@@ -121,4 +123,4 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 문서화된 `TC-005-01` 충돌 및 게임오버 기준을 실제 Playwright evidence 샘플에 연결해, 브라우저 실패 evidence가 `PRODUCT_FAIL`로 분류되는 흐름을 구현하는 것입니다.
+다음 작업은 Playwright 실패 evidence에 `timeline.json`을 연결하고, assertion error 상세 메시지를 metadata 또는 Decision Log에 자동으로 포함하는 것입니다.

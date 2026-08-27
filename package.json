@@ -9,6 +9,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test tests/e2e/runner.spec.js",
     "test:e2e:evidence": "playwright test tests/e2e/evidence.spec.js",
+    "test:e2e:product-fail-evidence": "playwright test tests/e2e/productFailEvidence.spec.js",
     "test:agent": "node tests/agent/agentLoopRunner.js",
     "test:agent:evidence": "node tests/agent/analyzePlaywrightEvidence.js"
   },

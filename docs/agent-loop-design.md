@@ -228,6 +228,8 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
 
 `npm run test:e2e:evidence`는 증거 저장을 검증하기 위한 의도된 실패 명령이다. 따라서 종료 코드 1이 발생하는 것이 정상이며, PASS/FAIL 기준을 완화하기 위한 명령이 아니다.
 
+`npm run test:e2e:product-fail-evidence`는 `TC-005-01` 기준 PRODUCT_FAIL 분류 흐름을 검증하기 위한 의도된 실패 명령이다. 제품 코드를 수정하지 않고 metadata의 expected/actual과 `classificationBasis`를 통해 Agent Loop가 `PRODUCT_FAIL`을 기록하는지 확인한다.
+
 ## Evidence 기반 판단 연결
 
 `tests/agent/playwrightEvidenceReader.js`는 저장된 Playwright evidence 디렉터리에서 `console-log.json`, `state.json`, `metadata.json`, `test-info.json`, `screenshot.png` 경로를 읽는다.
@@ -243,6 +245,8 @@ npm run test:agent:evidence
 이 명령은 가장 최근의 `artifacts/playwright-evidence/` 디렉터리를 읽어 실패 분류와 다음 행동 결정을 수행한다.
 
 현재 의도된 실패 샘플은 `TC-GROUP-08` 브라우저 E2E evidence 저장 검증용이다. 제품 요구사항 위반을 검증하는 테스트가 아니므로 `metadata.json`의 판단 근거에 따라 `REVIEW_REQUIRED`로 분류하고 `REVIEW`로 종료한다.
+
+`TC-005-01` PRODUCT_FAIL 샘플은 충돌 조건이 true일 때 expected status를 `gameOver`, actual status를 `running`으로 기록한다. 이 샘플은 실제 제품 결함 보고가 아니라, 하네스 가드레일 안에서 evidence 기반 제품 실패 분류가 동작하는지 검증하기 위한 테스트 전용 실패 샘플이다.
 
 제품 실패 판단은 다음 조건을 만족할 때만 수행한다.
 

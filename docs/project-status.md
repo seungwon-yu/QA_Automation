@@ -29,6 +29,7 @@
 | Playwright 실패 증거 | 완료 | 실패 시 screenshot, console log, QA state, test info 저장 확인 |
 | Evidence 기반 판단 연결 | 완료 | 최신 Playwright evidence를 읽어 분류, 결정, Decision Log 기록 |
 | Evidence 판단 근거 metadata | 완료 | `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
+| 브라우저 PRODUCT_FAIL 샘플 | 완료 | `TC-005-01` 기준 Playwright evidence를 `PRODUCT_FAIL`로 분류하고 Decision Log 기록 |
 | TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 대분류별 TC 문서 분리, `TC-GROUP-05`, `TC-GROUP-08` 상세화 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
@@ -46,6 +47,7 @@
 | `tests/harness/gameHarness.js` | 자동화 테스트용 하네스 |
 | `tests/unit/gameEngine.test.js` | 하네스 기반 단위 테스트 |
 | `tests/e2e/runner.spec.js` | 브라우저 E2E 테스트 |
+| `tests/e2e/productFailEvidence.spec.js` | `TC-005-01` PRODUCT_FAIL evidence 의도 실패 샘플 |
 | `tests/e2e/server.js` | Playwright E2E 전용 정적 서버 |
 | `docs/harness-engineering.md` | 하네스와 루프 엔지니어링 전략 |
 | `docs/test-classification.md` | 테스트 대분류와 Sprint 1 범위 |
@@ -103,7 +105,7 @@ Decision Log
 
 `metadata.json`은 모든 테스트 그룹이 공유하는 공통 판단 근거 구조이다. `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`은 공통으로 저장하고, 대분류별 차이는 `classificationBasis`에 추가한다.
 
-현재 실제 Playwright evidence 샘플은 `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용이므로 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. 단위 테스트에서는 `TC-GROUP-05` 충돌 expected/actual 불일치 metadata가 `PRODUCT_FAIL`로 분류되는 경로를 검증했다.
+현재 Playwright evidence 샘플은 두 갈래로 구성되어 있다. `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용 샘플은 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 의도 실패 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다.
 
 ## 다음 작업 우선순위
 
@@ -111,7 +113,6 @@ Decision Log
 
 필요 작업:
 
-- `PRODUCT_FAIL`로 분류 가능한 실제 브라우저 실패 샘플 추가
 - 필요하면 timeline 저장 구조와 연결
 - E2E 실패에서 assertion error 상세 메시지 자동 추출 검토
 
@@ -154,7 +155,7 @@ Decision Log
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
 - E2E 실패 evidence에 timeline 포함
-- 실제 브라우저 실패를 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`로 더 명확히 분류하는 샘플 확장
+- 실제 브라우저 실패를 `TEST_FAIL`, `ENV_FAIL`로 더 명확히 분류하는 샘플 확장
 - GitHub Actions 또는 CI 구성
 
 ## 이어받는 방법
@@ -193,13 +194,14 @@ Decision Log
 | Playwright metadata 증거 | 통과 |
 | Evidence 기반 Decision Log | 통과 |
 | metadata 기반 PRODUCT_FAIL 단위 분류 | 통과 |
+| Playwright PRODUCT_FAIL evidence 분류 | 통과 |
 
 ## 다음 추천 커밋
 
 ```text
-Test: 브라우저 제품 실패 샘플 추가
+Test: Playwright timeline evidence 연결
 
-- TC-GROUP-05 또는 TC-GROUP-08 기반 실제 브라우저 실패 샘플 추가
-- expected/actual 불일치 evidence를 PRODUCT_FAIL로 분류
-- timeline과 assertion 상세 메시지를 Decision Log에 연결
+- Playwright 실패 시 timeline.json 저장
+- TC metadata와 timeline을 Decision Log에 연결
+- assertion 상세 메시지 자동 추출 검토
 ```

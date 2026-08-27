@@ -9,7 +9,7 @@
 | 단위 테스트 | 통과 |
 | E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | 실제 브라우저 PRODUCT_FAIL 샘플, timeline evidence 연결, 의존성 취약점 대응 |
+| 남은 주요 작업 | timeline evidence 연결, assertion 상세 메시지 자동 추출, 의존성 취약점 대응 |
 
 ## 실행 명령과 결과
 
@@ -22,7 +22,8 @@
 | `npm run test:agent -- npm test` | 통과 | PASS 상황에서 `STOP` 결정과 Decision Log 기록 확인 |
 | `npm run test:agent -- node tests/agent/fixtures/testFailCommand.js` | 의도된 실패 | `TEST_FAIL`로 분류하고 재시도 없이 `STOP`, evidence 저장 확인 |
 | `npm run test:e2e:evidence` | 의도된 실패 | Playwright 실패 시 screenshot, console log, QA state, metadata 저장 확인 |
-| `npm run test:agent:evidence` | 의도된 실패 분석 | 최신 Playwright evidence를 읽어 `TC-GROUP-08`, expected/actual, assertion, `REVIEW_REQUIRED`, `REVIEW` 결정 기록 |
+| `npm run test:e2e:product-fail-evidence` | 의도된 실패 | `TC-005-01` expected/actual 불일치 metadata 저장 확인 |
+| `npm run test:agent:evidence` | 의도된 실패 분석 | 최신 Playwright evidence를 읽어 `TC-005-01`, expected/actual, assertion, `PRODUCT_FAIL`, `RETRY` 결정 기록 |
 | `npm audit --audit-level=moderate` | 실패 상태 반환 | 취약점 5개 확인, 자동 수정은 breaking change 가능 |
 
 ## Sprint 1 검증 내용
@@ -57,6 +58,7 @@
 | `PlaywrightEvidenceReader` | 확장 | `metadata.json`을 읽어 판단 근거를 분류기에 전달 |
 | `PlaywrightEvidenceAnalyzer` | 확장 | Decision Log에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion` 기록 |
 | `tests/e2e/server.js` | 추가 | Playwright E2E용 정적 서버를 직접 실행하고 idle shutdown으로 종료 안정성 확보 |
+| `tests/e2e/productFailEvidence.spec.js` | 추가 | `TC-005-01` 기준 PRODUCT_FAIL evidence 샘플 생성 |
 
 ## Sprint 2 주의사항
 
@@ -70,7 +72,7 @@ Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json
 
 `metadata.json`에는 실패 판단 근거가 저장된다. 공통 필드는 `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`이며, 대분류별 판단 차이는 `classificationBasis`에 기록한다.
 
-현재 Playwright 의도 실패 샘플은 `TC-GROUP-08` 증거 저장 검증용이므로 제품 요구사항 위반으로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다.
+현재 Playwright 의도 실패 샘플은 두 종류이다. `TC-GROUP-08` 증거 저장 검증용은 제품 요구사항 위반으로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다.
 
 브라우저 실패 컨텍스트가 아닌 Agent Loop fixture에서는 `screenshot.json` placeholder를 저장한다.
 
@@ -90,4 +92,4 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 
 이후 Playwright evidence를 `FailureClassifier`, `DecisionEngine`, `DecisionLogger`와 연결했다.
 
-현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장과 evidence 기반 판단 연결을 검증하기 위해 별도 명령으로 실행한다.
+현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.
