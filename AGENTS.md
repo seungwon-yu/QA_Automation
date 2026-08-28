@@ -12,13 +12,14 @@
 2. `docs/project-status.md`에서 현재 진행상황과 다음 작업을 확인한다.
 3. `docs/harness-engineering.md`에서 자동화 전략을 확인한다.
 4. `docs/agent-loop-design.md`에서 Sprint 2 실패 처리 파이프라인을 확인한다.
-5. `docs/test-classification.md`에서 테스트 대분류를 확인한다.
-6. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
-7. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`와 `docs/test-cases/`의 대분류별 문서를 확인한다.
-8. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
-9. 테스트를 실행하기 전에 `docs/test-guardrails.md`를 확인한다.
-10. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
-11. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
+5. `docs/agent-loop-runbook.md`에서 Agent Loop 실행 명령과 결과 해석을 확인한다.
+6. `docs/test-classification.md`에서 테스트 대분류를 확인한다.
+7. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
+8. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`와 `docs/test-cases/`의 대분류별 문서를 확인한다.
+9. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
+10. 테스트를 실행하기 전에 `docs/test-guardrails.md`를 확인한다.
+11. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
+12. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
 
 ## 저장소 지도
 - `index.html`: 브라우저 진입점.
@@ -38,6 +39,7 @@
 - `docs/test-report.md`: 마지막 테스트 실행 결과.
 - `docs/test-guardrails.md`: 테스트 수행 가드레일.
 - `docs/agent-loop-design.md`: QA Agent Loop 설계.
+- `docs/agent-loop-runbook.md`: Agent Loop 실행 명령과 결과 해석.
 - `docs/test-cases/`: 대분류별 테스트 케이스 상세 문서.
 - `docs/`: QA와 프로젝트 지식 문서.
 

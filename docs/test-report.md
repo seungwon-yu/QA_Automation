@@ -9,7 +9,7 @@
 | 단위 테스트 | 통과 |
 | E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | Agent Loop 실사용 검증 문서 예시 보강, Markdown 리포트 자동 생성, 의존성 취약점 대응 |
+| 남은 주요 작업 | 의존성 취약점 대응, Sprint 2 기능 테스트 후보 선정, Markdown 리포트 자동 생성 |
 
 ## 실행 명령과 결과
 
@@ -61,6 +61,7 @@
 | `DecisionLogger` | 기본 구현 | Decision Log와 요약 파일 저장 구조 추가 |
 | `AgentLoopRunner` | 기본 구현 | 명령 실행 결과에 따라 분류, 결정, 로그 기록 수행 |
 | `RetryEvidenceComparator` | 추가 | attempt별 실패 일관성과 재현성 요약 기록 |
+| `docs/agent-loop-runbook.md` | 추가 | Agent Loop 실행 명령과 결과 해석 문서화 |
 | `PlaywrightEvidenceReader` | 확장 | `metadata.json`을 읽어 판단 근거를 분류기에 전달 |
 | `PlaywrightEvidenceAnalyzer` | 확장 | Decision Log에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `failedCriteria`, `timelineSummary`, `comparison`, `assertionError`, `failureSummary` 기록 |
 | `tests/e2e/server.js` | 추가 | Playwright E2E용 정적 서버를 직접 실행하고 idle shutdown으로 종료 안정성 확보 |
@@ -89,6 +90,8 @@ Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json
 `TC-008-07` 샘플의 Agent 분석 결과는 `ENV_FAIL`과 `RETRY`이다. 실패 기준은 브라우저 E2E 테스트가 테스트 대상 서버에 접속할 수 있어야 한다는 것이고, 실제 결과는 `ERR_CONNECTION_REFUSED`이다.
 
 `RetryEvidenceComparator`는 Agent Loop 재시도 결과를 비교한다. `PRODUCT_FAIL` fixture를 실행한 결과, 3회 모두 동일 분류와 동일 observation이 반복되어 `REPRODUCED_3_OF_3`으로 요약되었다.
+
+`docs/agent-loop-runbook.md`에는 PASS, TEST_FAIL, PRODUCT_FAIL, ENV_FAIL, REVIEW_REQUIRED 실행 명령과 기대 분류, 기대 결정, 해석 방법을 정리했다.
 
 브라우저 실패 컨텍스트가 아닌 Agent Loop fixture에서는 `screenshot.json` placeholder를 저장한다.
 
@@ -119,5 +122,7 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 이후 Playwright 원본 assertion error를 `assertion-error.json`으로 저장하고, 코드 위치가 아닌 QA 평가 기준 중심의 `failureSummary`를 Decision Log에 추가했다.
 
 이후 retry attempt별 실패 일관성을 비교하는 `RetryEvidenceComparator`를 추가하고, `AgentLoopRunner` summary에 `retryEvidenceComparison`을 기록했다.
+
+이후 Agent Loop를 실제로 실행하고 해석하는 방법을 `docs/agent-loop-runbook.md`에 정리했다.
 
 현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.

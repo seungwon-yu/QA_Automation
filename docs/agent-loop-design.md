@@ -376,3 +376,5 @@ npm run test:agent:evidence
 상세한 테스트 수행 제한은 `docs/test-guardrails.md`를 따른다.
 
 Agent Loop는 가드레일을 우회하기 위한 구조가 아니라, 가드레일 안에서 실패를 안전하게 다루기 위한 구조이다.
+
+실제 실행 명령과 결과 해석은 `docs/agent-loop-runbook.md`를 따른다.

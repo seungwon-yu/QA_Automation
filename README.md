@@ -92,6 +92,7 @@ assertion-error.json
 - `docs/project-status.md`: 현재 진행상황과 다음 작업
 - `docs/harness-engineering.md`: 하네스와 루프 엔지니어링 전략
 - `docs/agent-loop-design.md`: Sprint 2 QA Agent Loop 설계
+- `docs/agent-loop-runbook.md`: Agent Loop 실행 명령과 결과 해석
 - `docs/test-classification.md`: 테스트 대분류와 Sprint 1 범위
 - `docs/test-plan.md`: 현재 테스트 목적, 범위, 시작 조건, 완료 조건
 - `docs/test-cases.md`: 테스트 케이스 목차와 공통 metadata 기준
@@ -140,6 +141,6 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 Agent Loop 실사용 검증 흐름을 정리하고, 실패 fixture 실행 결과를 문서 예시로 보강하는 것입니다.
+다음 작업은 의존성 취약점 대응 여부를 검토하거나, Sprint 2 기능 테스트 후보를 선정하는 것입니다.
 
 추후 evidence 구조가 충분히 안정되면 JSON evidence와 Decision Log를 기반으로 사람이 읽기 좋은 Markdown 테스트 리포트를 자동 생성하는 작업을 진행할 예정입니다.

@@ -26,6 +26,7 @@
 | Agent Loop 기본 모듈 | 완료 | Evidence, Classification, Decision, Log, Runner 기본 구조 추가 |
 | Agent Loop 실패 fixture | 완료 | ENV, TEST, PRODUCT, REVIEW_REQUIRED 실패 샘플 추가 |
 | Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진, 실패 경로, evidence 분석, retry 비교 테스트 통과 |
+| Agent Loop 실사용 Runbook | 완료 | PASS/TEST_FAIL/PRODUCT_FAIL/ENV_FAIL/REVIEW_REQUIRED 실행 명령과 해석 문서화 |
 | Retry Evidence Comparator | 완료 | attempt별 실패 분류와 failureSummary 일관성 비교, 재현성 요약 저장 |
 | Playwright 실패 증거 | 완료 | 실패 시 screenshot, console log, QA state, test info 저장 확인 |
 | Evidence 기반 판단 연결 | 완료 | 최신 Playwright evidence를 읽어 분류, 결정, Decision Log 기록 |
@@ -63,6 +64,7 @@
 | `docs/test-guardrails.md` | 테스트 수행 원칙과 실패 분류 기준 |
 | `docs/test-report.md` | 마지막 테스트 실행 결과 |
 | `docs/agent-loop-design.md` | Sprint 2 QA Agent Loop 설계 |
+| `docs/agent-loop-runbook.md` | Agent Loop 실행 명령과 결과 해석 |
 | `tests/agent/` | 실패 처리 파이프라인 기본 모듈 |
 | `tests/agent/retryEvidenceComparator.js` | 재시도 attempt별 실패 일관성 비교 |
 | `tests/agent/fixtures/` | 실패 분류 검증용 샘플 명령 |
@@ -129,15 +131,7 @@ Decision Log
 
 ## 다음 작업 우선순위
 
-### 1순위: Agent Loop 실사용 검증
-
-필요 작업:
-
-- `npm run test:agent -- npm test`를 정기 실행 경로로 정리
-- 실패 fixture 실행 결과를 문서 예시로 정리
-- Decision Log가 면접 설명에 쓸 수 있을 정도로 읽히는지 확인
-
-### 2순위: 의존성 취약점 대응
+### 1순위: 의존성 취약점 대응
 
 필요 작업:
 
@@ -146,7 +140,7 @@ Decision Log
 - breaking change가 있는 경우 별도 브랜치 또는 별도 커밋으로 처리
 - 업그레이드 후 `npm test`와 `npm run test:e2e` 재실행
 
-### 3순위: Sprint 2 기능 테스트 후보 선정
+### 2순위: Sprint 2 기능 테스트 후보 선정
 
 필요 작업:
 
@@ -155,7 +149,7 @@ Decision Log
 - 리그레션 플로우 반복 테스트 추가
 - 브라우저 E2E 테스트 확장
 
-### 4순위: CI 구성
+### 3순위: CI 구성
 
 필요 작업:
 
@@ -163,7 +157,7 @@ Decision Log
 - Playwright E2E 실행 여부 결정
 - 테스트 리포트 산출물 업로드 검토
 
-### 5순위: Markdown 리포트 자동 생성
+### 4순위: Markdown 리포트 자동 생성
 
 필요 작업:
 
@@ -176,7 +170,6 @@ Decision Log
 
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
-- Agent Loop 실사용 검증 문서 예시 보강
 - JSON evidence 기반 Markdown 리포트 자동 생성
 - GitHub Actions 또는 CI 구성
 
@@ -190,13 +183,14 @@ Decision Log
 6. `docs/harness-engineering.md`에서 추가 예정 하네스 API를 확인한다.
 7. 테스트 실행 전 `docs/test-guardrails.md`를 확인한다.
 8. `docs/agent-loop-design.md`에서 실패 처리 파이프라인을 확인한다.
-9. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
-10. `npm run test:agent -- npm test`로 Agent Loop 기본 동작을 확인한다.
-11. `npm run test:e2e:evidence`로 의도된 Playwright 실패 증거 생성을 확인한다.
-12. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
-13. `npm run test:e2e:test-fail-evidence`로 TEST_FAIL evidence 생성을 확인한다.
-14. `npm run test:e2e:env-fail-evidence`로 ENV_FAIL evidence 생성을 확인한다.
-15. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
+9. `docs/agent-loop-runbook.md`에서 Agent Loop 실행 명령과 결과 해석을 확인한다.
+10. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
+11. `npm run test:agent -- npm test`로 Agent Loop 기본 동작을 확인한다.
+12. `npm run test:e2e:evidence`로 의도된 Playwright 실패 증거 생성을 확인한다.
+13. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
+14. `npm run test:e2e:test-fail-evidence`로 TEST_FAIL evidence 생성을 확인한다.
+15. `npm run test:e2e:env-fail-evidence`로 ENV_FAIL evidence 생성을 확인한다.
+16. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
 
 ## 마지막 확인 상태
 
@@ -212,6 +206,7 @@ Decision Log
 | Playwright 실제 실행 | 통과 |
 | Agent Loop PASS 경로 | 통과 |
 | Agent Loop 실패 경로 | 통과 |
+| Agent Loop 실사용 Runbook | 통과 |
 | Playwright 실제 screenshot 증거 | 통과 |
 | Playwright QA state 증거 | 통과 |
 | Playwright console log 증거 | 통과 |
@@ -228,9 +223,9 @@ Decision Log
 ## 다음 추천 커밋
 
 ```text
-Test: Retry evidence 비교 구조 추가
+Docs: Agent Loop 실행 Runbook 추가
 
-- attempt별 실패 일관성 비교 모듈 추가
-- AgentLoopRunner summary에 retryEvidenceComparison 기록
-- PRODUCT_FAIL 재시도 재현성 테스트 추가
+- Agent Loop 실행 명령과 결과 해석 정리
+- 분류별 재시도 정책과 산출물 위치 문서화
+- 다음 작업 우선순위 갱신
 ```
