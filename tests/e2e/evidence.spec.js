@@ -3,7 +3,16 @@ import { test, expect } from "./evidenceTest.js";
 test.describe("Playwright evidence collector", () => {
   test("실패 시 screenshot, console log, QA state를 저장한다", async ({ page, qaEvidence }, testInfo) => {
     await page.goto("/");
+    qaEvidence.recordStep({
+      name: "page-loaded",
+      status: "passed"
+    });
+
     await page.evaluate(() => console.log("QA_EVIDENCE_SAMPLE_LOG"));
+    qaEvidence.recordStep({
+      name: "console-log-recorded",
+      status: "passed"
+    });
 
     qaEvidence.setMetadata({
       testCaseId: "TC-008-EVIDENCE-001",
@@ -39,6 +48,20 @@ test.describe("Playwright evidence collector", () => {
     testInfo.annotations.push({
       type: "expected-failure-sample",
       description: "증거 저장 검증을 위한 의도된 실패 샘플"
+    });
+
+    qaEvidence.recordCriterion({
+      name: "TC-008-EVIDENCE-001 의도 실패 기준",
+      status: "failed",
+      passCriteria: "의도 실패 샘플은 실패 후 evidence 저장을 확인한다.",
+      expected: {
+        evidenceSavedAfterFailure: true
+      },
+      actual: {
+        assertionFailureTriggered: true
+      },
+      result: "FAIL",
+      failedBecause: "evidence 저장 검증을 위해 의도적으로 assertion을 실패시킴"
     });
 
     expect(false).toBe(true);

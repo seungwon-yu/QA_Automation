@@ -16,6 +16,7 @@ export class PlaywrightEvidenceReader {
       available: false,
       reason: "metadata.json 파일이 없음"
     });
+    const timeline = await readOptionalJson(path.join(evidenceDir, "timeline.json"), []);
 
     return {
       evidenceDir,
@@ -23,6 +24,7 @@ export class PlaywrightEvidenceReader {
       state,
       testInfo,
       metadata,
+      timeline,
       screenshotPath: testInfo.screenshotPath ?? path.join(evidenceDir, "screenshot.png")
     };
   }

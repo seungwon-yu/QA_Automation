@@ -56,7 +56,7 @@ Test Execution
 │ EvidenceCollector │
 └─────────┬─────────┘
           ▼
-  screenshot / log / state / timeline
+  screenshot / log / state / metadata / timeline
           ▼
 ┌───────────────────┐
 │ FailureClassifier │
@@ -188,10 +188,13 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
 - `state.json`
 - `metadata.json`
 - `test-info.json`
+- `timeline.json`
 
 `state.json`은 브라우저에서 `window.__QA_AUTOMATION__.getState()`를 호출해 저장한다.
 
 `metadata.json`은 실패 기록에 판단 근거를 연결하기 위해 저장한다.
+
+`timeline.json`은 테스트 실행 흐름과 PASS/FAIL 기준 불합 지점을 연결하기 위해 저장한다. 단순히 언제 무엇을 했는지뿐 아니라, 어떤 기준이 실패했는지까지 남긴다.
 
 공통 구조는 다음과 같다.
 
@@ -230,11 +233,56 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
 
 `npm run test:e2e:product-fail-evidence`는 `TC-005-01` 기준 PRODUCT_FAIL 분류 흐름을 검증하기 위한 의도된 실패 명령이다. 제품 코드를 수정하지 않고 metadata의 expected/actual과 `classificationBasis`를 통해 Agent Loop가 `PRODUCT_FAIL`을 기록하는지 확인한다.
 
+## Timeline 기준 불합 기록
+
+`tests/e2e/evidenceTest.js`는 테스트 중 `qaEvidence.recordStep()`과 `qaEvidence.recordCriterion()`을 사용할 수 있게 한다.
+
+`recordStep()`은 테스트 흐름을 기록한다.
+
+예시:
+
+```json
+{
+  "type": "step",
+  "name": "start-clicked",
+  "status": "passed",
+  "state": {
+    "status": "running",
+    "score": 0
+  }
+}
+```
+
+`recordCriterion()`은 PASS/FAIL 기준과 실제 불합 사유를 기록한다.
+
+예시:
+
+```json
+{
+  "type": "criterion",
+  "name": "TC-005-01 PASS 기준",
+  "status": "failed",
+  "passCriteria": "충돌 이후 status === \"gameOver\"",
+  "expected": {
+    "status": "gameOver",
+    "collision": true
+  },
+  "actual": {
+    "status": "running",
+    "collision": true
+  },
+  "result": "FAIL",
+  "failedBecause": "actual.status가 expected.status와 다름"
+}
+```
+
+이 구조를 통해 타임라인에서 테스트가 어느 단계까지 정상 진행되었고, 어느 PASS 기준에서 실패했는지 확인할 수 있다.
+
 ## Evidence 기반 판단 연결
 
-`tests/agent/playwrightEvidenceReader.js`는 저장된 Playwright evidence 디렉터리에서 `console-log.json`, `state.json`, `metadata.json`, `test-info.json`, `screenshot.png` 경로를 읽는다.
+`tests/agent/playwrightEvidenceReader.js`는 저장된 Playwright evidence 디렉터리에서 `console-log.json`, `state.json`, `metadata.json`, `test-info.json`, `timeline.json`, `screenshot.png` 경로를 읽는다.
 
-`tests/agent/playwrightEvidenceAnalyzer.js`는 읽은 evidence를 `FailureClassifier`와 `DecisionEngine`에 전달하고, 판단 결과를 `DecisionLogger`에 기록한다.
+`tests/agent/playwrightEvidenceAnalyzer.js`는 읽은 evidence를 `FailureClassifier`와 `DecisionEngine`에 전달하고, 판단 결과를 `DecisionLogger`에 기록한다. 이때 `timeline.json`에서 실패한 기준만 모아 `failedCriteria`로 남기고, 전체 이벤트 수와 마지막 이벤트를 `timelineSummary`로 요약한다.
 
 실행 명령:
 

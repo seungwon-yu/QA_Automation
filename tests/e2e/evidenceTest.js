@@ -5,6 +5,7 @@ import path from "node:path";
 export const test = base.extend({
   qaEvidence: async ({ page }, use, testInfo) => {
     const consoleMessages = [];
+    const timeline = [];
     const metadata = {
       classificationBasis: []
     };
@@ -24,6 +25,12 @@ export const test = base.extend({
       },
       addClassificationBasis(nextBasis) {
         metadata.classificationBasis.push(nextBasis);
+      },
+      recordStep(step) {
+        timeline.push(normalizeTimelineEntry("step", step));
+      },
+      recordCriterion(criterion) {
+        timeline.push(normalizeTimelineEntry("criterion", criterion));
       }
     });
 
@@ -64,6 +71,7 @@ export const test = base.extend({
     await writeJson(path.join(evidenceDir, "console-log.json"), consoleMessages);
     await writeJson(path.join(evidenceDir, "state.json"), state);
     await writeJson(path.join(evidenceDir, "metadata.json"), normalizeMetadata(metadata));
+    await writeJson(path.join(evidenceDir, "timeline.json"), timeline);
     await writeJson(path.join(evidenceDir, "test-info.json"), {
       title: testInfo.title,
       status: testInfo.status,
@@ -97,5 +105,20 @@ function normalizeMetadata(metadata) {
     actual: metadata.actual ?? null,
     classificationBasis: metadata.classificationBasis ?? [],
     notes: metadata.notes ?? []
+  };
+}
+
+function normalizeTimelineEntry(type, entry) {
+  return {
+    type,
+    name: entry.name,
+    status: entry.status ?? "recorded",
+    expected: entry.expected ?? null,
+    actual: entry.actual ?? null,
+    passCriteria: entry.passCriteria ?? null,
+    result: entry.result ?? null,
+    failedBecause: entry.failedBecause ?? null,
+    state: entry.state ?? null,
+    recordedAt: new Date().toISOString()
   };
 }

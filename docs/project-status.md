@@ -6,7 +6,7 @@
 
 이 프로젝트는 QA 자동화 프로젝트를 직접 설계하고 구현하면서, 하네스 엔지니어링 기반으로 게임 상태를 제어하고 그 위에 Agent Loop를 연결해 실패 증거 수집, 실패 분류, 다음 행동 결정을 연습하기 위한 학습 프로젝트이다.
 
-현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장까지 구현했다.
+현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록까지 구현했다.
 
 ## 완료된 작업
 
@@ -30,6 +30,7 @@
 | Evidence 기반 판단 연결 | 완료 | 최신 Playwright evidence를 읽어 분류, 결정, Decision Log 기록 |
 | Evidence 판단 근거 metadata | 완료 | `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
 | 브라우저 PRODUCT_FAIL 샘플 | 완료 | `TC-005-01` 기준 Playwright evidence를 `PRODUCT_FAIL`로 분류하고 Decision Log 기록 |
+| Timeline 기준 불합 기록 | 완료 | `timeline.json`에 단계 흐름, PASS/FAIL 기준, expected/actual, 불합 사유 저장 |
 | TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 대분류별 TC 문서 분리, `TC-GROUP-05`, `TC-GROUP-08` 상세화 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
@@ -91,6 +92,7 @@ console-log.json
 state.json
 metadata.json
 test-info.json
+timeline.json
        ↓
 Playwright Evidence Reader
        ↓
@@ -105,6 +107,8 @@ Decision Log
 
 `metadata.json`은 모든 테스트 그룹이 공유하는 공통 판단 근거 구조이다. `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`은 공통으로 저장하고, 대분류별 차이는 `classificationBasis`에 추가한다.
 
+`timeline.json`은 테스트 흐름과 기준 불합 지점을 저장한다. `step` 항목은 정상 진행된 단계와 상태를 남기고, `criterion` 항목은 `passCriteria`, `expected`, `actual`, `failedBecause`를 남겨 어느 기준 때문에 FAIL이 되었는지 확인하게 한다.
+
 현재 Playwright evidence 샘플은 두 갈래로 구성되어 있다. `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용 샘플은 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 의도 실패 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다.
 
 ## 다음 작업 우선순위
@@ -113,8 +117,8 @@ Decision Log
 
 필요 작업:
 
-- 필요하면 timeline 저장 구조와 연결
 - E2E 실패에서 assertion error 상세 메시지 자동 추출 검토
+- `TEST_FAIL`, `ENV_FAIL` 브라우저 실패 샘플 확장
 
 ### 2순위: Agent Loop 실사용 검증
 
@@ -154,7 +158,6 @@ Decision Log
 
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
-- E2E 실패 evidence에 timeline 포함
 - 실제 브라우저 실패를 `TEST_FAIL`, `ENV_FAIL`로 더 명확히 분류하는 샘플 확장
 - GitHub Actions 또는 CI 구성
 
@@ -195,6 +198,7 @@ Decision Log
 | Evidence 기반 Decision Log | 통과 |
 | metadata 기반 PRODUCT_FAIL 단위 분류 | 통과 |
 | Playwright PRODUCT_FAIL evidence 분류 | 통과 |
+| Playwright timeline 기준 불합 기록 | 통과 |
 
 ## 다음 추천 커밋
 
@@ -202,6 +206,6 @@ Decision Log
 Test: Playwright timeline evidence 연결
 
 - Playwright 실패 시 timeline.json 저장
-- TC metadata와 timeline을 Decision Log에 연결
-- assertion 상세 메시지 자동 추출 검토
+- PASS/FAIL 기준 불합 정보를 Decision Log에 연결
+- TC-005-01 PRODUCT_FAIL 샘플의 failedCriteria 기록
 ```

@@ -3,10 +3,30 @@ import { test, expect } from "./evidenceTest.js";
 test.describe("Product failure evidence sample", () => {
   test("TC-005-01 충돌 시 gameOver 상태가 되어야 한다", async ({ page, qaEvidence }, testInfo) => {
     await page.goto("/");
+    qaEvidence.recordStep({
+      name: "page-loaded",
+      status: "passed"
+    });
+
     await page.getByRole("button", { name: "Start", exact: true }).click();
     await expect(page.locator("#state")).toHaveText("running");
 
     const state = await page.evaluate(() => window.__QA_AUTOMATION__.getState());
+    qaEvidence.recordStep({
+      name: "start-clicked",
+      status: "passed",
+      state: {
+        status: state.status,
+        score: state.score
+      }
+    });
+    qaEvidence.recordStep({
+      name: "collision-condition-assumed",
+      status: "recorded",
+      state: {
+        collision: true
+      }
+    });
 
     qaEvidence.setMetadata({
       testCaseId: "TC-005-01",
@@ -40,6 +60,22 @@ test.describe("Product failure evidence sample", () => {
     testInfo.annotations.push({
       type: "product-fail-evidence-sample",
       description: "TC-005-01 PRODUCT_FAIL 분류 검증을 위한 의도된 실패 샘플"
+    });
+
+    qaEvidence.recordCriterion({
+      name: "TC-005-01 PASS 기준",
+      status: "failed",
+      passCriteria: "충돌 이후 status === \"gameOver\"",
+      expected: {
+        status: "gameOver",
+        collision: true
+      },
+      actual: {
+        status: state.status,
+        collision: true
+      },
+      result: "FAIL",
+      failedBecause: "actual.status가 expected.status와 다름"
     });
 
     expect(state.status).toBe("gameOver");

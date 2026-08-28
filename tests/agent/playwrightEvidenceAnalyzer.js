@@ -35,6 +35,8 @@ export class PlaywrightEvidenceAnalyzer {
       expected: evidence.metadata.expected ?? null,
       actual: evidence.metadata.actual ?? null,
       assertion: evidence.metadata.assertion ?? null,
+      failedCriteria: getFailedCriteria(evidence.timeline),
+      timelineSummary: summarizeTimeline(evidence.timeline),
       attempt,
       result: classification.result,
       classification: classification.classification,
@@ -58,6 +60,40 @@ export class PlaywrightEvidenceAnalyzer {
 
     return entry;
   }
+}
+
+function getFailedCriteria(timeline) {
+  if (!Array.isArray(timeline)) {
+    return [];
+  }
+
+  return timeline
+    .filter((entry) => entry.type === "criterion" && entry.status === "failed")
+    .map((entry) => ({
+      name: entry.name,
+      passCriteria: entry.passCriteria,
+      expected: entry.expected,
+      actual: entry.actual,
+      failedBecause: entry.failedBecause
+    }));
+}
+
+function summarizeTimeline(timeline) {
+  if (!Array.isArray(timeline)) {
+    return {
+      totalEvents: 0,
+      failedCriteria: 0,
+      lastEvent: null
+    };
+  }
+
+  const failedCriteria = timeline.filter((entry) => entry.type === "criterion" && entry.status === "failed");
+
+  return {
+    totalEvents: timeline.length,
+    failedCriteria: failedCriteria.length,
+    lastEvent: timeline.at(-1)?.name ?? null
+  };
 }
 
 function getAttemptFromEvidence(evidence) {

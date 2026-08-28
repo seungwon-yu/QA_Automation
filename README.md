@@ -4,7 +4,7 @@
 
 이 프로젝트는 게임 로직과 렌더링을 분리해, 자동화 테스트가 하네스를 통해 게임 루프를 제어하고 실패 evidence를 기반으로 실패 유형을 분류할 수 있도록 구성합니다.
 
-현재 목표는 단순히 테스트를 PASS시키는 것이 아니라, 실패가 발생했을 때 `screenshot`, `console log`, `QA state`, `metadata`를 저장하고 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED`로 판단할 수 있는 QA Agent Loop 기반을 만드는 것입니다.
+현재 목표는 단순히 테스트를 PASS시키는 것이 아니라, 실패가 발생했을 때 `screenshot`, `console log`, `QA state`, `metadata`, `timeline`을 저장하고 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED`로 판단할 수 있는 QA Agent Loop 기반을 만드는 것입니다.
 
 ## 프로젝트 목적
 
@@ -19,7 +19,8 @@
 - 하네스를 통한 게임 상태 제어와 관찰
 - 루프 엔지니어링을 통한 프레임/시간 기반 테스트
 - Playwright 기반 브라우저 E2E 테스트
-- 실패 시 screenshot, log, state, metadata evidence 저장
+- 실패 시 screenshot, log, state, metadata, timeline evidence 저장
+- timeline 기반 PASS/FAIL 기준 불합 지점 추적
 - evidence 기반 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED` 분류
 - Decision Log를 통한 판단 과정 기록
 
@@ -43,6 +44,7 @@ npm run serve
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트
 - `tests/e2e/server.js`: Playwright E2E 전용 정적 서버
 - `tests/e2e/evidence.spec.js`: Playwright 실패 증거 저장 검증용 의도된 실패 샘플
+- `tests/e2e/productFailEvidence.spec.js`: `TC-005-01` 기준 PRODUCT_FAIL 의도 실패 샘플
 - `tests/agent/playwrightEvidenceAnalyzer.js`: 저장된 Playwright evidence 기반 실패 분류와 Decision Log 기록
 
 ## 현재 자동화 구조
@@ -69,9 +71,12 @@ console-log.json
 state.json
 metadata.json
 test-info.json
+timeline.json
 ```
 
 `metadata.json`에는 `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis`를 저장합니다.
+
+`timeline.json`에는 테스트 단계와 PASS/FAIL 기준 불합 지점을 저장합니다. 실패 기준 항목에는 `passCriteria`, `expected`, `actual`, `failedBecause`를 기록해 “어느 기준을 만족하지 못해서 FAIL이 되었는지”를 확인할 수 있게 합니다.
 
 ## 프로젝트 문서
 
@@ -123,4 +128,4 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 Playwright 실패 evidence에 `timeline.json`을 연결하고, assertion error 상세 메시지를 metadata 또는 Decision Log에 자동으로 포함하는 것입니다.
+다음 작업은 assertion error 상세 메시지를 metadata 또는 Decision Log에 자동으로 포함하고, `TEST_FAIL`, `ENV_FAIL` 브라우저 실패 샘플을 확장하는 것입니다.
