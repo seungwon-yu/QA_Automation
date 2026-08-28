@@ -76,7 +76,9 @@ timeline.json
 
 `metadata.json`에는 `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis`를 저장합니다.
 
-`timeline.json`에는 테스트 단계와 PASS/FAIL 기준 불합 지점을 저장합니다. 실패 기준 항목에는 `passCriteria`, `expected`, `actual`, `failedBecause`를 기록해 “어느 기준을 만족하지 못해서 FAIL이 되었는지”를 확인할 수 있게 합니다.
+`timeline.json`에는 테스트 단계와 PASS/FAIL 기준 불합 지점을 저장합니다. 실패 기준 항목에는 `comparison`, `passCriteria`, `expected`, `actual`, `failedBecause`를 기록해 “어느 기준을 만족하지 못해서 FAIL이 되었는지”를 확인할 수 있게 합니다.
+
+`comparison`은 사람이 한눈에 볼 수 있는 요약입니다. 예를 들어 기대결과는 `status=gameOver, collision=true`, 실제결과는 `status=running, collision=true`처럼 한 줄로 정리합니다.
 
 ## 프로젝트 문서
 

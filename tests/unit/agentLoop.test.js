@@ -280,6 +280,13 @@ describe("QA Agent Loop failure handling", () => {
         type: "criterion",
         name: "TC-008-EVIDENCE-001 의도 실패 기준",
         status: "failed",
+        comparison: {
+          passCriteria: "의도 실패 샘플은 실패 후 evidence 저장을 확인한다.",
+          expectedResult: "evidenceSavedAfterFailure=true",
+          actualResult: "assertionFailureTriggered=true",
+          result: "FAIL",
+          failedBecause: "evidence 저장 검증을 위해 의도적으로 assertion을 실패시킴"
+        },
         passCriteria: "의도 실패 샘플은 실패 후 evidence 저장을 확인한다.",
         expected: {
           evidenceSavedAfterFailure: true
@@ -319,6 +326,13 @@ describe("QA Agent Loop failure handling", () => {
       {
         name: "TC-008-EVIDENCE-001 의도 실패 기준",
         passCriteria: "의도 실패 샘플은 실패 후 evidence 저장을 확인한다.",
+        comparison: {
+          passCriteria: "의도 실패 샘플은 실패 후 evidence 저장을 확인한다.",
+          expectedResult: "evidenceSavedAfterFailure=true",
+          actualResult: "assertionFailureTriggered=true",
+          result: "FAIL",
+          failedBecause: "evidence 저장 검증을 위해 의도적으로 assertion을 실패시킴"
+        },
         expected: {
           evidenceSavedAfterFailure: true
         },

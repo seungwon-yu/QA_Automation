@@ -45,7 +45,7 @@
 | 1초 점수 증가 검증에서 부동소수점 누적 오차 가능성 확인 | 고정값 대신 허용 범위 검증으로 변경 |
 | 실패 당시 기록만으로 제품 실패를 단정할 근거가 부족함 | `metadata.json`에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
 | `npm run test:e2e`에서 테스트 본문 통과 후 프로세스 종료가 지연됨 | E2E 전용 정적 서버를 추가하고 idle shutdown으로 서버 프로세스가 남지 않도록 조치 |
-| 실패 타임라인만으로 어떤 기준 때문에 FAIL인지 보기 어려움 | `timeline.json`에 `passCriteria`, `expected`, `actual`, `failedBecause`를 기록하고 Decision Log에 `failedCriteria`, `timelineSummary`를 추가 |
+| 실패 타임라인만으로 어떤 기준 때문에 FAIL인지 보기 어려움 | `timeline.json`에 `comparison`, `passCriteria`, `expected`, `actual`, `failedBecause`를 기록하고 Decision Log에 `failedCriteria`, `timelineSummary`를 추가 |
 
 ## Sprint 2 초기 검증 내용
 
@@ -57,7 +57,7 @@
 | `DecisionLogger` | 기본 구현 | Decision Log와 요약 파일 저장 구조 추가 |
 | `AgentLoopRunner` | 기본 구현 | 명령 실행 결과에 따라 분류, 결정, 로그 기록 수행 |
 | `PlaywrightEvidenceReader` | 확장 | `metadata.json`을 읽어 판단 근거를 분류기에 전달 |
-| `PlaywrightEvidenceAnalyzer` | 확장 | Decision Log에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `failedCriteria`, `timelineSummary` 기록 |
+| `PlaywrightEvidenceAnalyzer` | 확장 | Decision Log에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `failedCriteria`, `timelineSummary`, `comparison` 기록 |
 | `tests/e2e/server.js` | 추가 | Playwright E2E용 정적 서버를 직접 실행하고 idle shutdown으로 종료 안정성 확보 |
 | `tests/e2e/productFailEvidence.spec.js` | 추가 | `TC-005-01` 기준 PRODUCT_FAIL evidence 샘플 생성 |
 
@@ -73,7 +73,7 @@ Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json
 
 `metadata.json`에는 실패 판단 근거가 저장된다. 공통 필드는 `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`이며, 대분류별 판단 차이는 `classificationBasis`에 기록한다.
 
-`timeline.json`에는 테스트 진행 단계와 기준 불합 정보가 저장된다. `TC-005-01` 샘플에서는 `충돌 이후 status === "gameOver"` 기준에 대해 expected status는 `gameOver`, actual status는 `running`으로 기록되며, 불합 사유는 `actual.status가 expected.status와 다름`으로 남는다.
+`timeline.json`에는 테스트 진행 단계와 기준 불합 정보가 저장된다. `TC-005-01` 샘플에서는 `충돌 이후 status === "gameOver"` 기준에 대해 expected status는 `gameOver`, actual status는 `running`으로 기록되며, 불합 사유는 `actual.status가 expected.status와 다름`으로 남는다. 사람이 한눈에 볼 수 있도록 `comparison.expectedResult`와 `comparison.actualResult`도 함께 저장한다.
 
 현재 Playwright 의도 실패 샘플은 두 종류이다. `TC-GROUP-08` 증거 저장 검증용은 제품 요구사항 위반으로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다.
 

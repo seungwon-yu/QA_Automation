@@ -72,6 +72,7 @@ function getFailedCriteria(timeline) {
     .map((entry) => ({
       name: entry.name,
       passCriteria: entry.passCriteria,
+      comparison: entry.comparison ?? null,
       expected: entry.expected,
       actual: entry.actual,
       failedBecause: entry.failedBecause

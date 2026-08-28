@@ -262,6 +262,13 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
   "type": "criterion",
   "name": "TC-005-01 PASS 기준",
   "status": "failed",
+  "comparison": {
+    "passCriteria": "충돌 이후 status === \"gameOver\"",
+    "expectedResult": "status=gameOver, collision=true",
+    "actualResult": "status=running, collision=true",
+    "result": "FAIL",
+    "failedBecause": "actual.status가 expected.status와 다름"
+  },
   "passCriteria": "충돌 이후 status === \"gameOver\"",
   "expected": {
     "status": "gameOver",
@@ -276,13 +283,15 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
 }
 ```
 
+`comparison`은 사람이 한눈에 읽기 위한 요약이고, `expected`와 `actual`은 Agent와 후속 분석 도구가 구조적으로 읽기 위한 원본 값이다.
+
 이 구조를 통해 타임라인에서 테스트가 어느 단계까지 정상 진행되었고, 어느 PASS 기준에서 실패했는지 확인할 수 있다.
 
 ## Evidence 기반 판단 연결
 
 `tests/agent/playwrightEvidenceReader.js`는 저장된 Playwright evidence 디렉터리에서 `console-log.json`, `state.json`, `metadata.json`, `test-info.json`, `timeline.json`, `screenshot.png` 경로를 읽는다.
 
-`tests/agent/playwrightEvidenceAnalyzer.js`는 읽은 evidence를 `FailureClassifier`와 `DecisionEngine`에 전달하고, 판단 결과를 `DecisionLogger`에 기록한다. 이때 `timeline.json`에서 실패한 기준만 모아 `failedCriteria`로 남기고, 전체 이벤트 수와 마지막 이벤트를 `timelineSummary`로 요약한다.
+`tests/agent/playwrightEvidenceAnalyzer.js`는 읽은 evidence를 `FailureClassifier`와 `DecisionEngine`에 전달하고, 판단 결과를 `DecisionLogger`에 기록한다. 이때 `timeline.json`에서 실패한 기준만 모아 `failedCriteria`로 남기고, 전체 이벤트 수와 마지막 이벤트를 `timelineSummary`로 요약한다. `failedCriteria`에는 `comparison`도 함께 포함해 기대결과와 실제결과를 바로 비교할 수 있게 한다.
 
 실행 명령:
 

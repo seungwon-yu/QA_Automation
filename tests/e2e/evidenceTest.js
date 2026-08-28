@@ -109,16 +109,57 @@ function normalizeMetadata(metadata) {
 }
 
 function normalizeTimelineEntry(type, entry) {
+  const expected = entry.expected ?? null;
+  const actual = entry.actual ?? null;
+  const result = entry.result ?? null;
+  const passCriteria = entry.passCriteria ?? null;
+  const failedBecause = entry.failedBecause ?? null;
+
   return {
     type,
     name: entry.name,
     status: entry.status ?? "recorded",
-    expected: entry.expected ?? null,
-    actual: entry.actual ?? null,
-    passCriteria: entry.passCriteria ?? null,
-    result: entry.result ?? null,
-    failedBecause: entry.failedBecause ?? null,
+    comparison: createComparison({
+      expected,
+      actual,
+      passCriteria,
+      result,
+      failedBecause
+    }),
+    expected,
+    actual,
+    passCriteria,
+    result,
+    failedBecause,
     state: entry.state ?? null,
     recordedAt: new Date().toISOString()
   };
+}
+
+function createComparison({ expected, actual, passCriteria, result, failedBecause }) {
+  if (!passCriteria && !expected && !actual && !result && !failedBecause) {
+    return null;
+  }
+
+  return {
+    passCriteria,
+    expectedResult: formatComparisonValue(expected),
+    actualResult: formatComparisonValue(actual),
+    result,
+    failedBecause
+  };
+}
+
+function formatComparisonValue(value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value !== "object") {
+    return String(value);
+  }
+
+  return Object.entries(value)
+    .map(([key, nextValue]) => `${key}=${String(nextValue)}`)
+    .join(", ");
 }

@@ -30,7 +30,7 @@
 | Evidence 기반 판단 연결 | 완료 | 최신 Playwright evidence를 읽어 분류, 결정, Decision Log 기록 |
 | Evidence 판단 근거 metadata | 완료 | `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
 | 브라우저 PRODUCT_FAIL 샘플 | 완료 | `TC-005-01` 기준 Playwright evidence를 `PRODUCT_FAIL`로 분류하고 Decision Log 기록 |
-| Timeline 기준 불합 기록 | 완료 | `timeline.json`에 단계 흐름, PASS/FAIL 기준, expected/actual, 불합 사유 저장 |
+| Timeline 기준 불합 기록 | 완료 | `timeline.json`에 단계 흐름, PASS/FAIL 기준, comparison, expected/actual, 불합 사유 저장 |
 | TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 대분류별 TC 문서 분리, `TC-GROUP-05`, `TC-GROUP-08` 상세화 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
@@ -107,7 +107,9 @@ Decision Log
 
 `metadata.json`은 모든 테스트 그룹이 공유하는 공통 판단 근거 구조이다. `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`은 공통으로 저장하고, 대분류별 차이는 `classificationBasis`에 추가한다.
 
-`timeline.json`은 테스트 흐름과 기준 불합 지점을 저장한다. `step` 항목은 정상 진행된 단계와 상태를 남기고, `criterion` 항목은 `passCriteria`, `expected`, `actual`, `failedBecause`를 남겨 어느 기준 때문에 FAIL이 되었는지 확인하게 한다.
+`timeline.json`은 테스트 흐름과 기준 불합 지점을 저장한다. `step` 항목은 정상 진행된 단계와 상태를 남기고, `criterion` 항목은 `comparison`, `passCriteria`, `expected`, `actual`, `failedBecause`를 남겨 어느 기준 때문에 FAIL이 되었는지 확인하게 한다.
+
+`comparison`은 사람이 보기 쉬운 요약이다. 기대결과와 실제결과를 각각 `status=gameOver, collision=true`, `status=running, collision=true`처럼 한 줄로 보여준다.
 
 현재 Playwright evidence 샘플은 두 갈래로 구성되어 있다. `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용 샘플은 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 의도 실패 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다.
 
