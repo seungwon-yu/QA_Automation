@@ -4,6 +4,7 @@ import { EvidenceCollector } from "./evidenceCollector.js";
 import { FailureClassifier } from "./failureClassifier.js";
 import { DecisionEngine } from "./decisionEngine.js";
 import { DecisionLogger } from "./decisionLogger.js";
+import { RetryEvidenceComparator } from "./retryEvidenceComparator.js";
 import { DECISION } from "./failureTypes.js";
 
 const DEFAULT_COMMAND = "npm test";
@@ -16,6 +17,7 @@ export class AgentLoopRunner {
     this.failureClassifier = options.failureClassifier ?? new FailureClassifier();
     this.decisionEngine = options.decisionEngine ?? new DecisionEngine({ maxRetries: this.maxRetries });
     this.decisionLogger = options.decisionLogger ?? new DecisionLogger();
+    this.retryEvidenceComparator = options.retryEvidenceComparator ?? new RetryEvidenceComparator();
     this.commandExecutor = options.commandExecutor ?? executeCommand;
   }
 
@@ -63,6 +65,7 @@ export class AgentLoopRunner {
           finalResult: entry.result,
           finalClassification: entry.classification,
           finalDecision: entry.decision,
+          retryEvidenceComparison: this.retryEvidenceComparator.compare(attempts),
           attempts
         };
         await this.decisionLogger.writeSummary(summary);
@@ -77,6 +80,7 @@ export class AgentLoopRunner {
       finalResult: lastAttempt.result,
       finalClassification: lastAttempt.classification,
       finalDecision: lastAttempt.decision,
+      retryEvidenceComparison: this.retryEvidenceComparator.compare(attempts),
       attempts
     };
   }

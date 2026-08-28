@@ -9,6 +9,7 @@ import { AgentLoopRunner } from "../agent/agentLoopRunner.js";
 import { DecisionLogger } from "../agent/decisionLogger.js";
 import { PlaywrightEvidenceAnalyzer } from "../agent/playwrightEvidenceAnalyzer.js";
 import { PlaywrightEvidenceReader } from "../agent/playwrightEvidenceReader.js";
+import { RetryEvidenceComparator } from "../agent/retryEvidenceComparator.js";
 import { CLASSIFICATION, DECISION, RESULT } from "../agent/failureTypes.js";
 
 describe("QA Agent Loop failure handling", () => {
@@ -266,8 +267,91 @@ describe("QA Agent Loop failure handling", () => {
     expect(summary.finalDecision).toBe(DECISION.STOP);
     expect(summary.attempts).toHaveLength(2);
     expect(summary.attempts[0].decision).toBe(DECISION.RETRY);
+    expect(summary.retryEvidenceComparison).toMatchObject({
+      totalAttempts: 2,
+      comparedAttempts: 2,
+      consistentFailure: true,
+      consistentClassification: true,
+      reproducibility: "REPRODUCED_2_OF_2"
+    });
 
     await rm(baseDir, { recursive: true, force: true });
+  });
+
+  it("RetryEvidenceComparator는 동일 실패 반복 여부를 요약한다", () => {
+    const comparator = new RetryEvidenceComparator();
+
+    const result = comparator.compare([
+      {
+        result: RESULT.FAIL,
+        classification: CLASSIFICATION.PRODUCT_FAIL,
+        observations: ["collisionStateMismatch"],
+        failureSummary: {
+          expectedResult: "status=gameOver",
+          actualResult: "status=running",
+          failedBecause: "actual.status가 expected.status와 다름"
+        }
+      },
+      {
+        result: RESULT.FAIL,
+        classification: CLASSIFICATION.PRODUCT_FAIL,
+        observations: ["collisionStateMismatch"],
+        failureSummary: {
+          expectedResult: "status=gameOver",
+          actualResult: "status=running",
+          failedBecause: "actual.status가 expected.status와 다름"
+        }
+      }
+    ]);
+
+    expect(result).toEqual({
+      totalAttempts: 2,
+      comparedAttempts: 2,
+      consistentFailure: true,
+      consistentClassification: true,
+      reproducibility: "REPRODUCED_2_OF_2",
+      summary: "동일 조건에서 2회 중 2회 동일 실패가 반복됨",
+      comparedFields: [
+        "result",
+        "classification",
+        "observations",
+        "failureSummary.expectedResult",
+        "failureSummary.actualResult",
+        "failureSummary.failedBecause"
+      ]
+    });
+  });
+
+  it("RetryEvidenceComparator는 attempt별 실패 양상이 다르면 변동 실패로 요약한다", () => {
+    const comparator = new RetryEvidenceComparator();
+
+    const result = comparator.compare([
+      {
+        result: RESULT.FAIL,
+        classification: CLASSIFICATION.PRODUCT_FAIL,
+        observations: ["collisionStateMismatch"],
+        failureSummary: {
+          expectedResult: "status=gameOver",
+          actualResult: "status=running",
+          failedBecause: "actual.status가 expected.status와 다름"
+        }
+      },
+      {
+        result: RESULT.FAIL,
+        classification: CLASSIFICATION.PRODUCT_FAIL,
+        observations: ["collisionStateMismatch"],
+        failureSummary: {
+          expectedResult: "status=gameOver",
+          actualResult: "status=ready",
+          failedBecause: "actual.status가 expected.status와 다름"
+        }
+      }
+    ]);
+
+    expect(result.consistentFailure).toBe(false);
+    expect(result.consistentClassification).toBe(true);
+    expect(result.reproducibility).toBe("VARIED_2_OF_2");
+    expect(result.summary).toBe("attempt별 실패 양상이 서로 달라 flaky 가능성 또는 추가 검토가 필요함");
   });
 
   it("REVIEW_REQUIRED는 재시도하지 않고 REVIEW로 종료한다", async () => {

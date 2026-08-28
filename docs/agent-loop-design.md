@@ -73,6 +73,7 @@ Test Execution
     RETRY └──────────↺
 
 모든 판단은 DecisionLog에 기록한다.
+재시도가 발생한 경우 attempt별 evidence는 RetryEvidenceComparator가 비교한다.
 ```
 
 ## 책임 분리
@@ -115,6 +116,36 @@ Agent는 제품 코드, 요구사항, 기대결과, assertion을 변경할 수 �
 | `RETRY` | 동일 조건으로 재시도한다. 최대 3회까지만 허용한다. |
 | `STOP` | 재시도하지 않고 종료한다. |
 | `REVIEW` | 사람이 검토해야 하므로 `REVIEW_REQUIRED`로 종료한다. |
+
+## Retry Evidence 비교
+
+`tests/agent/retryEvidenceComparator.js`는 동일 테스트의 attempt들을 비교해 실패 재현성을 요약한다.
+
+비교 대상은 다음과 같다.
+
+- `result`
+- `classification`
+- `observations`
+- `failureSummary.expectedResult`
+- `failureSummary.actualResult`
+- `failureSummary.failedBecause`
+
+출력 예시는 다음과 같다.
+
+```json
+{
+  "totalAttempts": 3,
+  "comparedAttempts": 3,
+  "consistentFailure": true,
+  "consistentClassification": true,
+  "reproducibility": "REPRODUCED_3_OF_3",
+  "summary": "동일 조건에서 3회 중 3회 동일 실패가 반복됨"
+}
+```
+
+이 비교 결과는 `AgentLoopRunner`의 `last-summary.json`에 `retryEvidenceComparison`으로 저장된다.
+
+`TEST_FAIL`과 `REVIEW_REQUIRED`는 재시도하지 않는 것이 기본이다. `PRODUCT_FAIL`과 `ENV_FAIL`은 동일 조건 재현성 확인을 위해 최대 3회까지 재시도할 수 있다.
 
 ## Decision Log 예시
 

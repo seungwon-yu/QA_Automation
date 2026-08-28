@@ -41,6 +41,7 @@ npm run serve
 - `tests/harness/gameHarness.js`: 루프와 상태 제어를 담당하는 하네스
 - `tests/unit/gameEngine.test.js`: 하네스 기반 단위 테스트
 - `tests/unit/agentLoop.test.js`: Agent Loop 실패 처리 단위 테스트
+- `tests/agent/retryEvidenceComparator.js`: 재시도 attempt별 실패 일관성 비교
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트
 - `tests/e2e/server.js`: Playwright E2E 전용 정적 서버
 - `tests/e2e/evidence.spec.js`: Playwright 실패 증거 저장 검증용 의도된 실패 샘플
@@ -59,6 +60,8 @@ Unit Test / E2E
 Evidence
  ↓
 Failure Classification
+ ↓
+Retry Evidence Comparison
  ↓
 Decision Log
 ```
@@ -137,6 +140,6 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 분류된 실패 샘플의 retry attempt별 evidence 비교 구조를 정리하는 것입니다.
+다음 작업은 Agent Loop 실사용 검증 흐름을 정리하고, 실패 fixture 실행 결과를 문서 예시로 보강하는 것입니다.
 
 추후 evidence 구조가 충분히 안정되면 JSON evidence와 Decision Log를 기반으로 사람이 읽기 좋은 Markdown 테스트 리포트를 자동 생성하는 작업을 진행할 예정입니다.

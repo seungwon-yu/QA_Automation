@@ -6,7 +6,7 @@
 
 이 프로젝트는 QA 자동화 프로젝트를 직접 설계하고 구현하면서, 하네스 엔지니어링 기반으로 게임 상태를 제어하고 그 위에 Agent Loop를 연결해 실패 증거 수집, 실패 분류, 다음 행동 결정을 연습하기 위한 학습 프로젝트이다.
 
-현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록까지 구현했다.
+현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다.
 
 ## 완료된 작업
 
@@ -25,7 +25,8 @@
 | Agent Loop 설계 | 완료 | `docs/agent-loop-design.md`에 실패 처리 파이프라인 정의 |
 | Agent Loop 기본 모듈 | 완료 | Evidence, Classification, Decision, Log, Runner 기본 구조 추가 |
 | Agent Loop 실패 fixture | 완료 | ENV, TEST, PRODUCT, REVIEW_REQUIRED 실패 샘플 추가 |
-| Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진, 실패 경로, evidence 분석 테스트 12개 통과 |
+| Agent Loop 단위 테스트 | 완료 | 실패 증거 저장, 실패 분류, 결정 엔진, 실패 경로, evidence 분석, retry 비교 테스트 통과 |
+| Retry Evidence Comparator | 완료 | attempt별 실패 분류와 failureSummary 일관성 비교, 재현성 요약 저장 |
 | Playwright 실패 증거 | 완료 | 실패 시 screenshot, console log, QA state, test info 저장 확인 |
 | Evidence 기반 판단 연결 | 완료 | 최신 Playwright evidence를 읽어 분류, 결정, Decision Log 기록 |
 | Evidence 판단 근거 metadata | 완료 | `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
@@ -63,6 +64,7 @@
 | `docs/test-report.md` | 마지막 테스트 실행 결과 |
 | `docs/agent-loop-design.md` | Sprint 2 QA Agent Loop 설계 |
 | `tests/agent/` | 실패 처리 파이프라인 기본 모듈 |
+| `tests/agent/retryEvidenceComparator.js` | 재시도 attempt별 실패 일관성 비교 |
 | `tests/agent/fixtures/` | 실패 분류 검증용 샘플 명령 |
 | `tests/unit/agentLoop.test.js` | Agent Loop 분류와 결정 단위 테스트 |
 | `tests/e2e/evidenceTest.js` | Playwright 실패 증거 수집 fixture |
@@ -106,6 +108,8 @@ Failure Classifier
        ↓
 Decision Engine
        ↓
+Retry Evidence Comparator
+       ↓
 Decision Log
 ```
 
@@ -121,17 +125,11 @@ Decision Log
 
 현재 Playwright evidence 샘플은 네 갈래로 구성되어 있다. `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용 샘플은 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 의도 실패 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다. `TC-008-06` locator 모호성 샘플은 테스트 자동화 코드 문제로 보고 `TEST_FAIL`로 분류한다. `TC-008-07` 서버 연결 실패 샘플은 실행 환경 문제로 보고 `ENV_FAIL`로 분류한다.
 
+`RetryEvidenceComparator`는 `AgentLoopRunner`가 생성한 attempt 목록을 비교한다. `PRODUCT_FAIL` fixture를 3회 재시도한 결과는 `REPRODUCED_3_OF_3`으로 요약되며, 동일 조건에서 동일 실패가 반복되었음을 보여준다.
+
 ## 다음 작업 우선순위
 
-### 1순위: Retry evidence 비교 구조 정리
-
-필요 작업:
-
-- retry attempt별 evidence를 묶어 비교하는 구조 설계
-- 동일 조건 재시도에서 expected/actual과 failureSummary가 유지되는지 확인
-- 최대 3회 재시도 제한과 Decision Log 요약 연결
-
-### 2순위: Agent Loop 실사용 검증
+### 1순위: Agent Loop 실사용 검증
 
 필요 작업:
 
@@ -139,7 +137,7 @@ Decision Log
 - 실패 fixture 실행 결과를 문서 예시로 정리
 - Decision Log가 면접 설명에 쓸 수 있을 정도로 읽히는지 확인
 
-### 3순위: 의존성 취약점 대응
+### 2순위: 의존성 취약점 대응
 
 필요 작업:
 
@@ -148,7 +146,7 @@ Decision Log
 - breaking change가 있는 경우 별도 브랜치 또는 별도 커밋으로 처리
 - 업그레이드 후 `npm test`와 `npm run test:e2e` 재실행
 
-### 4순위: Sprint 2 기능 테스트 후보 선정
+### 3순위: Sprint 2 기능 테스트 후보 선정
 
 필요 작업:
 
@@ -157,7 +155,7 @@ Decision Log
 - 리그레션 플로우 반복 테스트 추가
 - 브라우저 E2E 테스트 확장
 
-### 5순위: CI 구성
+### 4순위: CI 구성
 
 필요 작업:
 
@@ -165,7 +163,7 @@ Decision Log
 - Playwright E2E 실행 여부 결정
 - 테스트 리포트 산출물 업로드 검토
 
-### 6순위: Markdown 리포트 자동 생성
+### 5순위: Markdown 리포트 자동 생성
 
 필요 작업:
 
@@ -178,7 +176,7 @@ Decision Log
 
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
-- retry attempt별 evidence 비교 구조
+- Agent Loop 실사용 검증 문서 예시 보강
 - JSON evidence 기반 Markdown 리포트 자동 생성
 - GitHub Actions 또는 CI 구성
 
@@ -225,13 +223,14 @@ Decision Log
 | Playwright ENV_FAIL evidence 분류 | 통과 |
 | Playwright timeline 기준 불합 기록 | 통과 |
 | Playwright assertion error 내부 증거 저장 | 통과 |
+| Retry evidence 비교 | 통과 |
 
 ## 다음 추천 커밋
 
 ```text
-Test: Playwright ENV_FAIL evidence 샘플 추가
+Test: Retry evidence 비교 구조 추가
 
-- 서버 연결 실패 기반 ENV_FAIL 샘플 추가
-- metadata 기반 환경 실패 분류 확인
-- TC-008-07 문서화
+- attempt별 실패 일관성 비교 모듈 추가
+- AgentLoopRunner summary에 retryEvidenceComparison 기록
+- PRODUCT_FAIL 재시도 재현성 테스트 추가
 ```
