@@ -142,6 +142,6 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 Sprint 2 첫 구현 대상으로 선정한 `TC-GROUP-06 점수 및 기록` 테스트를 상세화하고 구현하는 것입니다.
+다음 작업은 ISTQB 기반 우선순위로 다시 선정한 Sprint 2 첫 구현 대상인 `TC-GROUP-04 장애물 생성 및 이동` 테스트를 상세화하고 구현하는 것입니다.
 
 추후 evidence 구조가 충분히 안정되면 JSON evidence와 Decision Log를 기반으로 사람이 읽기 좋은 Markdown 테스트 리포트를 자동 생성하는 작업을 진행할 예정입니다.

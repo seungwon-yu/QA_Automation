@@ -82,6 +82,6 @@ Sprint 2에서는 Agent Loop 판단 근거와 직접 연결되는 다음 문서�
 
 Sprint 2 기능 테스트 후보와 구현 우선순위는 `docs/sprint-2-feature-test-candidates.md`에 정리한다.
 
-첫 구현 대상은 `TC-GROUP-06 점수 및 기록`이다.
+첫 구현 대상은 `TC-GROUP-04 장애물 생성 및 이동`이다.
 
-선정 이유는 점수와 최고 기록이 expected/actual 비교가 명확하고, `metadata.json`과 `timeline.json`에 실패 판단 근거를 남기기 쉽기 때문이다.
+선정 이유는 장애물이 게임 진행, 충돌, 난이도에 직접 영향을 주는 핵심 리스크이며, 경계값 분석과 동등 분할을 적용하기 좋은 테스트 조건이기 때문이다.

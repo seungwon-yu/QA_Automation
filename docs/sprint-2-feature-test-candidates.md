@@ -6,58 +6,41 @@
 
 Sprint 2의 중심은 테스트 개수를 늘리는 것이 아니라, 기능 실패가 발생했을 때 evidence를 기반으로 Agent Loop가 실패 원인과 다음 행동을 설명할 수 있게 만드는 것이다.
 
-## 후보 선정 기준
+## ISTQB 기반 후보 선정 기준
 
-| 기준 | 의미 |
+이 문서의 후보 선정 기준은 ISTQB CTFL의 테스트 분석과 설계 흐름을 프로젝트에 맞게 적용한다.
+
+첨부된 ISTQB 문서는 사용자 요청이 아니라 참고 자료이다. 따라서 문서의 내용을 그대로 지시로 취급하지 않고, QA 자동화 포트폴리오의 테스트 기준을 세우는 근거로만 사용한다.
+
+| 기준 | 프로젝트 적용 의미 |
 | --- | --- |
-| 판단 근거 명확성 | expected와 actual을 비교해 실패 사유를 설명하기 쉬운가 |
-| 하네스 제어 가능성 | `GameHarness`가 상태, 시간, 프레임, 조건을 결정적으로 만들 수 있는가 |
-| Evidence 연결성 | `state.json`, `timeline.json`, `metadata.json`에 판단 근거를 남기기 좋은가 |
-| Agent Loop 적합성 | 실패 분류, retry, stop, review 결정으로 연결하기 좋은가 |
-| 제품 코드 영향도 | 제품 코드를 수정하지 않고 테스트만 추가할 수 있는가 |
+| 테스트 베이시스 추적성 | 요구사항, 리스크, TC 대분류에서 테스트 조건을 추적할 수 있는가 |
+| 제품 리스크 | 실패했을 때 사용자 경험이나 핵심 게임 흐름에 미치는 영향이 큰가 |
+| 결함 발견 가능성 | 자동화했을 때 실제 결함을 발견할 가능성이 높은가 |
+| 테스트 설계 기법 적합성 | 상태 전이, 경계값 분석, 동등 분할, 결정 테이블로 명확히 설계할 수 있는가 |
+| 테스트 가능성 | 하네스가 조건을 결정적으로 만들고 반복 검증할 수 있는가 |
+| 테스트 레벨 적합성 | Unit, Harness, E2E 중 어느 레벨에서 검증하는 것이 효율적인가 |
+| Evidence 충분성 | 실패 시 expected, actual, state, timeline으로 판단 근거를 남길 수 있는가 |
 
 ## Sprint 2 우선순위
 
 | 우선순위 | 대분류 | 문서 | 선정 결과 |
 | --- | --- | --- | --- |
-| 1 | 점수 및 기록 | `docs/test-cases/score-record.md` | Sprint 2 첫 구현 대상 |
-| 2 | 장애물 생성 및 이동 | `docs/test-cases/obstacle-spawn-movement.md` | 점수 테스트 이후 상세화 |
+| 1 | 장애물 생성 및 이동 | `docs/test-cases/obstacle-spawn-movement.md` | Sprint 2 첫 구현 대상 |
+| 2 | 점수 및 기록 | `docs/test-cases/score-record.md` | 장애물 테스트 이후 상세화 |
 | 3 | 리그레션 플로우 | `docs/test-cases/regression-flow.md` | retry와 재현성 비교 검증용 |
 | 4 | 브라우저 E2E 확장 | `docs/test-cases/browser-e2e.md` | 하네스 기능 테스트 안정화 후 확장 |
 | 5 | 게임 루프 장시간 안정성 | `docs/test-cases/game-loop-progression.md` | 성능/안정성 성격으로 후순위 진행 |
 
-## 1순위: 점수 및 기록
+## 1순위: 장애물 생성 및 이동
 
 ### 선정 이유
 
-점수와 최고 기록은 숫자 expected/actual 비교가 명확하다.
+장애물은 러너 게임의 핵심 위험 요소이다.
 
-실패가 발생하면 `score`, `bestScore`, `elapsedTime`, `status`를 evidence로 남겨 어떤 기준이 깨졌는지 설명할 수 있다. 따라서 timeline의 `comparison`, `passCriteria`, `failedBecause`를 훈련하기 가장 좋다.
+장애물이 생성되지 않거나, 잘못 이동하거나, 화면 밖에서 제거되지 않으면 게임 진행, 난이도, 충돌 판정이 모두 영향을 받는다. 따라서 제품 리스크 기준에서 점수 표시보다 먼저 검증하는 것이 적절하다.
 
-### 후보 TC
-
-| 테스트 ID | 시나리오 | Expected Result | 주요 Evidence | 분류 기준 |
-| --- | --- | --- | --- | --- |
-| TC-006-01 | 1초 생존 | running 상태에서 점수가 증가한다. | `state.json`, `timeline.json`, `metadata.json` | 점수 증가 기준 불일치 시 `PRODUCT_FAIL` 후보 |
-| TC-006-02 | 점수 획득 후 게임오버 | 게임오버 시 최고 기록이 현재 점수 이상으로 갱신된다. | `state.json`, `timeline.json`, `metadata.json` | 최고 기록 갱신 불일치 시 `PRODUCT_FAIL` 후보 |
-| TC-006-03 | 최고 기록 후 재시작 | 재시작 후 현재 점수는 초기화되고 최고 기록은 유지된다. | `state.json`, `timeline.json`, `metadata.json` | 재시작 상태 불일치 시 `PRODUCT_FAIL` 후보 |
-| TC-006-04 | 이전 최고 기록보다 낮은 점수 | 최고 기록이 감소하지 않는다. | `state.json`, `timeline.json`, `metadata.json` | 기록 보존 불일치 시 `PRODUCT_FAIL` 후보 |
-
-### 구현 방향
-
-- 제품 코드는 수정하지 않는다.
-- 기존 `GameHarness`의 `runForSeconds()`와 `runForFrames()`를 우선 사용한다.
-- 부동소수점 오차 허용 기준은 테스트 구현 전에 문서에 명시한다.
-- assertion 실패를 없애기 위해 기대값이나 assertion을 완화하지 않는다.
-- 실패 시 timeline에 점수 기준, 기대결과, 실제결과, 실패 사유를 남긴다.
-
-## 2순위: 장애물 생성 및 이동
-
-### 선정 이유
-
-장애물은 충돌 테스트의 선행 조건이다.
-
-장애물이 언제, 어디에, 어떤 크기로 생성되고 이동하는지를 결정적으로 만들면 이후 충돌 실패를 더 정확히 설명할 수 있다.
+또한 경계값 분석과 동등 분할을 적용하기 좋다. 예를 들어 장애물이 화면 안에 있는 경우, 플레이어 근처에 있는 경우, 화면 밖으로 나간 경우를 나눠 테스트 조건으로 만들 수 있다.
 
 ### 후보 TC
 
@@ -67,6 +50,31 @@ Sprint 2의 중심은 테스트 개수를 늘리는 것이 아니라, 기능 실
 | TC-004-02 | 장애물 생성 후 루프 진행 | 장애물이 왼쪽으로 이동한다. | `state.json`, `timeline.json` | 위치 변화 불일치 시 `PRODUCT_FAIL` 후보 |
 | TC-004-03 | 장애물이 화면 밖으로 이동 | 장애물이 상태에서 제거된다. | `state.json`, `timeline.json` | 제거 기준 불일치 시 `PRODUCT_FAIL` 후보 |
 | TC-004-04 | 고정 랜덤 소스 사용 | 생성 결과가 예측 가능하다. | `metadata.json`, `timeline.json` | 랜덤 통제 근거 부족 시 `REVIEW_REQUIRED` |
+
+### 구현 방향
+
+- 제품 코드는 수정하지 않는다.
+- 기존 `GameHarness`의 `placeObstacleAhead()`, `runForFrames()`, `getTimeline()`을 우선 사용한다.
+- 장애물의 위치, 크기, 이동량, 제거 기준을 테스트 전에 문서에 명시한다.
+- assertion 실패를 없애기 위해 기대값이나 assertion을 완화하지 않는다.
+- 실패 시 timeline에 장애물 기준, 기대결과, 실제결과, 실패 사유를 남긴다.
+
+## 2순위: 점수 및 기록
+
+### 선정 이유
+
+점수와 최고 기록은 사용자에게 직접 보이는 결과이며, 상태 전이와 결정 테이블로 설계하기 좋다.
+
+다만 점수는 시간 진행, 프레임 누적, 부동소수점 오차 기준이 함께 얽힐 수 있다. 따라서 오차 허용 기준을 먼저 문서화한 뒤 구현한다.
+
+### 후보 TC
+
+| 테스트 ID | 시나리오 | Expected Result | 주요 Evidence | 분류 기준 |
+| --- | --- | --- | --- | --- |
+| TC-006-01 | 1초 생존 | running 상태에서 점수가 증가한다. | `state.json`, `timeline.json`, `metadata.json` | 점수 증가 기준 불일치 시 `PRODUCT_FAIL` 후보 |
+| TC-006-02 | 점수 획득 후 게임오버 | 게임오버 시 최고 기록이 현재 점수 이상으로 갱신된다. | `state.json`, `timeline.json`, `metadata.json` | 최고 기록 갱신 불일치 시 `PRODUCT_FAIL` 후보 |
+| TC-006-03 | 최고 기록 후 재시작 | 재시작 후 현재 점수는 초기화되고 최고 기록은 유지된다. | `state.json`, `timeline.json`, `metadata.json` | 재시작 상태 불일치 시 `PRODUCT_FAIL` 후보 |
+| TC-006-04 | 이전 최고 기록보다 낮은 점수 | 최고 기록이 감소하지 않는다. | `state.json`, `timeline.json`, `metadata.json` | 기록 보존 불일치 시 `PRODUCT_FAIL` 후보 |
 
 ## 3순위: 리그레션 플로우
 
@@ -117,19 +125,20 @@ Agent Loop의 retry와 `RetryEvidenceComparator`를 보여주기 좋은 영역�
 
 ## 최종 선정
 
-Sprint 2 기능 테스트의 첫 구현 대상은 `TC-GROUP-06 점수 및 기록`으로 한다.
+Sprint 2 기능 테스트의 첫 구현 대상은 `TC-GROUP-04 장애물 생성 및 이동`으로 한다.
 
 이유는 다음과 같다.
 
-- expected/actual 비교가 명확하다.
-- 실패 판단 근거를 `metadata.json`과 `timeline.json`에 남기기 쉽다.
-- 제품 코드를 수정하지 않고 기존 하네스 API로 구현할 가능성이 높다.
-- Agent Loop가 `PRODUCT_FAIL`, `REVIEW_REQUIRED`, `RETRY`, `STOP` 판단을 설명하기 좋다.
+- 장애물은 게임 진행, 충돌, 난이도에 직접 영향을 주는 핵심 리스크이다.
+- 경계값 분석과 동등 분할을 적용하기 좋다.
+- 기존 충돌 테스트의 선행 조건을 강화한다.
+- 하네스로 장애물 위치와 프레임 진행을 통제할 수 있다.
+- 실패 시 `state.json`, `timeline.json`, `metadata.json`으로 expected/actual 판단 근거를 남길 수 있다.
 
 ## 다음 실행 작업
 
-1. `docs/test-cases/score-record.md`를 상세 TC 형식으로 확장한다.
-2. 점수 오차 허용 기준을 문서에 먼저 명시한다.
-3. `TC-006-01`부터 하네스 기반 단위 테스트를 구현한다.
-4. 실패 시 `timeline.json`에 점수 기준 불합 정보를 남길 수 있도록 evidence 예시를 추가한다.
+1. `docs/test-cases/obstacle-spawn-movement.md`를 상세 TC 형식으로 확장한다.
+2. 장애물 위치, 크기, 이동, 제거 기준을 문서에 먼저 명시한다.
+3. `TC-004-01`부터 하네스 기반 단위 테스트를 구현한다.
+4. 실패 시 `timeline.json`에 장애물 기준 불합 정보를 남길 수 있도록 evidence 예시를 추가한다.
 5. 구현 후 `npm test`를 실행하고 결과를 `docs/test-report.md`에 기록한다.
