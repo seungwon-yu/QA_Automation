@@ -5,6 +5,7 @@ const ENV_PATTERNS = [
   "Failed to connect",
   "Could not connect",
   "ECONNREFUSED",
+  "ERR_CONNECTION_REFUSED",
   "browserType.launch",
   "Cannot find module",
   "command not found",
@@ -121,6 +122,7 @@ function classifyByMetadata(evidence) {
     : [];
   const productBasis = basis.filter((item) => item.supports === CLASSIFICATION.PRODUCT_FAIL);
   const testBasis = basis.filter((item) => item.supports === CLASSIFICATION.TEST_FAIL);
+  const envBasis = basis.filter((item) => item.supports === CLASSIFICATION.ENV_FAIL);
 
   if (productBasis.length > 0) {
     return {
@@ -137,6 +139,15 @@ function classifyByMetadata(evidence) {
       classification: CLASSIFICATION.TEST_FAIL,
       observations: buildMetadataObservations(metadata, testBasis),
       reason: "metadata의 대분류별 판단 근거가 테스트 코드 또는 테스트 도구 사용 문제를 지지함"
+    };
+  }
+
+  if (envBasis.length > 0) {
+    return {
+      result: RESULT.FAIL,
+      classification: CLASSIFICATION.ENV_FAIL,
+      observations: buildMetadataObservations(metadata, envBasis),
+      reason: "metadata의 대분류별 판단 근거가 테스트 실행 환경 문제를 지지함"
     };
   }
 

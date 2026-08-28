@@ -31,6 +31,7 @@
 | Evidence 판단 근거 metadata | 완료 | `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
 | 브라우저 PRODUCT_FAIL 샘플 | 완료 | `TC-005-01` 기준 Playwright evidence를 `PRODUCT_FAIL`로 분류하고 Decision Log 기록 |
 | 브라우저 TEST_FAIL 샘플 | 완료 | `TC-008-06` 기준 모호한 locator evidence를 `TEST_FAIL`로 분류하고 Decision Log 기록 |
+| 브라우저 ENV_FAIL 샘플 | 완료 | `TC-008-07` 기준 서버 연결 실패 evidence를 `ENV_FAIL`로 분류하고 Decision Log 기록 |
 | Timeline 기준 불합 기록 | 완료 | `timeline.json`에 단계 흐름, PASS/FAIL 기준, comparison, expected/actual, 불합 사유 저장 |
 | Assertion Error 내부 증거 | 완료 | `assertion-error.json`에 Playwright 원본 실패 메시지와 stack trace 저장, `failureSummary`에는 QA 관점 요약 연결 |
 | TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 대분류별 TC 문서 분리, `TC-GROUP-05`, `TC-GROUP-08` 상세화 |
@@ -52,6 +53,7 @@
 | `tests/e2e/runner.spec.js` | 브라우저 E2E 테스트 |
 | `tests/e2e/productFailEvidence.spec.js` | `TC-005-01` PRODUCT_FAIL evidence 의도 실패 샘플 |
 | `tests/e2e/testFailEvidence.spec.js` | `TC-008-06` TEST_FAIL evidence 의도 실패 샘플 |
+| `tests/e2e/envFailEvidence.spec.js` | `TC-008-07` ENV_FAIL evidence 의도 실패 샘플 |
 | `tests/e2e/server.js` | Playwright E2E 전용 정적 서버 |
 | `docs/harness-engineering.md` | 하네스와 루프 엔지니어링 전략 |
 | `docs/test-classification.md` | 테스트 대분류와 Sprint 1 범위 |
@@ -117,15 +119,17 @@ Decision Log
 
 `assertion-error.json`은 Playwright 원본 실패 메시지와 stack trace를 내부 증거로 보존한다. 사람에게 보여주는 요약은 `failureSummary`로 분리해 코드 위치보다 평가 기준, 기대결과, 실제결과, 실패 사유를 먼저 보여준다.
 
-현재 Playwright evidence 샘플은 세 갈래로 구성되어 있다. `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용 샘플은 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 의도 실패 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다. `TC-008-06` locator 모호성 샘플은 테스트 자동화 코드 문제로 보고 `TEST_FAIL`로 분류한다.
+현재 Playwright evidence 샘플은 네 갈래로 구성되어 있다. `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용 샘플은 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 의도 실패 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다. `TC-008-06` locator 모호성 샘플은 테스트 자동화 코드 문제로 보고 `TEST_FAIL`로 분류한다. `TC-008-07` 서버 연결 실패 샘플은 실행 환경 문제로 보고 `ENV_FAIL`로 분류한다.
 
 ## 다음 작업 우선순위
 
-### 1순위: Evidence 기반 판단 고도화
+### 1순위: Retry evidence 비교 구조 정리
 
 필요 작업:
 
-- `ENV_FAIL` 브라우저 실패 샘플 확장
+- retry attempt별 evidence를 묶어 비교하는 구조 설계
+- 동일 조건 재시도에서 expected/actual과 failureSummary가 유지되는지 확인
+- 최대 3회 재시도 제한과 Decision Log 요약 연결
 
 ### 2순위: Agent Loop 실사용 검증
 
@@ -174,7 +178,7 @@ Decision Log
 
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
-- 실제 브라우저 실패를 `ENV_FAIL`로 더 명확히 분류하는 샘플 확장
+- retry attempt별 evidence 비교 구조
 - JSON evidence 기반 Markdown 리포트 자동 생성
 - GitHub Actions 또는 CI 구성
 
@@ -193,7 +197,8 @@ Decision Log
 11. `npm run test:e2e:evidence`로 의도된 Playwright 실패 증거 생성을 확인한다.
 12. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
 13. `npm run test:e2e:test-fail-evidence`로 TEST_FAIL evidence 생성을 확인한다.
-14. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
+14. `npm run test:e2e:env-fail-evidence`로 ENV_FAIL evidence 생성을 확인한다.
+15. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
 
 ## 마지막 확인 상태
 
@@ -217,15 +222,16 @@ Decision Log
 | metadata 기반 PRODUCT_FAIL 단위 분류 | 통과 |
 | Playwright PRODUCT_FAIL evidence 분류 | 통과 |
 | Playwright TEST_FAIL evidence 분류 | 통과 |
+| Playwright ENV_FAIL evidence 분류 | 통과 |
 | Playwright timeline 기준 불합 기록 | 통과 |
 | Playwright assertion error 내부 증거 저장 | 통과 |
 
 ## 다음 추천 커밋
 
 ```text
-Test: Playwright TEST_FAIL evidence 샘플 추가
+Test: Playwright ENV_FAIL evidence 샘플 추가
 
-- 모호한 locator 기반 TEST_FAIL 샘플 추가
-- assertion error와 metadata 기반 테스트 실패 분류 확인
-- TC-008-06 문서화
+- 서버 연결 실패 기반 ENV_FAIL 샘플 추가
+- metadata 기반 환경 실패 분류 확인
+- TC-008-07 문서화
 ```

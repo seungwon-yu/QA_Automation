@@ -100,3 +100,19 @@
 | PASS 기준 | 자동화 locator가 단일 요소만 선택한다. |
 | FAIL 후보 | locator가 여러 요소를 동시에 선택해 Playwright strict mode violation이 발생함 |
 | Classification Basis | 제품 요구사항 위반이 아니라 테스트 자동화 코드의 locator 문제이므로 `TEST_FAIL` |
+
+## TC-008-07 테스트 서버에 연결할 수 없으면 ENV_FAIL로 분류한다
+
+| 항목 | 내용 |
+| --- | --- |
+| 테스트 ID | TC-008-07 |
+| 요구사항 ID | REQ-E2E-ENV-001 |
+| Test Condition | 브라우저 E2E 테스트는 테스트 대상 서버에 연결할 수 있어야 한다. |
+| 사전 조건 | 잘못된 포트 또는 실행되지 않은 테스트 대상 URL을 사용한다. |
+| 절차 | `http://127.0.0.1:59999`에 접속을 시도한다. |
+| Expected Result | 테스트 대상 서버 연결이 가능해야 한다. |
+| Actual Result | 테스트 대상 서버 연결이 거부된다. |
+| Evidence | `screenshot.png`, `state.json`, `metadata.json`, `timeline.json`, `assertion-error.json`, `test-info.json` |
+| PASS 기준 | 브라우저가 테스트 대상 서버에 접속할 수 있다. |
+| FAIL 후보 | `ERR_CONNECTION_REFUSED`, `ECONNREFUSED`, `Failed to connect` 등 서버 연결 실패 |
+| Classification Basis | 제품 기능이나 테스트 locator 문제가 아니라 실행 환경 문제이므로 `ENV_FAIL` |

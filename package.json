@@ -11,6 +11,7 @@
     "test:e2e:evidence": "playwright test tests/e2e/evidence.spec.js",
     "test:e2e:product-fail-evidence": "playwright test tests/e2e/productFailEvidence.spec.js",
     "test:e2e:test-fail-evidence": "playwright test tests/e2e/testFailEvidence.spec.js",
+    "test:e2e:env-fail-evidence": "playwright test tests/e2e/envFailEvidence.spec.js",
     "test:agent": "node tests/agent/agentLoopRunner.js",
     "test:agent:evidence": "node tests/agent/analyzePlaywrightEvidence.js"
   },

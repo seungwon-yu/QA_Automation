@@ -110,6 +110,38 @@ describe("QA Agent Loop failure handling", () => {
     expect(result.observations).toContain("testGroupId=TC-GROUP-08");
   });
 
+  it("metadata의 서버 연결 판단 근거로 ENV_FAIL을 분류한다", () => {
+    const classifier = new FailureClassifier();
+
+    const result = classifier.classify({
+      exitCode: 1,
+      evidence: {
+        metadata: {
+          testCaseId: "TC-008-07",
+          testGroupId: "TC-GROUP-08",
+          expected: {
+            serverConnection: "available"
+          },
+          actual: {
+            serverConnection: "refused"
+          },
+          classificationBasis: [
+            {
+              testGroupId: "TC-GROUP-08",
+              basisType: "serverConnectionRefused",
+              supports: CLASSIFICATION.ENV_FAIL,
+              reason: "테스트 대상 URL에 연결할 수 없음"
+            }
+          ]
+        }
+      }
+    });
+
+    expect(result.classification).toBe(CLASSIFICATION.ENV_FAIL);
+    expect(result.observations).toContain("testCaseId=TC-008-07");
+    expect(result.observations).toContain("testGroupId=TC-GROUP-08");
+  });
+
   it("PASS 결과는 STOP으로 결정한다", () => {
     const engine = new DecisionEngine();
 

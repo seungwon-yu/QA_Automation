@@ -181,6 +181,7 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
 | `tests/e2e/evidence.spec.js` | 증거 저장 검증용 의도된 실패 샘플 |
 | `tests/e2e/productFailEvidence.spec.js` | PRODUCT_FAIL 분류 검증용 의도된 실패 샘플 |
 | `tests/e2e/testFailEvidence.spec.js` | TEST_FAIL 분류 검증용 의도된 실패 샘플 |
+| `tests/e2e/envFailEvidence.spec.js` | ENV_FAIL 분류 검증용 의도된 실패 샘플 |
 | `artifacts/playwright-evidence/` | 실패 시 생성되는 브라우저 증거 저장 위치 |
 
 저장되는 증거는 다음과 같다.
@@ -239,6 +240,8 @@ fixture는 실패 처리 파이프라인 검증용이며, 제품 게임 코드�
 `npm run test:e2e:product-fail-evidence`는 `TC-005-01` 기준 PRODUCT_FAIL 분류 흐름을 검증하기 위한 의도된 실패 명령이다. 제품 코드를 수정하지 않고 metadata의 expected/actual과 `classificationBasis`를 통해 Agent Loop가 `PRODUCT_FAIL`을 기록하는지 확인한다.
 
 `npm run test:e2e:test-fail-evidence`는 `TC-008-06` 기준 TEST_FAIL 분류 흐름을 검증하기 위한 의도된 실패 명령이다. 제품 기능을 검증하는 대신 모호한 locator 사용이 테스트 자동화 코드 문제로 분류되는지 확인한다.
+
+`npm run test:e2e:env-fail-evidence`는 `TC-008-07` 기준 ENV_FAIL 분류 흐름을 검증하기 위한 의도된 실패 명령이다. 테스트 대상 서버 연결 실패를 제품 결함으로 단정하지 않고 실행 환경 문제로 분류하는지 확인한다.
 
 ## Timeline 기준 불합 기록
 
