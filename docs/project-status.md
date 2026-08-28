@@ -156,11 +156,21 @@ Decision Log
 - Playwright E2E 실행 여부 결정
 - 테스트 리포트 산출물 업로드 검토
 
+### 6순위: Markdown 리포트 자동 생성
+
+필요 작업:
+
+- JSON evidence와 Decision Log를 읽어 사람이 보기 좋은 Markdown 리포트 생성
+- 테스트별 PASS 기준, 기대결과, 실제결과, 실패 사유를 표로 정리
+- screenshot, console log, state, timeline evidence 경로를 리포트에 연결
+- 면접과 포트폴리오 설명에 바로 사용할 수 있는 요약 섹션 추가
+
 ## 아직 하지 않은 작업
 
 - 의존성 취약점 대응
 - Sprint 2 상세 테스트 구현
 - 실제 브라우저 실패를 `TEST_FAIL`, `ENV_FAIL`로 더 명확히 분류하는 샘플 확장
+- JSON evidence 기반 Markdown 리포트 자동 생성
 - GitHub Actions 또는 CI 구성
 
 ## 이어받는 방법

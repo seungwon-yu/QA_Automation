@@ -9,7 +9,7 @@
 | 단위 테스트 | 통과 |
 | E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | assertion 상세 메시지 자동 추출, TEST_FAIL/ENV_FAIL 브라우저 샘플 확장, 의존성 취약점 대응 |
+| 남은 주요 작업 | assertion 상세 메시지 자동 추출, TEST_FAIL/ENV_FAIL 브라우저 샘플 확장, Markdown 리포트 자동 생성, 의존성 취약점 대응 |
 
 ## 실행 명령과 결과
 
@@ -78,6 +78,12 @@ Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json
 현재 Playwright 의도 실패 샘플은 두 종류이다. `TC-GROUP-08` 증거 저장 검증용은 제품 요구사항 위반으로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다.
 
 브라우저 실패 컨텍스트가 아닌 Agent Loop fixture에서는 `screenshot.json` placeholder를 저장한다.
+
+## 후속 리포트 계획
+
+현재 evidence와 Decision Log는 Agent Loop가 안정적으로 읽을 수 있도록 JSON으로 저장한다.
+
+추후 evidence 구조가 충분히 쌓이면 JSON을 입력으로 사용해 Markdown 리포트를 자동 생성한다. Markdown 리포트에는 테스트 케이스, PASS 기준, 기대결과, 실제결과, 실패 사유, 실패 분류, 다음 행동, evidence 파일 경로를 사람이 읽기 쉬운 표와 요약으로 정리한다.
 
 ## 의존성 보안 메모
 
