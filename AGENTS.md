@@ -13,13 +13,14 @@
 3. `docs/harness-engineering.md`에서 자동화 전략을 확인한다.
 4. `docs/agent-loop-design.md`에서 Sprint 2 실패 처리 파이프라인을 확인한다.
 5. `docs/agent-loop-runbook.md`에서 Agent Loop 실행 명령과 결과 해석을 확인한다.
-6. `docs/test-classification.md`에서 테스트 대분류를 확인한다.
-7. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
-8. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`와 `docs/test-cases/`의 대분류별 문서를 확인한다.
-9. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
-10. 테스트를 실행하기 전에 `docs/test-guardrails.md`를 확인한다.
-11. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
-12. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
+6. `docs/sprint-2-feature-test-candidates.md`에서 Sprint 2 기능 테스트 우선순위를 확인한다.
+7. `docs/test-classification.md`에서 테스트 대분류를 확인한다.
+8. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
+9. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`와 `docs/test-cases/`의 대분류별 문서를 확인한다.
+10. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
+11. 테스트를 실행하기 전에 `docs/test-guardrails.md`를 확인한다.
+12. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
+13. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
 
 ## 저장소 지도
 - `index.html`: 브라우저 진입점.
@@ -40,6 +41,7 @@
 - `docs/test-guardrails.md`: 테스트 수행 가드레일.
 - `docs/agent-loop-design.md`: QA Agent Loop 설계.
 - `docs/agent-loop-runbook.md`: Agent Loop 실행 명령과 결과 해석.
+- `docs/sprint-2-feature-test-candidates.md`: Sprint 2 기능 테스트 후보와 구현 우선순위.
 - `docs/test-cases/`: 대분류별 테스트 케이스 상세 문서.
 - `docs/`: QA와 프로젝트 지식 문서.
 
@@ -78,11 +80,11 @@
 1순위: 입력 및 플레이어 동작.
 1순위: 게임 루프 진행.
 1순위: 충돌 및 게임오버.
-2순위: 점수 및 최고 기록.
-2순위: 장애물 생성 및 이동.
-2순위: 리그레션 플로우.
-3순위: 브라우저 E2E 확장.
-3순위: 장시간 안정성 테스트.
+Sprint 2 1순위: 점수 및 최고 기록.
+Sprint 2 2순위: 장애물 생성 및 이동.
+Sprint 2 3순위: 리그레션 플로우.
+Sprint 2 4순위: 브라우저 E2E 확장.
+Sprint 2 5순위: 장시간 안정성 테스트.
 
 ## 코드 스타일
 문자열은 쌍따옴표를 사용한다.

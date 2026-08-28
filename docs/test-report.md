@@ -9,7 +9,7 @@
 | 단위 테스트 | 통과 |
 | E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | 의존성 취약점 대응, Sprint 2 기능 테스트 후보 선정, Markdown 리포트 자동 생성 |
+| 남은 주요 작업 | TC-GROUP-06 점수 및 기록 상세 테스트 구현, 의존성 취약점 대응, Markdown 리포트 자동 생성 |
 
 ## 실행 명령과 결과
 
@@ -68,6 +68,7 @@
 | `tests/e2e/productFailEvidence.spec.js` | 추가 | `TC-005-01` 기준 PRODUCT_FAIL evidence 샘플 생성 |
 | `tests/e2e/testFailEvidence.spec.js` | 추가 | `TC-008-06` 기준 TEST_FAIL evidence 샘플 생성 |
 | `tests/e2e/envFailEvidence.spec.js` | 추가 | `TC-008-07` 기준 ENV_FAIL evidence 샘플 생성 |
+| `docs/sprint-2-feature-test-candidates.md` | 추가 | Sprint 2 기능 테스트 후보와 구현 우선순위 정리 |
 
 ## Sprint 2 주의사항
 
@@ -124,5 +125,7 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 이후 retry attempt별 실패 일관성을 비교하는 `RetryEvidenceComparator`를 추가하고, `AgentLoopRunner` summary에 `retryEvidenceComparison`을 기록했다.
 
 이후 Agent Loop를 실제로 실행하고 해석하는 방법을 `docs/agent-loop-runbook.md`에 정리했다.
+
+이후 Sprint 2 기능 테스트 후보를 선정하고, 첫 구현 대상을 `TC-GROUP-06 점수 및 기록`으로 정했다.
 
 현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.

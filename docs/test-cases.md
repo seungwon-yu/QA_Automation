@@ -77,3 +77,11 @@ Sprint 2에서는 Agent Loop 판단 근거와 직접 연결되는 다음 문서�
 | [browser-e2e.md](test-cases/browser-e2e.md) | 실제 브라우저 E2E와 evidence 저장 흐름을 검증하기 좋음 |
 
 나머지 그룹은 이후 Sprint에서 같은 형식으로 확장한다.
+
+## Sprint 2 기능 테스트 후보 선정
+
+Sprint 2 기능 테스트 후보와 구현 우선순위는 `docs/sprint-2-feature-test-candidates.md`에 정리한다.
+
+첫 구현 대상은 `TC-GROUP-06 점수 및 기록`이다.
+
+선정 이유는 점수와 최고 기록이 expected/actual 비교가 명확하고, `metadata.json`과 `timeline.json`에 실패 판단 근거를 남기기 쉽기 때문이다.

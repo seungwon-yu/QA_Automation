@@ -6,7 +6,7 @@
 
 이 프로젝트는 QA 자동화 프로젝트를 직접 설계하고 구현하면서, 하네스 엔지니어링 기반으로 게임 상태를 제어하고 그 위에 Agent Loop를 연결해 실패 증거 수집, 실패 분류, 다음 행동 결정을 연습하기 위한 학습 프로젝트이다.
 
-현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다.
+현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다. 이후 Sprint 2 기능 테스트 후보를 선정하고, 첫 구현 대상을 `TC-GROUP-06 점수 및 기록`으로 정했다.
 
 ## 완료된 작업
 
@@ -37,6 +37,7 @@
 | Timeline 기준 불합 기록 | 완료 | `timeline.json`에 단계 흐름, PASS/FAIL 기준, comparison, expected/actual, 불합 사유 저장 |
 | Assertion Error 내부 증거 | 완료 | `assertion-error.json`에 Playwright 원본 실패 메시지와 stack trace 저장, `failureSummary`에는 QA 관점 요약 연결 |
 | TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 대분류별 TC 문서 분리, `TC-GROUP-05`, `TC-GROUP-08` 상세화 |
+| Sprint 2 기능 테스트 후보 선정 | 완료 | 점수 및 기록, 장애물, 리그레션, 브라우저 E2E 확장 우선순위 정리 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -61,6 +62,7 @@
 | `docs/test-classification.md` | 테스트 대분류와 Sprint 1 범위 |
 | `docs/test-cases.md` | 테스트 케이스 목차와 공통 metadata 기준 |
 | `docs/test-cases/` | 대분류별 테스트 케이스 상세 문서 |
+| `docs/sprint-2-feature-test-candidates.md` | Sprint 2 기능 테스트 후보와 구현 우선순위 |
 | `docs/test-guardrails.md` | 테스트 수행 원칙과 실패 분류 기준 |
 | `docs/test-report.md` | 마지막 테스트 실행 결과 |
 | `docs/agent-loop-design.md` | Sprint 2 QA Agent Loop 설계 |
@@ -131,7 +133,17 @@ Decision Log
 
 ## 다음 작업 우선순위
 
-### 1순위: 의존성 취약점 대응
+### 1순위: TC-GROUP-06 점수 및 기록 상세화와 구현
+
+필요 작업:
+
+- `docs/test-cases/score-record.md`를 상세 TC 형식으로 확장
+- 점수 오차 허용 기준을 문서에 먼저 명시
+- `TC-006-01`부터 하네스 기반 단위 테스트 구현
+- 실패 시 `timeline.json`에 점수 기준 불합 정보가 남는지 확인
+- 구현 후 `npm test` 실행
+
+### 2순위: 의존성 취약점 대응
 
 필요 작업:
 
@@ -140,16 +152,15 @@ Decision Log
 - breaking change가 있는 경우 별도 브랜치 또는 별도 커밋으로 처리
 - 업그레이드 후 `npm test`와 `npm run test:e2e` 재실행
 
-### 2순위: Sprint 2 기능 테스트 후보 선정
+### 3순위: Sprint 2 추가 기능 테스트 확장
 
 필요 작업:
 
 - 장애물 생성 및 이동 테스트 확장
-- 점수와 최고 기록 테스트 확장
 - 리그레션 플로우 반복 테스트 추가
 - 브라우저 E2E 테스트 확장
 
-### 3순위: CI 구성
+### 4순위: CI 구성
 
 필요 작업:
 
@@ -157,7 +168,7 @@ Decision Log
 - Playwright E2E 실행 여부 결정
 - 테스트 리포트 산출물 업로드 검토
 
-### 4순위: Markdown 리포트 자동 생성
+### 5순위: Markdown 리포트 자동 생성
 
 필요 작업:
 
@@ -169,7 +180,8 @@ Decision Log
 ## 아직 하지 않은 작업
 
 - 의존성 취약점 대응
-- Sprint 2 상세 테스트 구현
+- TC-GROUP-06 점수 및 기록 상세 테스트 구현
+- Sprint 2 추가 기능 테스트 구현
 - JSON evidence 기반 Markdown 리포트 자동 생성
 - GitHub Actions 또는 CI 구성
 
@@ -180,17 +192,18 @@ Decision Log
 3. `docs/test-classification.md`에서 Sprint 1 범위를 확인한다.
 4. `docs/test-cases.md`에서 테스트 케이스 목차와 공통 metadata 기준을 확인한다.
 5. `docs/test-cases/`에서 작업 대상 대분류 문서를 확인한다.
-6. `docs/harness-engineering.md`에서 추가 예정 하네스 API를 확인한다.
-7. 테스트 실행 전 `docs/test-guardrails.md`를 확인한다.
-8. `docs/agent-loop-design.md`에서 실패 처리 파이프라인을 확인한다.
-9. `docs/agent-loop-runbook.md`에서 Agent Loop 실행 명령과 결과 해석을 확인한다.
-10. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
-11. `npm run test:agent -- npm test`로 Agent Loop 기본 동작을 확인한다.
-12. `npm run test:e2e:evidence`로 의도된 Playwright 실패 증거 생성을 확인한다.
-13. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
-14. `npm run test:e2e:test-fail-evidence`로 TEST_FAIL evidence 생성을 확인한다.
-15. `npm run test:e2e:env-fail-evidence`로 ENV_FAIL evidence 생성을 확인한다.
-16. Sprint 2 범위를 정하고 필요한 QA 문서를 갱신한다.
+6. `docs/sprint-2-feature-test-candidates.md`에서 Sprint 2 기능 테스트 우선순위를 확인한다.
+7. `docs/harness-engineering.md`에서 추가 예정 하네스 API를 확인한다.
+8. 테스트 실행 전 `docs/test-guardrails.md`를 확인한다.
+9. `docs/agent-loop-design.md`에서 실패 처리 파이프라인을 확인한다.
+10. `docs/agent-loop-runbook.md`에서 Agent Loop 실행 명령과 결과 해석을 확인한다.
+11. `docs/test-report.md`에서 마지막 테스트 실행 결과를 확인한다.
+12. `npm run test:agent -- npm test`로 Agent Loop 기본 동작을 확인한다.
+13. `npm run test:e2e:evidence`로 의도된 Playwright 실패 증거 생성을 확인한다.
+14. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
+15. `npm run test:e2e:test-fail-evidence`로 TEST_FAIL evidence 생성을 확인한다.
+16. `npm run test:e2e:env-fail-evidence`로 ENV_FAIL evidence 생성을 확인한다.
+17. `TC-GROUP-06 점수 및 기록`을 상세화하고 구현한다.
 
 ## 마지막 확인 상태
 
@@ -219,13 +232,14 @@ Decision Log
 | Playwright timeline 기준 불합 기록 | 통과 |
 | Playwright assertion error 내부 증거 저장 | 통과 |
 | Retry evidence 비교 | 통과 |
+| Sprint 2 기능 테스트 후보 선정 | 완료 |
 
 ## 다음 추천 커밋
 
 ```text
-Docs: Agent Loop 실행 Runbook 추가
+Docs: Sprint 2 기능 테스트 후보 선정
 
-- Agent Loop 실행 명령과 결과 해석 정리
-- 분류별 재시도 정책과 산출물 위치 문서화
+- Sprint 2 기능 테스트 후보와 우선순위 정리
+- 점수 및 기록 테스트를 첫 구현 대상으로 선정
 - 다음 작업 우선순위 갱신
 ```
