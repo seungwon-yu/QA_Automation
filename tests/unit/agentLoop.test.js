@@ -78,6 +78,38 @@ describe("QA Agent Loop failure handling", () => {
     expect(result.observations).toContain("testGroupId=TC-GROUP-05");
   });
 
+  it("metadata의 locator 판단 근거로 TEST_FAIL을 분류한다", () => {
+    const classifier = new FailureClassifier();
+
+    const result = classifier.classify({
+      exitCode: 1,
+      evidence: {
+        metadata: {
+          testCaseId: "TC-008-06",
+          testGroupId: "TC-GROUP-08",
+          expected: {
+            matchedElements: 1
+          },
+          actual: {
+            matchedElements: 3
+          },
+          classificationBasis: [
+            {
+              testGroupId: "TC-GROUP-08",
+              basisType: "locatorAmbiguity",
+              supports: CLASSIFICATION.TEST_FAIL,
+              reason: "button role locator가 여러 버튼을 동시에 선택함"
+            }
+          ]
+        }
+      }
+    });
+
+    expect(result.classification).toBe(CLASSIFICATION.TEST_FAIL);
+    expect(result.observations).toContain("testCaseId=TC-008-06");
+    expect(result.observations).toContain("testGroupId=TC-GROUP-08");
+  });
+
   it("PASS 결과는 STOP으로 결정한다", () => {
     const engine = new DecisionEngine();
 

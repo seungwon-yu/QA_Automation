@@ -104,6 +104,7 @@ npm test
 npm run test:e2e
 npm run test:e2e:evidence
 npm run test:e2e:product-fail-evidence
+npm run test:e2e:test-fail-evidence
 npm run test:agent:evidence
 ```
 
@@ -111,6 +112,7 @@ npm run test:agent:evidence
 `npm run test:e2e`는 Playwright 기반 정상 브라우저 E2E를 실행합니다.
 `npm run test:e2e:evidence`는 실패 증거 저장을 확인하기 위한 의도된 실패 명령입니다.
 `npm run test:e2e:product-fail-evidence`는 `TC-005-01` 기준 PRODUCT_FAIL evidence 분류를 확인하기 위한 의도된 실패 명령입니다.
+`npm run test:e2e:test-fail-evidence`는 `TC-008-06` 기준 TEST_FAIL evidence 분류를 확인하기 위한 의도된 실패 명령입니다.
 `npm run test:agent:evidence`는 저장된 Playwright evidence를 읽어 실패 분류와 다음 행동 결정을 기록합니다.
 
 ## 현재 TC 문서 구조
@@ -133,6 +135,6 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 `TEST_FAIL`, `ENV_FAIL` 브라우저 실패 샘플을 확장하는 것입니다.
+다음 작업은 `ENV_FAIL` 브라우저 실패 샘플을 확장하는 것입니다.
 
 추후 evidence 구조가 충분히 안정되면 JSON evidence와 Decision Log를 기반으로 사람이 읽기 좋은 Markdown 테스트 리포트를 자동 생성하는 작업을 진행할 예정입니다.

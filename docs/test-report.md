@@ -9,7 +9,7 @@
 | 단위 테스트 | 통과 |
 | E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | TEST_FAIL/ENV_FAIL 브라우저 샘플 확장, Markdown 리포트 자동 생성, 의존성 취약점 대응 |
+| 남은 주요 작업 | ENV_FAIL 브라우저 샘플 확장, Markdown 리포트 자동 생성, 의존성 취약점 대응 |
 
 ## 실행 명령과 결과
 
@@ -23,7 +23,8 @@
 | `npm run test:agent -- node tests/agent/fixtures/testFailCommand.js` | 의도된 실패 | `TEST_FAIL`로 분류하고 재시도 없이 `STOP`, evidence 저장 확인 |
 | `npm run test:e2e:evidence` | 의도된 실패 | Playwright 실패 시 screenshot, console log, QA state, metadata 저장 확인 |
 | `npm run test:e2e:product-fail-evidence` | 의도된 실패 | `TC-005-01` expected/actual 불일치 metadata 저장 확인 |
-| `npm run test:agent:evidence` | 의도된 실패 분석 | 최신 Playwright evidence를 읽어 `TC-005-01`, expected/actual, assertion, `PRODUCT_FAIL`, `RETRY`, failedCriteria, timelineSummary, failureSummary 기록 |
+| `npm run test:e2e:test-fail-evidence` | 의도된 실패 | `TC-008-06` locator 모호성 metadata 저장 확인 |
+| `npm run test:agent:evidence` | 의도된 실패 분석 | 최신 Playwright evidence를 읽어 expected/actual, assertion, failedCriteria, timelineSummary, failureSummary, 실패 분류와 다음 행동 기록 |
 | `npm audit --audit-level=moderate` | 실패 상태 반환 | 취약점 5개 확인, 자동 수정은 breaking change 가능 |
 
 ## Sprint 1 검증 내용
@@ -61,6 +62,7 @@
 | `PlaywrightEvidenceAnalyzer` | 확장 | Decision Log에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `failedCriteria`, `timelineSummary`, `comparison`, `assertionError`, `failureSummary` 기록 |
 | `tests/e2e/server.js` | 추가 | Playwright E2E용 정적 서버를 직접 실행하고 idle shutdown으로 종료 안정성 확보 |
 | `tests/e2e/productFailEvidence.spec.js` | 추가 | `TC-005-01` 기준 PRODUCT_FAIL evidence 샘플 생성 |
+| `tests/e2e/testFailEvidence.spec.js` | 추가 | `TC-008-06` 기준 TEST_FAIL evidence 샘플 생성 |
 
 ## Sprint 2 주의사항
 
@@ -78,7 +80,7 @@ Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json
 
 `assertion-error.json`에는 Playwright 원본 실패 메시지와 stack trace가 저장된다. 코드 위치는 내부 증거로만 보존하고, 사람용 요약은 `failureSummary`에서 평가 기준, 기대결과, 실제결과, 실패 사유 중심으로 확인한다.
 
-현재 Playwright 의도 실패 샘플은 두 종류이다. `TC-GROUP-08` 증거 저장 검증용은 제품 요구사항 위반으로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다.
+현재 Playwright 의도 실패 샘플은 세 종류이다. `TC-GROUP-08` 증거 저장 검증용은 제품 요구사항 위반으로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다. `TC-008-06` locator 모호성 샘플은 테스트 자동화 코드 문제로 보고 `TEST_FAIL`로 분류한다.
 
 브라우저 실패 컨텍스트가 아닌 Agent Loop fixture에서는 `screenshot.json` placeholder를 저장한다.
 
@@ -108,4 +110,4 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 
 이후 Playwright 원본 assertion error를 `assertion-error.json`으로 저장하고, 코드 위치가 아닌 QA 평가 기준 중심의 `failureSummary`를 Decision Log에 추가했다.
 
-현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.
+현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL`, `TEST_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.

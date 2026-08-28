@@ -84,3 +84,19 @@
 | PASS 기준 | 이 테스트는 의도 실패 샘플이므로 Playwright 명령은 실패를 반환한다. Agent 분석은 `REVIEW_REQUIRED`와 `REVIEW`를 기록한다. |
 | FAIL 후보 | evidence 파일이 생성되지 않거나 Agent 분석이 evidence를 읽지 못함 |
 | Classification Basis | 제품 요구사항 위반을 검증하는 테스트가 아니므로 `PRODUCT_FAIL`로 단정하지 않고 `REVIEW_REQUIRED` |
+
+## TC-008-06 locator가 모호하면 TEST_FAIL로 분류한다
+
+| 항목 | 내용 |
+| --- | --- |
+| 테스트 ID | TC-008-06 |
+| 요구사항 ID | REQ-E2E-LOCATOR-001 |
+| Test Condition | 자동화 테스트는 사용자 조작 대상 요소를 명확한 locator로 선택해야 한다. |
+| 사전 조건 | 페이지 로드 완료, Start/Jump/Restart 버튼이 모두 표시되어 있다. |
+| 절차 | `/`에 접속한다. 이름을 지정하지 않은 `button` role locator로 클릭을 시도한다. |
+| Expected Result | locator는 조작 대상 요소 하나만 선택해야 한다. |
+| Actual Result | `button` role locator가 Start, Jump, Restart 버튼을 모두 선택한다. |
+| Evidence | `screenshot.png`, `state.json`, `metadata.json`, `timeline.json`, `assertion-error.json`, `test-info.json` |
+| PASS 기준 | 자동화 locator가 단일 요소만 선택한다. |
+| FAIL 후보 | locator가 여러 요소를 동시에 선택해 Playwright strict mode violation이 발생함 |
+| Classification Basis | 제품 요구사항 위반이 아니라 테스트 자동화 코드의 locator 문제이므로 `TEST_FAIL` |

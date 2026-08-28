@@ -91,8 +91,9 @@ function extractEvidenceText(evidence) {
     : JSON.stringify(evidence.state ?? {});
   const testInfoText = JSON.stringify(evidence.testInfo ?? {});
   const metadataText = JSON.stringify(evidence.metadata ?? {});
+  const assertionErrorText = JSON.stringify(evidence.assertionError ?? {});
 
-  return `${consoleText}\n${stateText}\n${testInfoText}\n${metadataText}`;
+  return `${consoleText}\n${stateText}\n${testInfoText}\n${metadataText}\n${assertionErrorText}`;
 }
 
 function buildFail(classification, reason, output, patterns) {
@@ -119,6 +120,7 @@ function classifyByMetadata(evidence) {
     ? metadata.classificationBasis
     : [];
   const productBasis = basis.filter((item) => item.supports === CLASSIFICATION.PRODUCT_FAIL);
+  const testBasis = basis.filter((item) => item.supports === CLASSIFICATION.TEST_FAIL);
 
   if (productBasis.length > 0) {
     return {
@@ -126,6 +128,15 @@ function classifyByMetadata(evidence) {
       classification: CLASSIFICATION.PRODUCT_FAIL,
       observations: buildMetadataObservations(metadata, productBasis),
       reason: "metadata의 expected/actual과 대분류별 판단 근거가 제품 기대 동작 불일치를 지지함"
+    };
+  }
+
+  if (testBasis.length > 0) {
+    return {
+      result: RESULT.FAIL,
+      classification: CLASSIFICATION.TEST_FAIL,
+      observations: buildMetadataObservations(metadata, testBasis),
+      reason: "metadata의 대분류별 판단 근거가 테스트 코드 또는 테스트 도구 사용 문제를 지지함"
     };
   }
 
