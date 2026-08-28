@@ -31,6 +31,7 @@
 | Evidence 판단 근거 metadata | 완료 | `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
 | 브라우저 PRODUCT_FAIL 샘플 | 완료 | `TC-005-01` 기준 Playwright evidence를 `PRODUCT_FAIL`로 분류하고 Decision Log 기록 |
 | Timeline 기준 불합 기록 | 완료 | `timeline.json`에 단계 흐름, PASS/FAIL 기준, comparison, expected/actual, 불합 사유 저장 |
+| Assertion Error 내부 증거 | 완료 | `assertion-error.json`에 Playwright 원본 실패 메시지와 stack trace 저장, `failureSummary`에는 QA 관점 요약 연결 |
 | TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 대분류별 TC 문서 분리, `TC-GROUP-05`, `TC-GROUP-08` 상세화 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
@@ -93,6 +94,7 @@ state.json
 metadata.json
 test-info.json
 timeline.json
+assertion-error.json
        ↓
 Playwright Evidence Reader
        ↓
@@ -111,6 +113,8 @@ Decision Log
 
 `comparison`은 사람이 보기 쉬운 요약이다. 기대결과와 실제결과를 각각 `status=gameOver, collision=true`, `status=running, collision=true`처럼 한 줄로 보여준다.
 
+`assertion-error.json`은 Playwright 원본 실패 메시지와 stack trace를 내부 증거로 보존한다. 사람에게 보여주는 요약은 `failureSummary`로 분리해 코드 위치보다 평가 기준, 기대결과, 실제결과, 실패 사유를 먼저 보여준다.
+
 현재 Playwright evidence 샘플은 두 갈래로 구성되어 있다. `TC-GROUP-08` 브라우저 E2E 증거 저장 검증용 샘플은 제품 버그로 단정하지 않고 `REVIEW_REQUIRED`로 분류한다. `TC-005-01` 충돌 및 게임오버 의도 실패 샘플은 expected/actual과 `classificationBasis`를 근거로 `PRODUCT_FAIL`로 분류한다.
 
 ## 다음 작업 우선순위
@@ -119,7 +123,6 @@ Decision Log
 
 필요 작업:
 
-- E2E 실패에서 assertion error 상세 메시지 자동 추출 검토
 - `TEST_FAIL`, `ENV_FAIL` 브라우저 실패 샘플 확장
 
 ### 2순위: Agent Loop 실사용 검증
@@ -211,13 +214,14 @@ Decision Log
 | metadata 기반 PRODUCT_FAIL 단위 분류 | 통과 |
 | Playwright PRODUCT_FAIL evidence 분류 | 통과 |
 | Playwright timeline 기준 불합 기록 | 통과 |
+| Playwright assertion error 내부 증거 저장 | 통과 |
 
 ## 다음 추천 커밋
 
 ```text
-Test: Playwright timeline evidence 연결
+Test: Assertion error evidence 연결
 
-- Playwright 실패 시 timeline.json 저장
-- PASS/FAIL 기준 불합 정보를 Decision Log에 연결
-- TC-005-01 PRODUCT_FAIL 샘플의 failedCriteria 기록
+- Playwright 실패 시 assertion-error.json 저장
+- 원본 실패 메시지와 QA 평가 요약을 분리
+- Decision Log에 failureSummary 기록
 ```

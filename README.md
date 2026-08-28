@@ -72,6 +72,7 @@ state.json
 metadata.json
 test-info.json
 timeline.json
+assertion-error.json
 ```
 
 `metadata.json`에는 `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis`를 저장합니다.
@@ -79,6 +80,8 @@ timeline.json
 `timeline.json`에는 테스트 단계와 PASS/FAIL 기준 불합 지점을 저장합니다. 실패 기준 항목에는 `comparison`, `passCriteria`, `expected`, `actual`, `failedBecause`를 기록해 “어느 기준을 만족하지 못해서 FAIL이 되었는지”를 확인할 수 있게 합니다.
 
 `comparison`은 사람이 한눈에 볼 수 있는 요약입니다. 예를 들어 기대결과는 `status=gameOver, collision=true`, 실제결과는 `status=running, collision=true`처럼 한 줄로 정리합니다.
+
+`assertion-error.json`에는 Playwright가 남긴 원본 실패 메시지와 stack trace를 내부 evidence로 저장합니다. 사람이 보는 요약에서는 코드 위치보다 `failureSummary`의 평가 기준, 기대결과, 실제결과, 실패 사유를 우선 확인합니다.
 
 ## 프로젝트 문서
 
@@ -130,6 +133,6 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 assertion error 상세 메시지를 metadata 또는 Decision Log에 자동으로 포함하고, `TEST_FAIL`, `ENV_FAIL` 브라우저 실패 샘플을 확장하는 것입니다.
+다음 작업은 `TEST_FAIL`, `ENV_FAIL` 브라우저 실패 샘플을 확장하는 것입니다.
 
 추후 evidence 구조가 충분히 안정되면 JSON evidence와 Decision Log를 기반으로 사람이 읽기 좋은 Markdown 테스트 리포트를 자동 생성하는 작업을 진행할 예정입니다.

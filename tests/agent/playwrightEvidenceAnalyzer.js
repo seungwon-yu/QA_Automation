@@ -37,6 +37,14 @@ export class PlaywrightEvidenceAnalyzer {
       assertion: evidence.metadata.assertion ?? null,
       failedCriteria: getFailedCriteria(evidence.timeline),
       timelineSummary: summarizeTimeline(evidence.timeline),
+      assertionError: summarizeAssertionError(evidence.assertionError),
+      failureSummary: createFailureSummary({
+        metadata: evidence.metadata,
+        timeline: evidence.timeline,
+        assertionError: evidence.assertionError,
+        classification,
+        decision
+      }),
       attempt,
       result: classification.result,
       classification: classification.classification,
@@ -95,6 +103,68 @@ function summarizeTimeline(timeline) {
     failedCriteria: failedCriteria.length,
     lastEvent: timeline.at(-1)?.name ?? null
   };
+}
+
+function summarizeAssertionError(assertionError) {
+  if (!assertionError?.available) {
+    return {
+      available: false,
+      message: assertionError?.reason ?? "assertion-error evidence가 없음"
+    };
+  }
+
+  return {
+    available: true,
+    message: assertionError.summary?.message ?? null,
+    expected: assertionError.summary?.expected ?? null,
+    received: assertionError.summary?.received ?? null
+  };
+}
+
+function createFailureSummary({ metadata, timeline, assertionError, classification, decision }) {
+  const failedCriterion = getFailedCriteria(timeline)[0] ?? {};
+  const comparison = failedCriterion.comparison ?? {};
+
+  return {
+    evaluationTarget: metadata.assertion?.name ?? failedCriterion.name ?? null,
+    passCriteria: comparison.passCriteria ?? failedCriterion.passCriteria ?? null,
+    expectedResult: comparison.expectedResult ?? formatComparisonValue(metadata.expected),
+    actualResult: comparison.actualResult ?? formatComparisonValue(metadata.actual),
+    frameworkObserved: createFrameworkObserved(assertionError),
+    failedBecause: comparison.failedBecause ?? failedCriterion.failedBecause ?? null,
+    classification: classification.classification,
+    decision: decision.decision,
+    nextAction: decision.nextAction
+  };
+}
+
+function createFrameworkObserved(assertionError) {
+  if (!assertionError?.available) {
+    return null;
+  }
+
+  const expected = assertionError.summary?.expected;
+  const received = assertionError.summary?.received;
+
+  if (!expected && !received) {
+    return assertionError.summary?.message ?? null;
+  }
+
+  return `Expected ${expected}, Received ${received}`;
+}
+
+function formatComparisonValue(value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value !== "object") {
+    return String(value);
+  }
+
+  return Object.entries(value)
+    .map(([key, nextValue]) => `${key}=${String(nextValue)}`)
+    .join(", ");
 }
 
 function getAttemptFromEvidence(evidence) {

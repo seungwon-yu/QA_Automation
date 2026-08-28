@@ -297,6 +297,23 @@ describe("QA Agent Loop failure handling", () => {
         failedBecause: "evidence 저장 검증을 위해 의도적으로 assertion을 실패시킴"
       }
     ]);
+    await writeJson(path.join(evidenceDir, "assertion-error.json"), {
+      available: true,
+      summary: {
+        message: "expect(received).toBe(expected)",
+        expected: "true",
+        received: "false"
+      },
+      errors: [
+        {
+          message: "expect(received).toBe(expected)",
+          expected: "true",
+          received: "false",
+          location: "tests/e2e/evidence.spec.js:55",
+          stack: "Error stack sample"
+        }
+      ]
+    });
     await writeFile(path.join(evidenceDir, "screenshot.png"), "fake screenshot", "utf8");
 
     const analyzer = new PlaywrightEvidenceAnalyzer({
@@ -321,6 +338,23 @@ describe("QA Agent Loop failure handling", () => {
       totalEvents: 2,
       failedCriteria: 1,
       lastEvent: "TC-008-EVIDENCE-001 의도 실패 기준"
+    });
+    expect(entry.assertionError).toEqual({
+      available: true,
+      message: "expect(received).toBe(expected)",
+      expected: "true",
+      received: "false"
+    });
+    expect(entry.failureSummary).toEqual({
+      evaluationTarget: "Playwright 실패 증거 저장",
+      passCriteria: "의도 실패 샘플은 실패 후 evidence 저장을 확인한다.",
+      expectedResult: "evidenceSavedAfterFailure=true",
+      actualResult: "assertionFailureTriggered=true",
+      frameworkObserved: "Expected true, Received false",
+      failedBecause: "evidence 저장 검증을 위해 의도적으로 assertion을 실패시킴",
+      classification: CLASSIFICATION.REVIEW_REQUIRED,
+      decision: DECISION.REVIEW,
+      nextAction: "REVIEW_REQUIRED로 종료하고 증거를 검토"
     });
     expect(entry.failedCriteria).toEqual([
       {

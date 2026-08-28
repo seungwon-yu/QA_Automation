@@ -72,6 +72,7 @@ export const test = base.extend({
     await writeJson(path.join(evidenceDir, "state.json"), state);
     await writeJson(path.join(evidenceDir, "metadata.json"), normalizeMetadata(metadata));
     await writeJson(path.join(evidenceDir, "timeline.json"), timeline);
+    await writeJson(path.join(evidenceDir, "assertion-error.json"), normalizeAssertionErrors(testInfo.errors));
     await writeJson(path.join(evidenceDir, "test-info.json"), {
       title: testInfo.title,
       status: testInfo.status,
@@ -162,4 +163,67 @@ function formatComparisonValue(value) {
   return Object.entries(value)
     .map(([key, nextValue]) => `${key}=${String(nextValue)}`)
     .join(", ");
+}
+
+function normalizeAssertionErrors(errors) {
+  if (!Array.isArray(errors) || errors.length === 0) {
+    return {
+      available: false,
+      reason: "Playwright assertion error가 없음",
+      errors: []
+    };
+  }
+
+  const normalizedErrors = errors.map((error) => {
+    const message = stripAnsi(error.message ?? "");
+    const stack = stripAnsi(error.stack ?? "");
+
+    return {
+      message,
+      expected: extractErrorValue(message, "Expected"),
+      received: extractErrorValue(message, "Received"),
+      location: extractErrorLocation(stack),
+      stack
+    };
+  });
+
+  return {
+    available: true,
+    summary: createAssertionErrorSummary(normalizedErrors[0]),
+    errors: normalizedErrors
+  };
+}
+
+function createAssertionErrorSummary(error) {
+  return {
+    message: getFirstLine(error.message),
+    expected: error.expected,
+    received: error.received
+  };
+}
+
+function extractErrorValue(message, label) {
+  const pattern = new RegExp(`${label}:\\s+(.+)`);
+  const match = message.match(pattern);
+
+  if (!match) {
+    return null;
+  }
+
+  return match[1].trim();
+}
+
+function extractErrorLocation(stack) {
+  const lines = stack.split("\n");
+  const locationLine = lines.find((line) => line.includes(".spec.js:") || line.includes(".test.js:"));
+
+  return locationLine?.trim() ?? null;
+}
+
+function getFirstLine(value) {
+  return value.split("\n")[0] ?? value;
+}
+
+function stripAnsi(value) {
+  return value.replace(/\u001b\[[0-9;]*m/g, "");
 }

@@ -17,6 +17,11 @@ export class PlaywrightEvidenceReader {
       reason: "metadata.json 파일이 없음"
     });
     const timeline = await readOptionalJson(path.join(evidenceDir, "timeline.json"), []);
+    const assertionError = await readOptionalJson(path.join(evidenceDir, "assertion-error.json"), {
+      available: false,
+      reason: "assertion-error.json 파일이 없음",
+      errors: []
+    });
 
     return {
       evidenceDir,
@@ -25,6 +30,7 @@ export class PlaywrightEvidenceReader {
       testInfo,
       metadata,
       timeline,
+      assertionError,
       screenshotPath: testInfo.screenshotPath ?? path.join(evidenceDir, "screenshot.png")
     };
   }
