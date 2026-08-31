@@ -4,20 +4,20 @@
 
 | 항목 | 결과 |
 | --- | --- |
-| 실행 날짜 | 2026-08-28 |
-| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, 브라우저 E2E 기본 흐름, evidence metadata 판단 근거, timeline 기준 불합 기록, retry evidence 비교 |
+| 실행 날짜 | 2026-08-31 |
+| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, TC-GROUP-04 장애물 생성 및 이동, 브라우저 E2E 기본 흐름, evidence metadata 판단 근거, timeline 기준 불합 기록, retry evidence 비교 |
 | 단위 테스트 | 통과 |
-| E2E 테스트 | 통과 |
+| E2E 테스트 | 이전 통과 유지 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | TC-GROUP-04 장애물 생성 및 이동 상세 테스트 구현, 의존성 취약점 대응, Markdown 리포트 자동 생성 |
+| 남은 주요 작업 | TC-GROUP-06 점수 및 기록 상세 테스트 구현, 의존성 취약점 대응, Markdown 리포트 자동 생성 |
 
 ## 실행 명령과 결과
 
 | 명령 | 결과 | 비고 |
 | --- | --- | --- |
-| `npm test` | 통과 | `tests/unit/gameEngine.test.js` 13개 테스트 통과 |
+| `npm test` | 통과 | `tests/unit/gameEngine.test.js` 17개 테스트 통과 |
 | `npm test` | 통과 | `tests/unit/agentLoop.test.js` 17개 테스트 통과 |
-| `npm test` | 통과 | 전체 단위 테스트 30개 통과 |
+| `npm test` | 통과 | 2026-08-31 실행, 전체 단위 테스트 34개 통과 |
 | `npm run test:e2e` | 통과 | `tests/e2e/runner.spec.js` 1개 테스트 통과, 명령 자동 종료 확인 |
 | `npm run test:agent -- npm test` | 통과 | PASS 상황에서 `STOP` 결정과 Decision Log 기록 확인 |
 | `npm run test:agent -- node tests/agent/fixtures/productFailCommand.js` | 의도된 실패 | 3회 재시도 후 `REPRODUCED_3_OF_3`, `PRODUCT_FAIL`, `STOP` 확인 |
@@ -36,6 +36,7 @@
 | TC-GROUP-01 초기화 및 상태 관리 | 완료 | 초기 상태, 시작 상태 전이, 재시작 |
 | TC-GROUP-02 입력 및 플레이어 동작 | 완료 | 점프, 공중 중복 점프 방지, 착지, 재점프 |
 | TC-GROUP-03 게임 루프 진행 | 완료 | 프레임 진행, 초 단위 진행, 타임라인 기록, 게임오버 후 정지 |
+| TC-GROUP-04 장애물 생성 및 이동 | 완료 | 장애물 강제 생성, 왼쪽 이동, 화면 밖 제거, 고정 랜덤 소스 |
 | TC-GROUP-05 충돌 및 게임오버 | 완료 | 충돌 시 게임오버, 비충돌 유지, 충돌 후 재시작 |
 
 ## 발견 및 조치
@@ -69,6 +70,7 @@
 | `tests/e2e/testFailEvidence.spec.js` | 추가 | `TC-008-06` 기준 TEST_FAIL evidence 샘플 생성 |
 | `tests/e2e/envFailEvidence.spec.js` | 추가 | `TC-008-07` 기준 ENV_FAIL evidence 샘플 생성 |
 | `docs/sprint-2-feature-test-candidates.md` | 추가 | ISTQB 기반 Sprint 2 기능 테스트 후보와 구현 우선순위 정리 |
+| `docs/test-cases/obstacle-spawn-movement.md` | 상세화 | `TC-004-01`부터 `TC-004-04`까지 상세 TC 기준 정리 |
 
 ## Sprint 2 주의사항
 
@@ -127,5 +129,7 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 이후 Agent Loop를 실제로 실행하고 해석하는 방법을 `docs/agent-loop-runbook.md`에 정리했다.
 
 이후 ISTQB 기반으로 Sprint 2 기능 테스트 후보를 다시 선정하고, 첫 구현 대상을 `TC-GROUP-04 장애물 생성 및 이동`으로 정했다.
+
+이후 `TC-GROUP-04 장애물 생성 및 이동`을 상세 TC 문서로 확장하고, 하네스 기반 단위 테스트 4개를 추가했다.
 
 현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.

@@ -87,6 +87,16 @@ export class GameHarness {
     return this;
   }
 
+  placeObstacle(rect) {
+    this.engine.forceObstacle(rect);
+    return this;
+  }
+
+  spawnObstacle(x) {
+    this.engine.spawnObstacle(x);
+    return this;
+  }
+
   getTimeline() {
     return this.timeline.map((entry) => ({
       frame: entry.frame,

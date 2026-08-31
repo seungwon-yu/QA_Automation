@@ -84,6 +84,58 @@ describe("GameEngine harness loop", () => {
     expect(harness.getState().score).toBe(gameOverScore);
   });
 
+  it("TC-004-01 장애물 강제 생성 시 상태에 장애물이 추가된다", () => {
+    const harness = new GameHarness().start();
+    const stateBeforePlacement = harness.getState();
+
+    harness.placeObstacleAhead(120, { width: 30, height: 50 });
+
+    const obstacle = harness.getState().obstacles[0];
+    expect(harness.getState().obstacles).toHaveLength(1);
+    expect(obstacle.x).toBe(stateBeforePlacement.player.x + stateBeforePlacement.player.width + 120);
+    expect(obstacle.y).toBe(stateBeforePlacement.groundY - 50);
+    expect(obstacle.width).toBe(30);
+    expect(obstacle.height).toBe(50);
+  });
+
+  it("TC-004-02 장애물은 루프 진행에 따라 왼쪽으로 이동한다", () => {
+    const harness = new GameHarness().start().placeObstacleAhead(220);
+    const initialObstacleX = harness.getState().obstacles[0].x;
+
+    harness.runForFrames(10);
+
+    expect(harness.getState().obstacles[0].x).toBeLessThan(initialObstacleX);
+  });
+
+  it("TC-004-03 화면 밖으로 이동한 장애물은 상태에서 제거된다", () => {
+    const harness = new GameHarness().start();
+
+    harness.placeObstacle({
+      id: "near-left-boundary",
+      x: -25,
+      y: harness.getState().groundY - 40,
+      width: 20,
+      height: 40
+    });
+    harness.runForFrames(1);
+
+    expect(harness.getState().obstacles).toHaveLength(0);
+  });
+
+  it("TC-004-04 고정 랜덤 소스를 사용하면 장애물 크기를 예측할 수 있다", () => {
+    const randomValues = [0, 0.999, 0.123];
+    const harness = new GameHarness({
+      rng: () => randomValues.shift() ?? 0.5
+    }).start();
+
+    harness.spawnObstacle(480);
+
+    const obstacle = harness.getState().obstacles[0];
+    expect(obstacle.x).toBe(480);
+    expect(obstacle.height).toBe(34);
+    expect(obstacle.width).toBe(37);
+  });
+
   it("TC-005-01 장애물이 플레이어와 겹치면 gameOver가 된다", () => {
     const harness = new GameHarness().start();
 
