@@ -164,6 +164,49 @@ describe("GameEngine harness loop", () => {
     expect(harness.getState().score).toBe(0);
   });
 
+  it("TC-006-01 1초 생존 시 표시 점수는 허용 범위 안에서 증가한다", () => {
+    const harness = new GameHarness().start();
+
+    harness.runForSeconds(1);
+
+    expect(harness.getState().score).toBeGreaterThanOrEqual(11);
+    expect(harness.getState().score).toBeLessThanOrEqual(12);
+  });
+
+  it("TC-006-02 점수 획득 후 게임오버 시 최고 기록이 현재 점수로 갱신된다", () => {
+    const harness = new GameHarness().start().runForFrames(120);
+
+    harness.placeObstacleAtPlayer().runForFrames(1);
+
+    expect(harness.getState().status).toBe("gameOver");
+    expect(harness.getState().bestScore).toBe(harness.getState().score);
+  });
+
+  it("TC-006-03 최고 기록 후 재시작하면 현재 점수만 초기화되고 최고 기록은 유지된다", () => {
+    const harness = new GameHarness().start().runForFrames(120);
+
+    harness.placeObstacleAtPlayer().runForFrames(1);
+    const bestScoreBeforeRestart = harness.getState().bestScore;
+    harness.restart();
+
+    expect(harness.getState().status).toBe("running");
+    expect(harness.getState().score).toBe(0);
+    expect(harness.getState().bestScore).toBe(bestScoreBeforeRestart);
+  });
+
+  it("TC-006-04 낮은 점수로 다시 게임오버가 되어도 최고 기록은 감소하지 않는다", () => {
+    const harness = new GameHarness().start().runForFrames(180);
+
+    harness.placeObstacleAtPlayer().runForFrames(1);
+    const firstBestScore = harness.getState().bestScore;
+    harness.restart().runForFrames(30);
+    harness.placeObstacleAtPlayer().runForFrames(1);
+
+    expect(harness.getState().status).toBe("gameOver");
+    expect(harness.getState().score).toBeLessThan(firstBestScore);
+    expect(harness.getState().bestScore).toBe(firstBestScore);
+  });
+
   it("타임라인은 clearTimeline으로 초기화할 수 있다", () => {
     const harness = new GameHarness().start().runForFrames(10);
 

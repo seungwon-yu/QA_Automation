@@ -6,7 +6,7 @@
 
 이 프로젝트는 QA 자동화 프로젝트를 직접 설계하고 구현하면서, 하네스 엔지니어링 기반으로 게임 상태를 제어하고 그 위에 Agent Loop를 연결해 실패 증거 수집, 실패 분류, 다음 행동 결정을 연습하기 위한 학습 프로젝트이다.
 
-현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다. 이후 ISTQB 기반으로 Sprint 2 기능 테스트 후보를 다시 선정하고, 첫 구현 대상인 `TC-GROUP-04 장애물 생성 및 이동` 상세 문서와 하네스 기반 단위 테스트를 구현했다.
+현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다. 이후 ISTQB 기반으로 Sprint 2 기능 테스트 후보를 다시 선정하고, `TC-GROUP-04 장애물 생성 및 이동`과 `TC-GROUP-06 점수 및 기록` 상세 문서와 하네스 기반 단위 테스트를 구현했다.
 
 ## 완료된 작업
 
@@ -39,6 +39,7 @@
 | TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 대분류별 TC 문서 분리, `TC-GROUP-05`, `TC-GROUP-08` 상세화 |
 | Sprint 2 기능 테스트 후보 선정 | 완료 | ISTQB 기반으로 장애물, 점수 및 기록, 리그레션, 브라우저 E2E 확장 우선순위 정리 |
 | TC-GROUP-04 장애물 테스트 | 완료 | 장애물 생성, 이동, 화면 밖 제거, 고정 랜덤 소스 단위 테스트 구현 |
+| TC-GROUP-06 점수 및 기록 테스트 | 완료 | 1초 생존 점수, 최고 기록 갱신, 재시작 후 기록 유지, 낮은 점수 기록 보존 테스트 구현 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -134,14 +135,14 @@ Decision Log
 
 ## 다음 작업 우선순위
 
-### 1순위: TC-GROUP-06 점수 및 기록 상세화와 구현
+### 1순위: TC-GROUP-07 리그레션 플로우 상세화와 구현
 
 필요 작업:
 
-- `docs/test-cases/score-record.md`를 상세 TC 형식으로 확장
-- 점수 증가, 최고 기록 갱신, 재시작 후 기록 유지 기준을 문서에 먼저 명시
-- `TC-006-01`부터 하네스 기반 단위 테스트 구현
-- 실패 시 `timeline.json`에 점수 기준 불합 정보가 남는지 확인
+- `docs/test-cases/regression-flow.md`를 상세 TC 형식으로 확장
+- 시작, 점프, 착지, 점수 증가, 충돌, 재시작 흐름을 하나의 사용자 여정으로 연결
+- 반복 실행 중 동일 실패가 재현되는지 확인하는 기준 정리
+- retry evidence 비교 구조와 기능 시나리오를 연결
 - 구현 후 `npm test` 실행
 
 ### 2순위: 의존성 취약점 대응
@@ -181,7 +182,7 @@ Decision Log
 ## 아직 하지 않은 작업
 
 - 의존성 취약점 대응
-- TC-GROUP-06 점수 및 기록 상세 테스트 구현
+- TC-GROUP-07 리그레션 플로우 상세 테스트 구현
 - Sprint 2 추가 기능 테스트 구현
 - JSON evidence 기반 Markdown 리포트 자동 생성
 - GitHub Actions 또는 CI 구성
@@ -204,7 +205,7 @@ Decision Log
 14. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
 15. `npm run test:e2e:test-fail-evidence`로 TEST_FAIL evidence 생성을 확인한다.
 16. `npm run test:e2e:env-fail-evidence`로 ENV_FAIL evidence 생성을 확인한다.
-17. `TC-GROUP-06 점수 및 기록`을 상세화하고 구현한다.
+17. `TC-GROUP-07 리그레션 플로우`를 상세화하고 구현한다.
 
 ## 마지막 확인 상태
 
@@ -235,13 +236,14 @@ Decision Log
 | Retry evidence 비교 | 통과 |
 | Sprint 2 기능 테스트 후보 선정 | 완료 |
 | TC-GROUP-04 장애물 생성 및 이동 | 통과 |
+| TC-GROUP-06 점수 및 기록 | 통과 |
 
 ## 다음 추천 커밋
 
 ```text
-Test: 장애물 생성 및 이동 테스트 추가
+Test: 점수 및 기록 테스트 추가
 
-- 장애물 생성, 이동, 제거, 고정 랜덤 소스 테스트 추가
-- TC-GROUP-04 상세 테스트 문서 갱신
+- 점수 증가와 최고 기록 갱신 테스트 추가
+- TC-GROUP-06 상세 테스트 문서 갱신
 - 단위 테스트 실행 결과 갱신
 ```
