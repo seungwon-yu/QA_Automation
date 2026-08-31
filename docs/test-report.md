@@ -75,6 +75,9 @@
 | `docs/test-cases/obstacle-spawn-movement.md` | 상세화 | `TC-004-01`부터 `TC-004-04`까지 상세 TC 기준 정리 |
 | `docs/test-cases/score-record.md` | 상세화 | `TC-006-01`부터 `TC-006-04`까지 상세 TC 기준 정리 |
 | `docs/test-cases/regression-flow.md` | 상세화 | `TC-007-01`부터 `TC-007-03`까지 상세 TC 기준 정리 |
+| `docs/test-cases/initial-state-management.md` | 상세화 | `TC-001-01`부터 `TC-001-04`까지 상세 TC 기준 정리 |
+| `docs/test-cases/player-input-movement.md` | 상세화 | `TC-002-01`부터 `TC-002-04`까지 상세 TC 기준 정리 |
+| `docs/test-cases/game-loop-progression.md` | 상세화 | `TC-003-01`부터 `TC-003-04`까지 상세 TC 기준 정리 |
 
 ## Sprint 2 주의사항
 
@@ -139,5 +142,7 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 이후 `TC-GROUP-06 점수 및 기록`을 상세 TC 문서로 확장하고, 하네스 기반 단위 테스트 4개를 추가했다. 1초 생존 점수 허용 범위는 표시 점수 내림과 부동소수점 누적 오차 기준에 따라 `11 이상 12 이하`로 문서화했다.
 
 이후 `TC-GROUP-07 리그레션 플로우`를 상세 TC 문서로 확장하고, 기본 플레이 흐름, 게임오버 후 재시작, 핵심 세션 3회 반복 단위 테스트 3개를 추가했다.
+
+이후 후보 수준으로 남아 있던 `TC-GROUP-01 초기화 및 상태 관리`, `TC-GROUP-02 입력 및 플레이어 동작`, `TC-GROUP-03 게임 루프 진행` 문서를 상세 TC 기준으로 확장해 모든 대분류 문서 수준을 맞췄다.
 
 현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.

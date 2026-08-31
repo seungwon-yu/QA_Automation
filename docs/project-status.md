@@ -6,7 +6,7 @@
 
 이 프로젝트는 QA 자동화 프로젝트를 직접 설계하고 구현하면서, 하네스 엔지니어링 기반으로 게임 상태를 제어하고 그 위에 Agent Loop를 연결해 실패 증거 수집, 실패 분류, 다음 행동 결정을 연습하기 위한 학습 프로젝트이다.
 
-현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다. 이후 ISTQB 기반으로 Sprint 2 기능 테스트 후보를 다시 선정하고, `TC-GROUP-04 장애물 생성 및 이동`, `TC-GROUP-06 점수 및 기록`, `TC-GROUP-07 리그레션 플로우` 상세 문서와 하네스 기반 단위 테스트를 구현했다.
+현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다. 이후 ISTQB 기반으로 Sprint 2 기능 테스트 후보를 다시 선정하고, `TC-GROUP-04 장애물 생성 및 이동`, `TC-GROUP-06 점수 및 기록`, `TC-GROUP-07 리그레션 플로우` 상세 문서와 하네스 기반 단위 테스트를 구현했다. 현재는 `TC-GROUP-01`부터 `TC-GROUP-08`까지 모든 대분류 문서를 동일한 상세 수준으로 맞췄다.
 
 ## 완료된 작업
 
@@ -36,11 +36,12 @@
 | 브라우저 ENV_FAIL 샘플 | 완료 | `TC-008-07` 기준 서버 연결 실패 evidence를 `ENV_FAIL`로 분류하고 Decision Log 기록 |
 | Timeline 기준 불합 기록 | 완료 | `timeline.json`에 단계 흐름, PASS/FAIL 기준, comparison, expected/actual, 불합 사유 저장 |
 | Assertion Error 내부 증거 | 완료 | `assertion-error.json`에 Playwright 원본 실패 메시지와 stack trace 저장, `failureSummary`에는 QA 관점 요약 연결 |
-| TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 대분류별 TC 문서 분리, `TC-GROUP-05`, `TC-GROUP-08` 상세화 |
+| TC 상세 기준 문서화 | 완료 | `docs/test-cases/`에 `TC-GROUP-01`부터 `TC-GROUP-08`까지 모든 대분류 상세화 |
 | Sprint 2 기능 테스트 후보 선정 | 완료 | ISTQB 기반으로 장애물, 점수 및 기록, 리그레션, 브라우저 E2E 확장 우선순위 정리 |
 | TC-GROUP-04 장애물 테스트 | 완료 | 장애물 생성, 이동, 화면 밖 제거, 고정 랜덤 소스 단위 테스트 구현 |
 | TC-GROUP-06 점수 및 기록 테스트 | 완료 | 1초 생존 점수, 최고 기록 갱신, 재시작 후 기록 유지, 낮은 점수 기록 보존 테스트 구현 |
 | TC-GROUP-07 리그레션 플로우 테스트 | 완료 | 기본 플레이 흐름, 게임오버 후 재시작, 핵심 세션 3회 반복 테스트 구현 |
+| TC 문서 수준 통일 | 완료 | 후보 수준으로 남아 있던 `TC-GROUP-01`, `TC-GROUP-02`, `TC-GROUP-03` 상세 문서화 |
 | 기본 E2E 테스트 | 완료 | Playwright 기반 시작과 점프 흐름 테스트 작성 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
@@ -238,13 +239,14 @@ Decision Log
 | TC-GROUP-04 장애물 생성 및 이동 | 통과 |
 | TC-GROUP-06 점수 및 기록 | 통과 |
 | TC-GROUP-07 리그레션 플로우 | 통과 |
+| 전체 TC 대분류 상세 문서화 | 완료 |
 
 ## 다음 추천 커밋
 
 ```text
-Test: 리그레션 플로우 테스트 추가
+Docs: 전체 TC 문서 상세화
 
-- 기본 플레이와 재시작 리그레션 테스트 추가
-- TC-GROUP-07 상세 테스트 문서 갱신
-- 단위 테스트 실행 결과 갱신
+- TC-GROUP-01부터 TC-GROUP-03 상세 문서 보강
+- 전체 TC 대분류 문서 수준 통일
+- 진행상황과 문서 목차 갱신
 ```

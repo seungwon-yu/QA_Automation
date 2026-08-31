@@ -25,9 +25,9 @@
 
 | 대분류 | 문서 | 현재 상태 |
 | --- | --- | --- |
-| 초기화 및 상태 관리 | [initial-state-management.md](test-cases/initial-state-management.md) | 후보 TC 정리 |
-| 입력 및 플레이어 동작 | [player-input-movement.md](test-cases/player-input-movement.md) | 후보 TC 정리 |
-| 게임 루프 진행 | [game-loop-progression.md](test-cases/game-loop-progression.md) | 후보 TC 정리 |
+| 초기화 및 상태 관리 | [initial-state-management.md](test-cases/initial-state-management.md) | 상세 TC 정리 |
+| 입력 및 플레이어 동작 | [player-input-movement.md](test-cases/player-input-movement.md) | 상세 TC 정리 |
+| 게임 루프 진행 | [game-loop-progression.md](test-cases/game-loop-progression.md) | 상세 TC 정리 |
 | 장애물 생성 및 이동 | [obstacle-spawn-movement.md](test-cases/obstacle-spawn-movement.md) | 상세 TC 정리 |
 | 충돌 및 게임오버 | [collision-game-over.md](test-cases/collision-game-over.md) | 상세 TC 정리 |
 | 점수 및 기록 | [score-record.md](test-cases/score-record.md) | 상세 TC 정리 |

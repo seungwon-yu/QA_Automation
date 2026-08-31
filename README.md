@@ -138,7 +138,7 @@ docs/test-cases/
 └─ browser-e2e.md
 ```
 
-현재 상세화가 완료된 주요 문서는 `collision-game-over.md`와 `browser-e2e.md`입니다.
+현재 `TC-GROUP-01`부터 `TC-GROUP-08`까지 모든 대분류 문서는 상세 TC 기준으로 정리되어 있습니다.
 
 ## 다음 작업
 
