@@ -207,6 +207,52 @@ describe("GameEngine harness loop", () => {
     expect(harness.getState().bestScore).toBe(firstBestScore);
   });
 
+  it("TC-007-01 시작, 점프, 착지, 점수 증가 흐름은 게임오버 없이 완료된다", () => {
+    const harness = new GameHarness();
+
+    harness.start().pressJump();
+    const landingResult = harness.runUntil((state) => state.player.isGrounded, 180);
+    harness.runForSeconds(1);
+
+    expect(landingResult.matched).toBe(true);
+    expect(harness.getState().status).toBe("running");
+    expect(harness.getState().player.isGrounded).toBe(true);
+    expect(harness.getState().score).toBeGreaterThan(0);
+  });
+
+  it("TC-007-02 게임오버 후 재시작하면 다시 정상 플레이할 수 있다", () => {
+    const harness = new GameHarness().start().runForFrames(120);
+
+    harness.placeObstacleAtPlayer().runForFrames(1);
+    const bestScoreAfterGameOver = harness.getState().bestScore;
+    harness.restart().runForFrames(30);
+
+    expect(harness.getState().status).toBe("running");
+    expect(harness.getState().score).toBeGreaterThan(0);
+    expect(harness.getState().bestScore).toBe(bestScoreAfterGameOver);
+  });
+
+  it("TC-007-03 핵심 플레이 세션을 3회 반복해도 상태와 최고 기록이 안정적으로 유지된다", () => {
+    const harness = new GameHarness();
+    let previousBestScore = 0;
+
+    for (let session = 1; session <= 3; session += 1) {
+      harness.restart().runForFrames(session * 30);
+      harness.placeObstacleAtPlayer().runForFrames(1);
+
+      expect(harness.getState().status).toBe("gameOver");
+      expect(harness.getState().bestScore).toBeGreaterThanOrEqual(previousBestScore);
+
+      previousBestScore = harness.getState().bestScore;
+    }
+
+    harness.restart();
+
+    expect(harness.getState().status).toBe("running");
+    expect(harness.getState().score).toBe(0);
+    expect(harness.getState().bestScore).toBe(previousBestScore);
+  });
+
   it("타임라인은 clearTimeline으로 초기화할 수 있다", () => {
     const harness = new GameHarness().start().runForFrames(10);
 
