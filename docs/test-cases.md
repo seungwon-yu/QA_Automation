@@ -67,21 +67,16 @@ E2E 실패 evidence에는 다음 공통 metadata를 저장한다.
 
 공통 필드는 모든 TC-GROUP에서 공유한다. 대분류별 차이는 `classificationBasis`에 추가한다.
 
-## Sprint 2 우선 상세화 범위
+## 상세화 완료 상태
 
-Sprint 2에서는 Agent Loop 판단 근거와 직접 연결되는 다음 문서를 우선 상세화했다.
+현재 `TC-GROUP-01`부터 `TC-GROUP-08`까지 모든 대분류 문서는 상세 TC 기준으로 정리되어 있다.
 
-| 문서 | 이유 |
-| --- | --- |
-| [collision-game-over.md](test-cases/collision-game-over.md) | 제품 동작 불일치인 `PRODUCT_FAIL`을 설명하기 가장 좋음 |
-| [browser-e2e.md](test-cases/browser-e2e.md) | 실제 브라우저 E2E와 evidence 저장 흐름을 검증하기 좋음 |
-
-나머지 그룹은 이후 Sprint에서 같은 형식으로 확장한다.
+각 문서는 테스트 베이시스, 테스트 설계 기준, 공통 PASS/FAIL 기준, 상세 테스트 케이스, Evidence 기준, Timeline 예시, Classification Basis, 구현 상태를 포함한다.
 
 ## Sprint 2 기능 테스트 후보 선정
 
 Sprint 2 기능 테스트 후보와 구현 우선순위는 `docs/sprint-2-feature-test-candidates.md`에 정리한다.
 
-첫 구현 대상은 `TC-GROUP-04 장애물 생성 및 이동`이다.
+첫 구현 대상은 `TC-GROUP-04 장애물 생성 및 이동`이었다.
 
 선정 이유는 장애물이 게임 진행, 충돌, 난이도에 직접 영향을 주는 핵심 리스크이며, 경계값 분석과 동등 분할을 적용하기 좋은 테스트 조건이기 때문이다.

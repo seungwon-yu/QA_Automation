@@ -5,11 +5,11 @@
 | 항목 | 결과 |
 | --- | --- |
 | 실행 날짜 | 2026-08-31 |
-| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, TC-GROUP-04 장애물 생성 및 이동, TC-GROUP-06 점수 및 기록, TC-GROUP-07 리그레션 플로우, 브라우저 E2E 기본 흐름, evidence metadata 판단 근거, timeline 기준 불합 기록, retry evidence 비교 |
+| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, TC-GROUP-04 장애물 생성 및 이동, TC-GROUP-06 점수 및 기록, TC-GROUP-07 리그레션 플로우, TC-GROUP-08 브라우저 E2E 확장, evidence metadata 판단 근거, timeline 기준 불합 기록, retry evidence 비교 |
 | 단위 테스트 | 통과 |
-| E2E 테스트 | 이전 통과 유지 |
+| E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | 브라우저 E2E 확장, Markdown 리포트 자동 생성, 의존성 취약점 대응 |
+| 남은 주요 작업 | Markdown 리포트 자동 생성, CI 구성, 의존성 취약점 대응 |
 
 ## 실행 명령과 결과
 
@@ -18,7 +18,7 @@
 | `npm test` | 통과 | `tests/unit/gameEngine.test.js` 24개 테스트 통과 |
 | `npm test` | 통과 | `tests/unit/agentLoop.test.js` 17개 테스트 통과 |
 | `npm test` | 통과 | 2026-08-31 실행, 전체 단위 테스트 41개 통과 |
-| `npm run test:e2e` | 통과 | `tests/e2e/runner.spec.js` 1개 테스트 통과, 명령 자동 종료 확인 |
+| `npm run test:e2e` | 통과 | 2026-08-31 실행, `tests/e2e/runner.spec.js` 4개 테스트 통과, 명령 자동 종료 확인 |
 | `npm run test:agent -- npm test` | 통과 | PASS 상황에서 `STOP` 결정과 Decision Log 기록 확인 |
 | `npm run test:agent -- node tests/agent/fixtures/productFailCommand.js` | 의도된 실패 | 3회 재시도 후 `REPRODUCED_3_OF_3`, `PRODUCT_FAIL`, `STOP` 확인 |
 | `npm run test:agent -- node tests/agent/fixtures/testFailCommand.js` | 의도된 실패 | `TEST_FAIL`로 분류하고 재시도 없이 `STOP`, evidence 저장 확인 |
@@ -51,6 +51,7 @@
 | 1초 점수 증가 검증에서 부동소수점 누적 오차 가능성 확인 | 고정값 대신 허용 범위 검증으로 변경 |
 | 실패 당시 기록만으로 제품 실패를 단정할 근거가 부족함 | `metadata.json`에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis` 저장 |
 | `npm run test:e2e`에서 테스트 본문 통과 후 프로세스 종료가 지연됨 | E2E 전용 정적 서버를 추가하고 idle shutdown으로 서버 프로세스가 남지 않도록 조치 |
+| `npm run test:e2e`에서 서버가 실제 테스트 시작 전에 종료될 수 있음 | idle shutdown 기본값을 30초로 늘려 서버가 테스트 중 먼저 종료되지 않도록 조정 |
 | 실패 타임라인만으로 어떤 기준 때문에 FAIL인지 보기 어려움 | `timeline.json`에 `comparison`, `passCriteria`, `expected`, `actual`, `failedBecause`를 기록하고 Decision Log에 `failedCriteria`, `timelineSummary`를 추가 |
 | Playwright 원본 실패와 QA 평가 기준이 분리되어 있음 | `assertion-error.json`에 원본 실패를 저장하고, Decision Log에는 코드 위치를 제외한 `failureSummary` 요약을 추가 |
 
@@ -78,6 +79,7 @@
 | `docs/test-cases/initial-state-management.md` | 상세화 | `TC-001-01`부터 `TC-001-04`까지 상세 TC 기준 정리 |
 | `docs/test-cases/player-input-movement.md` | 상세화 | `TC-002-01`부터 `TC-002-04`까지 상세 TC 기준 정리 |
 | `docs/test-cases/game-loop-progression.md` | 상세화 | `TC-003-01`부터 `TC-003-04`까지 상세 TC 기준 정리 |
+| `tests/e2e/runner.spec.js` | 확장 | `TC-008-01`부터 `TC-008-04`까지 정상 브라우저 E2E 테스트 구현 |
 
 ## Sprint 2 주의사항
 
@@ -144,5 +146,7 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 이후 `TC-GROUP-07 리그레션 플로우`를 상세 TC 문서로 확장하고, 기본 플레이 흐름, 게임오버 후 재시작, 핵심 세션 3회 반복 단위 테스트 3개를 추가했다.
 
 이후 후보 수준으로 남아 있던 `TC-GROUP-01 초기화 및 상태 관리`, `TC-GROUP-02 입력 및 플레이어 동작`, `TC-GROUP-03 게임 루프 진행` 문서를 상세 TC 기준으로 확장해 모든 대분류 문서 수준을 맞췄다.
+
+이후 정상 브라우저 E2E를 `TC-008-01`부터 `TC-008-04`까지 확장했다. 페이지 로드, Start 버튼, Space 키 점프, Restart 버튼 흐름을 각각 분리해 실패 시 원인 분류가 더 명확해지도록 했다.
 
 현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.

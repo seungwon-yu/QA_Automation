@@ -70,6 +70,17 @@
 | FAIL 후보 | Restart 이후 상태가 바뀌지 않거나 점수가 초기화되지 않음 |
 | Classification Basis | Restart locator 문제는 `TEST_FAIL`, 클릭이 정상이고 상태 초기화가 실패하면 `PRODUCT_FAIL` 후보 |
 
+## 정상 E2E 구현 상태
+
+현재 `tests/e2e/runner.spec.js`에는 다음 정상 브라우저 E2E 테스트가 구현되어 있다.
+
+| 테스트 ID | 구현 상태 | 검증 내용 |
+| --- | --- | --- |
+| TC-008-01 | 완료 | 페이지 로드 시 canvas, Start, Jump, Restart UI 표시 |
+| TC-008-02 | 완료 | Start 버튼 클릭 후 UI와 QA state가 `running` |
+| TC-008-03 | 완료 | Space 키 입력 후 `player.y`가 입력 전보다 감소 |
+| TC-008-04 | 완료 | Restart 버튼 클릭 후 상태는 `running`, 점수는 `0` |
+
 ## TC-008-EVIDENCE-001 실패 시 브라우저 evidence를 저장한다
 
 | 항목 | 내용 |
@@ -116,3 +127,24 @@
 | PASS 기준 | 브라우저가 테스트 대상 서버에 접속할 수 있다. |
 | FAIL 후보 | `ERR_CONNECTION_REFUSED`, `ECONNREFUSED`, `Failed to connect` 등 서버 연결 실패 |
 | Classification Basis | 제품 기능이나 테스트 locator 문제가 아니라 실행 환경 문제이므로 `ENV_FAIL` |
+
+## E2E 확장 이유
+
+브라우저 E2E는 하네스 단위 테스트와 역할이 다르다.
+
+하네스 단위 테스트는 게임 엔진 규칙을 빠르고 결정적으로 검증한다. 브라우저 E2E는 실제 사용자가 보는 UI, 버튼, 키보드 입력, QA state 노출이 엔진과 정상적으로 연결되어 있는지 검증한다.
+
+따라서 E2E 확장은 다음 목적을 가진다.
+
+- `Start`, `Space`, `Restart` 같은 실제 사용자 조작을 검증한다.
+- 화면 상태와 `window.__QA_AUTOMATION__.getState()` 결과가 일치하는지 확인한다.
+- 실패 시 `screenshot.png`, `console-log.json`, `state.json`, `timeline.json`으로 브라우저 수준 evidence를 수집할 수 있게 한다.
+- Unit/Harness 테스트에서는 발견하기 어려운 selector, focus, DOM 연결 문제를 분리한다.
+
+## E2E 실행 안정성 기준
+
+E2E 전용 서버는 테스트 시작 전 Playwright가 실행한다.
+
+서버가 너무 빨리 idle shutdown되면 Playwright가 서버 준비 확인을 마친 뒤 실제 브라우저 `page.goto("/")`를 실행하기 전에 서버가 종료될 수 있다. 이 경우 제품 문제가 아니라 테스트 환경 문제인 `ENV_FAIL`로 본다.
+
+현재 E2E 서버 idle shutdown 기본값은 `30000ms`이다. 테스트 후 서버가 남지 않게 하면서도 브라우저 기동 지연 때문에 먼저 종료되지 않도록 하기 위한 기준이다.

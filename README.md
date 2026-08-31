@@ -142,6 +142,6 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 브라우저 E2E 확장 또는 JSON evidence 기반 Markdown 리포트 자동 생성 중 하나를 선택해 진행하는 것입니다.
+다음 작업은 JSON evidence 기반 Markdown 리포트 자동 생성 또는 CI 구성을 선택해 진행하는 것입니다.
 
 추후 evidence 구조가 충분히 안정되면 JSON evidence와 Decision Log를 기반으로 사람이 읽기 좋은 Markdown 테스트 리포트를 자동 생성하는 작업을 진행할 예정입니다.

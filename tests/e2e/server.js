@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const port = Number(process.env.PORT ?? 4173);
 const host = "127.0.0.1";
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const idleShutdownMs = Number(process.env.E2E_SERVER_IDLE_SHUTDOWN_MS ?? 5000);
+const idleShutdownMs = Number(process.env.E2E_SERVER_IDLE_SHUTDOWN_MS ?? 30000);
 let idleTimer = null;
 
 const mimeTypes = {
