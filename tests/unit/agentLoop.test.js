@@ -10,6 +10,7 @@ import { DecisionLogger } from "../agent/decisionLogger.js";
 import { PlaywrightEvidenceAnalyzer } from "../agent/playwrightEvidenceAnalyzer.js";
 import { PlaywrightEvidenceReader } from "../agent/playwrightEvidenceReader.js";
 import { RetryEvidenceComparator } from "../agent/retryEvidenceComparator.js";
+import { createMarkdownReport } from "../agent/markdownReportGenerator.js";
 import { CLASSIFICATION, DECISION, RESULT } from "../agent/failureTypes.js";
 
 describe("QA Agent Loop failure handling", () => {
@@ -528,6 +529,49 @@ describe("QA Agent Loop failure handling", () => {
     expect(entry.screenshotPath).toContain("screenshot.png");
 
     await rm(baseDir, { recursive: true, force: true });
+  });
+
+  it("Decision Summary를 사람이 읽기 좋은 Markdown 리포트로 변환한다", () => {
+    const markdown = createMarkdownReport({
+      testId: "TC-005-01",
+      command: "npm run test:e2e:product-fail-evidence",
+      finalResult: RESULT.FAIL,
+      finalClassification: CLASSIFICATION.PRODUCT_FAIL,
+      finalDecision: DECISION.STOP,
+      retryEvidenceComparison: {
+        reproducibility: "REPRODUCED_3_OF_3",
+        summary: "동일 조건에서 3회 중 3회 동일 실패가 반복됨"
+      },
+      attempts: [
+        {
+          testId: "TC-005-01",
+          attempt: 1,
+          result: RESULT.FAIL,
+          classification: CLASSIFICATION.PRODUCT_FAIL,
+          decision: DECISION.RETRY,
+          observations: ["collision=true", "status=running"],
+          evidenceDir: "artifacts/playwright-evidence/TC-005-01",
+          screenshotPath: "artifacts/playwright-evidence/TC-005-01/screenshot.png",
+          failureSummary: {
+            evaluationTarget: "충돌 이후 게임오버 상태 전이",
+            passCriteria: "충돌이 발생하면 status는 gameOver가 되어야 한다.",
+            expectedResult: "status=gameOver, collision=true",
+            actualResult: "status=running, collision=true",
+            frameworkObserved: "Expected gameOver, Received running",
+            failedBecause: "actual.status가 expected.status와 다름"
+          },
+          nextAction: "동일 명령 재실행",
+          reason: "동일 조건 재현성 확인"
+        }
+      ]
+    });
+
+    expect(markdown).toContain("# QA 자동화 요약 리포트");
+    expect(markdown).toContain("| 테스트 ID | TC-005-01 |");
+    expect(markdown).toContain("| 기대결과 | status=gameOver, collision=true |");
+    expect(markdown).toContain("| 실제결과 | status=running, collision=true |");
+    expect(markdown).toContain("| 최종 분류 | PRODUCT_FAIL |");
+    expect(markdown).toContain("artifacts/playwright-evidence/TC-005-01/screenshot.png");
   });
 });
 

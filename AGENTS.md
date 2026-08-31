@@ -13,14 +13,16 @@
 3. `docs/harness-engineering.md`에서 자동화 전략을 확인한다.
 4. `docs/agent-loop-design.md`에서 Sprint 2 실패 처리 파이프라인을 확인한다.
 5. `docs/agent-loop-runbook.md`에서 Agent Loop 실행 명령과 결과 해석을 확인한다.
-6. `docs/sprint-2-feature-test-candidates.md`에서 Sprint 2 기능 테스트 우선순위를 확인한다.
-7. `docs/test-classification.md`에서 테스트 대분류를 확인한다.
-8. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
-9. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`와 `docs/test-cases/`의 대분류별 문서를 확인한다.
-10. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
-11. 테스트를 실행하기 전에 `docs/test-guardrails.md`를 확인한다.
-12. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
-13. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
+6. `docs/markdown-report.md`에서 요약 리포트 생성 방법을 확인한다.
+7. `docs/ci.md`에서 GitHub Actions CI 구성을 확인한다.
+8. `docs/sprint-2-feature-test-candidates.md`에서 Sprint 2 기능 테스트 우선순위를 확인한다.
+9. `docs/test-classification.md`에서 테스트 대분류를 확인한다.
+10. `docs/test-plan.md`에서 현재 테스트 범위를 확인한다.
+11. 테스트 케이스를 변경하기 전에 `docs/test-cases.md`와 `docs/test-cases/`의 대분류별 문서를 확인한다.
+12. 위험한 게임 동작을 변경하기 전에 `docs/risk-analysis.md`를 확인한다.
+13. 테스트를 실행하기 전에 `docs/test-guardrails.md`를 확인한다.
+14. 코드를 수정하기 전에 `docs/code-convention.md`를 확인한다.
+15. 커밋하기 전에 `docs/commit-convention.md`를 확인한다.
 
 ## 저장소 지도
 - `index.html`: 브라우저 진입점.
@@ -32,10 +34,12 @@
 - `tests/agent/`: Agent Loop 실패 처리 파이프라인.
 - `tests/agent/fixtures/`: 실패 분류 검증용 샘플 명령.
 - `tests/agent/playwrightEvidenceAnalyzer.js`: Playwright evidence 기반 판단 연결.
+- `tests/agent/markdownReportGenerator.js`: JSON summary 기반 Markdown 요약 리포트 생성.
 - `tests/unit/gameEngine.test.js`: 하네스 기반 루프 테스트.
 - `tests/e2e/evidenceTest.js`: Playwright 실패 증거 수집 fixture.
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트.
 - `tests/e2e/server.js`: Playwright E2E 전용 정적 서버와 종료 안정성 처리.
+- `.github/workflows/ci.yml`: GitHub Actions 자동 검증 workflow.
 - `docs/project-status.md`: 진행상황과 다음 작업 기록.
 - `docs/test-report.md`: 마지막 테스트 실행 결과.
 - `docs/test-guardrails.md`: 테스트 수행 가드레일.

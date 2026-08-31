@@ -42,8 +42,10 @@ npm run serve
 - `tests/unit/gameEngine.test.js`: 하네스 기반 단위 테스트
 - `tests/unit/agentLoop.test.js`: Agent Loop 실패 처리 단위 테스트
 - `tests/agent/retryEvidenceComparator.js`: 재시도 attempt별 실패 일관성 비교
+- `tests/agent/markdownReportGenerator.js`: JSON summary를 사람이 읽기 좋은 Markdown 리포트로 변환
 - `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트
 - `tests/e2e/server.js`: Playwright E2E 전용 정적 서버
+- `.github/workflows/ci.yml`: GitHub Actions 자동 검증 workflow
 - `tests/e2e/evidence.spec.js`: Playwright 실패 증거 저장 검증용 의도된 실패 샘플
 - `tests/e2e/productFailEvidence.spec.js`: `TC-005-01` 기준 PRODUCT_FAIL 의도 실패 샘플
 - `tests/agent/playwrightEvidenceAnalyzer.js`: 저장된 Playwright evidence 기반 실패 분류와 Decision Log 기록
@@ -93,6 +95,8 @@ assertion-error.json
 - `docs/harness-engineering.md`: 하네스와 루프 엔지니어링 전략
 - `docs/agent-loop-design.md`: Sprint 2 QA Agent Loop 설계
 - `docs/agent-loop-runbook.md`: Agent Loop 실행 명령과 결과 해석
+- `docs/markdown-report.md`: JSON evidence 기반 Markdown 요약 리포트 생성 방법
+- `docs/ci.md`: GitHub Actions CI 구성과 결과 해석
 - `docs/sprint-2-feature-test-candidates.md`: Sprint 2 기능 테스트 후보와 우선순위
 - `docs/test-classification.md`: 테스트 대분류와 Sprint 1 범위
 - `docs/test-plan.md`: 현재 테스트 목적, 범위, 시작 조건, 완료 조건
@@ -112,6 +116,7 @@ npm run test:e2e:product-fail-evidence
 npm run test:e2e:test-fail-evidence
 npm run test:e2e:env-fail-evidence
 npm run test:agent:evidence
+npm run report:markdown
 ```
 
 `npm test`는 Vitest 기반 단위 테스트를 실행합니다.
@@ -121,6 +126,7 @@ npm run test:agent:evidence
 `npm run test:e2e:test-fail-evidence`는 `TC-008-06` 기준 TEST_FAIL evidence 분류를 확인하기 위한 의도된 실패 명령입니다.
 `npm run test:e2e:env-fail-evidence`는 `TC-008-07` 기준 ENV_FAIL evidence 분류를 확인하기 위한 의도된 실패 명령입니다.
 `npm run test:agent:evidence`는 저장된 Playwright evidence를 읽어 실패 분류와 다음 행동 결정을 기록합니다.
+`npm run report:markdown`은 `artifacts/agent/last-summary.json`을 읽어 `artifacts/reports/latest-summary.md` 요약 리포트를 생성합니다.
 
 ## 현재 TC 문서 구조
 
@@ -142,6 +148,8 @@ docs/test-cases/
 
 ## 다음 작업
 
-다음 작업은 JSON evidence 기반 Markdown 리포트 자동 생성 또는 CI 구성을 선택해 진행하는 것입니다.
+다음 작업은 의존성 취약점 대응 또는 여러 evidence를 묶는 종합 Markdown 리포트 확장 중 하나를 선택해 진행하는 것입니다.
 
-추후 evidence 구조가 충분히 안정되면 JSON evidence와 Decision Log를 기반으로 사람이 읽기 좋은 Markdown 테스트 리포트를 자동 생성하는 작업을 진행할 예정입니다.
+Markdown 요약 리포트는 현재 `last-summary.json` 단일 summary 기준으로 생성된다. 추후에는 여러 evidence 디렉터리를 한 번에 묶어 실행 회차별 종합 리포트를 만드는 방식으로 확장할 예정이다.
+
+CI는 현재 GitHub Actions로 구성되어 있으며, push 또는 pull request 시 `npm test`, `npm run test:e2e`, `npm run test:agent -- npm test`, `npm run report:markdown`을 실행한다.

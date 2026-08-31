@@ -6,7 +6,7 @@
 
 이 프로젝트는 QA 자동화 프로젝트를 직접 설계하고 구현하면서, 하네스 엔지니어링 기반으로 게임 상태를 제어하고 그 위에 Agent Loop를 연결해 실패 증거 수집, 실패 분류, 다음 행동 결정을 연습하기 위한 학습 프로젝트이다.
 
-현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다. 이후 ISTQB 기반으로 Sprint 2 기능 테스트 후보를 다시 선정하고, `TC-GROUP-04 장애물 생성 및 이동`, `TC-GROUP-06 점수 및 기록`, `TC-GROUP-07 리그레션 플로우` 상세 문서와 하네스 기반 단위 테스트를 구현했다. 현재는 `TC-GROUP-01`부터 `TC-GROUP-08`까지 모든 대분류 문서를 동일한 상세 수준으로 맞추고, 정상 브라우저 E2E를 `TC-008-01`부터 `TC-008-04`까지 확장했다.
+현재는 게임 실행, 하네스 루프 API, Sprint 1 기본 테스트, 테스트 실행 리포트, GitHub 연결까지 완료된 상태이다. Sprint 2에서는 QA Agent Loop 기반 실패 처리 파이프라인, Playwright 실패 증거 연동, evidence 판단 근거 metadata 저장, timeline 기준 불합 기록, retry evidence 비교 구조까지 구현했다. 이후 ISTQB 기반으로 Sprint 2 기능 테스트 후보를 다시 선정하고, `TC-GROUP-04 장애물 생성 및 이동`, `TC-GROUP-06 점수 및 기록`, `TC-GROUP-07 리그레션 플로우` 상세 문서와 하네스 기반 단위 테스트를 구현했다. 현재는 `TC-GROUP-01`부터 `TC-GROUP-08`까지 모든 대분류 문서를 동일한 상세 수준으로 맞추고, 정상 브라우저 E2E를 `TC-008-01`부터 `TC-008-04`까지 확장했으며, JSON summary 기반 Markdown 요약 리포트와 GitHub Actions CI 구성을 추가했다.
 
 ## 완료된 작업
 
@@ -44,6 +44,8 @@
 | TC 문서 수준 통일 | 완료 | 후보 수준으로 남아 있던 `TC-GROUP-01`, `TC-GROUP-02`, `TC-GROUP-03` 상세 문서화 |
 | 브라우저 E2E 확장 | 완료 | 페이지 로드, Start, Space Jump, Restart 정상 E2E 4개 테스트 구현 |
 | E2E 서버 안정성 조정 | 완료 | idle shutdown 기본값을 30초로 조정해 브라우저 기동 전 서버 종료 방지 |
+| Markdown 요약 리포트 | 완료 | `last-summary.json`을 읽어 사람이 보기 좋은 Markdown 리포트 생성 |
+| CI 구성 | 완료 | GitHub Actions에서 Unit, E2E, Agent Summary, Markdown 리포트 생성 자동 실행 |
 | QA 문서 구조 | 완료 | 테스트 계획, 테스트 케이스, 리스크 분석, 테스트 분류 작성 |
 | 컨벤션 문서 | 완료 | 코드 컨벤션과 커밋 메시지 컨벤션 작성 |
 | 프로젝트 지도 | 완료 | `AGENTS.md`로 읽는 순서와 작업 규칙 정리 |
@@ -80,6 +82,10 @@
 | `tests/e2e/evidence.spec.js` | Playwright 증거 저장 검증용 의도된 실패 샘플 |
 | `tests/agent/playwrightEvidenceReader.js` | 저장된 Playwright evidence 읽기 |
 | `tests/agent/playwrightEvidenceAnalyzer.js` | evidence 기반 분류와 결정 연결 |
+| `tests/agent/markdownReportGenerator.js` | JSON summary 기반 Markdown 요약 리포트 생성 |
+| `docs/markdown-report.md` | Markdown 요약 리포트 생성 목적과 사용 방법 |
+| `.github/workflows/ci.yml` | GitHub Actions 자동 검증 workflow |
+| `docs/ci.md` | CI 구성 목적과 실패 해석 기준 |
 
 ## 현재 자동화 구조
 
@@ -140,20 +146,25 @@ Decision Log
 
 ### 1순위: Markdown 리포트 자동 생성
 
+현재 상태: 1차 구현 완료.
+
 필요 작업:
 
-- JSON evidence와 Decision Log를 읽어 사람이 보기 좋은 Markdown 리포트 생성
+- 단일 `last-summary.json` 기반 Markdown 요약 리포트 생성
 - 테스트별 PASS 기준, 기대결과, 실제결과, 실패 사유를 표로 정리
-- screenshot, console log, state, timeline evidence 경로를 리포트에 연결
-- 면접과 포트폴리오 설명에 바로 사용할 수 있는 요약 섹션 추가
+- screenshot과 evidence 디렉터리 경로를 리포트에 연결
+- 추후 여러 evidence 디렉터리를 묶는 종합 리포트로 확장
 
 ### 2순위: CI 구성
+
+현재 상태: 1차 구현 완료.
 
 필요 작업:
 
 - GitHub Actions로 `npm test` 실행
-- Playwright E2E 실행 여부 결정
-- 테스트 리포트 산출물 업로드 검토
+- Playwright Chromium 설치 후 `npm run test:e2e` 실행
+- Agent Summary와 Markdown 리포트 생성
+- 테스트 리포트 산출물 업로드
 
 ### 3순위: 의존성 취약점 대응
 
@@ -176,8 +187,8 @@ Decision Log
 
 - 의존성 취약점 대응
 - Sprint 2 추가 기능 테스트 구현
-- JSON evidence 기반 Markdown 리포트 자동 생성
-- GitHub Actions 또는 CI 구성
+- 여러 evidence 디렉터리를 묶는 종합 Markdown 리포트 생성
+- 의도 실패 샘플 전용 CI workflow 분리 검토
 
 ## 이어받는 방법
 
@@ -197,7 +208,8 @@ Decision Log
 14. `npm run test:agent:evidence`로 최신 evidence 기반 판단 연결을 확인한다.
 15. `npm run test:e2e:test-fail-evidence`로 TEST_FAIL evidence 생성을 확인한다.
 16. `npm run test:e2e:env-fail-evidence`로 ENV_FAIL evidence 생성을 확인한다.
-17. JSON evidence 기반 Markdown 리포트 자동 생성 또는 CI 구성 중 다음 작업을 선택한다.
+17. `npm run report:markdown`으로 최신 summary 기반 Markdown 요약 리포트를 생성한다.
+18. 의존성 취약점 대응 또는 종합 Markdown 리포트 확장 중 다음 작업을 선택한다.
 
 ## 마지막 확인 상태
 
@@ -232,13 +244,15 @@ Decision Log
 | TC-GROUP-07 리그레션 플로우 | 통과 |
 | 전체 TC 대분류 상세 문서화 | 완료 |
 | 브라우저 E2E 확장 | 통과 |
+| Markdown 요약 리포트 생성 | 통과 |
+| GitHub Actions CI 구성 | 로컬 파일 구성 완료 |
 
 ## 다음 추천 커밋
 
 ```text
-Test: 브라우저 E2E 정상 흐름 확장
+Chore: CI 자동 검증 구성 추가
 
-- TC-008-01부터 TC-008-04 정상 E2E 테스트 추가
-- E2E 서버 idle shutdown 안정성 조정
-- 브라우저 E2E 문서와 테스트 리포트 갱신
+- GitHub Actions workflow 추가
+- Unit, E2E, Agent Summary, Markdown 리포트 생성 자동화
+- CI 구성과 실패 해석 기준 문서화
 ```

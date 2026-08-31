@@ -5,11 +5,11 @@
 | 항목 | 결과 |
 | --- | --- |
 | 실행 날짜 | 2026-08-31 |
-| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, TC-GROUP-04 장애물 생성 및 이동, TC-GROUP-06 점수 및 기록, TC-GROUP-07 리그레션 플로우, TC-GROUP-08 브라우저 E2E 확장, evidence metadata 판단 근거, timeline 기준 불합 기록, retry evidence 비교 |
+| 테스트 범위 | Sprint 1 하네스 루프 테스트, Sprint 2 Agent Loop 실패 경로, TC-GROUP-04 장애물 생성 및 이동, TC-GROUP-06 점수 및 기록, TC-GROUP-07 리그레션 플로우, TC-GROUP-08 브라우저 E2E 확장, evidence metadata 판단 근거, timeline 기준 불합 기록, retry evidence 비교, Markdown 요약 리포트 생성, CI 구성 |
 | 단위 테스트 | 통과 |
 | E2E 테스트 | 통과 |
 | Agent Loop 러너 | 통과 |
-| 남은 주요 작업 | Markdown 리포트 자동 생성, CI 구성, 의존성 취약점 대응 |
+| 남은 주요 작업 | 의존성 취약점 대응, 여러 evidence를 묶는 종합 Markdown 리포트 확장, 의도 실패 샘플 전용 CI 검토 |
 
 ## 실행 명령과 결과
 
@@ -27,6 +27,8 @@
 | `npm run test:e2e:test-fail-evidence` | 의도된 실패 | `TC-008-06` locator 모호성 metadata 저장 확인 |
 | `npm run test:e2e:env-fail-evidence` | 의도된 실패 | `TC-008-07` 서버 연결 실패 metadata 저장 확인 |
 | `npm run test:agent:evidence` | 의도된 실패 분석 | 최신 Playwright evidence를 읽어 `ENV_FAIL`, `RETRY`, failureSummary 기록 |
+| `npm run report:markdown` | 통과 | `artifacts/agent/last-summary.json`을 읽어 `artifacts/reports/latest-summary.md` 생성 |
+| `.github/workflows/ci.yml` | 구성 완료 | GitHub Actions에서 Unit, E2E, Agent Summary, Markdown 리포트 생성 실행 |
 | `npm audit --audit-level=moderate` | 실패 상태 반환 | 취약점 5개 확인, 자동 수정은 breaking change 가능 |
 
 ## Sprint 1 검증 내용
@@ -68,6 +70,7 @@
 | `docs/agent-loop-runbook.md` | 추가 | Agent Loop 실행 명령과 결과 해석 문서화 |
 | `PlaywrightEvidenceReader` | 확장 | `metadata.json`을 읽어 판단 근거를 분류기에 전달 |
 | `PlaywrightEvidenceAnalyzer` | 확장 | Decision Log에 `testCaseId`, `testGroupId`, `expected`, `actual`, `assertion`, `failedCriteria`, `timelineSummary`, `comparison`, `assertionError`, `failureSummary` 기록 |
+| `MarkdownReportGenerator` | 추가 | `last-summary.json` 기반 사람이 읽기 쉬운 Markdown 요약 리포트 생성 |
 | `tests/e2e/server.js` | 추가 | Playwright E2E용 정적 서버를 직접 실행하고 idle shutdown으로 종료 안정성 확보 |
 | `tests/e2e/productFailEvidence.spec.js` | 추가 | `TC-005-01` 기준 PRODUCT_FAIL evidence 샘플 생성 |
 | `tests/e2e/testFailEvidence.spec.js` | 추가 | `TC-008-06` 기준 TEST_FAIL evidence 샘플 생성 |
@@ -111,7 +114,9 @@ Playwright 실패 샘플을 이용해 실제 `screenshot.png`, `console-log.json
 
 현재 evidence와 Decision Log는 Agent Loop가 안정적으로 읽을 수 있도록 JSON으로 저장한다.
 
-추후 evidence 구조가 충분히 쌓이면 JSON을 입력으로 사용해 Markdown 리포트를 자동 생성한다. Markdown 리포트에는 테스트 케이스, PASS 기준, 기대결과, 실제결과, 실패 사유, 실패 분류, 다음 행동, evidence 파일 경로를 사람이 읽기 쉬운 표와 요약으로 정리한다.
+현재 `npm run report:markdown`으로 `artifacts/agent/last-summary.json`을 입력으로 사용해 Markdown 요약 리포트를 생성할 수 있다. Markdown 리포트에는 테스트 케이스, PASS 기준, 기대결과, 실제결과, 실패 사유, 실패 분류, 다음 행동, evidence 파일 경로를 사람이 읽기 쉬운 표와 요약으로 정리한다.
+
+추후에는 여러 evidence 디렉터리를 한 번에 묶어 실행 회차별 종합 리포트를 생성하는 방식으로 확장한다.
 
 ## 의존성 보안 메모
 
@@ -149,4 +154,8 @@ Sprint 2의 첫 단계로 QA Agent Loop 실패 처리 파이프라인의 기본 
 
 이후 정상 브라우저 E2E를 `TC-008-01`부터 `TC-008-04`까지 확장했다. 페이지 로드, Start 버튼, Space 키 점프, Restart 버튼 흐름을 각각 분리해 실패 시 원인 분류가 더 명확해지도록 했다.
 
-현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석은 통과한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.
+이후 JSON summary를 사람이 읽기 좋은 Markdown 요약 리포트로 변환하는 기능을 추가했다.
+
+이후 GitHub Actions CI를 추가해 push와 pull request에서 Unit, E2E, Agent Summary, Markdown 리포트 생성이 자동 실행되도록 구성했다.
+
+현재 단위 테스트, 브라우저 E2E, Agent Loop evidence 분석, Markdown 요약 리포트 생성은 통과한다. CI는 GitHub에 push된 뒤 Actions 실행 결과로 최종 확인한다. 의도된 실패 샘플은 실패 증거 저장, `REVIEW_REQUIRED`, `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL` 분류 흐름을 검증하기 위해 별도 명령으로 실행한다.

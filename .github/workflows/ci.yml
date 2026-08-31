@@ -1,0 +1,54 @@
+name: QA Automation CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Unit, E2E, and Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run browser E2E tests
+        run: npm run test:e2e
+
+      - name: Create Agent Loop summary
+        run: npm run test:agent -- npm test
+
+      - name: Generate Markdown summary report
+        run: npm run report:markdown
+
+      - name: Upload QA artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-automation-artifacts
+          path: |
+            artifacts/agent/last-summary.json
+            artifacts/reports/latest-summary.md
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
