@@ -1,0 +1,27 @@
+{
+  "testCaseId": "EXP-001",
+  "requirementId": "REQ-COLLISION-001",
+  "testGroupId": "TC-GROUP-05",
+  "testGroupName": null,
+  "assertion": {
+    "name": "실제 겹침 조건에서 충돌 상태 전이"
+  },
+  "expected": {
+    "status": "gameOver",
+    "collision": true
+  },
+  "actual": {
+    "status": "running",
+    "collision": true
+  },
+  "classificationBasis": [
+    {
+      "basisType": "controlledMutation",
+      "supports": "PRODUCT_FAIL",
+      "reason": "겹침을 확인한 뒤 충돌 판정을 비활성화한 실험에서 gameOver 전이가 누락됨"
+    }
+  ],
+  "notes": [
+    "인위적 결함 주입 실험. 배포 게임에서 발견한 실제 결함이 아니다. 브라우저 인스턴스에만 적용한다."
+  ]
+}

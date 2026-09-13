@@ -1,0 +1,17 @@
+{
+  "testCaseId": "EVID-001",
+  "requirementId": null,
+  "testGroupId": null,
+  "testGroupName": null,
+  "assertion": null,
+  "expected": {
+    "value": true
+  },
+  "actual": {
+    "value": false
+  },
+  "classificationBasis": [],
+  "notes": [
+    "캡처 불가 경로를 검증하는 의도 실패"
+  ]
+}

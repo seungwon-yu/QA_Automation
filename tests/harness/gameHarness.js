@@ -26,11 +26,14 @@ export class GameHarness {
     return this;
   }
 
-  tick(frames = 1, fps = 60) {
+  tick(frames = 1, fps = this.defaultFps) {
     return this.runForFrames(frames, fps);
   }
 
   runForFrames(frames = 1, fps = this.defaultFps) {
+    if (!Number.isInteger(frames) || frames < 0 || !Number.isFinite(fps) || fps <= 0) {
+      throw new RangeError("frames는 0 이상의 정수, fps는 유한한 양수여야 한다.");
+    }
     for (let i = 0; i < frames; i += 1) {
       this.engine.tick(1 / fps);
       this.recordFrame();
@@ -44,7 +47,10 @@ export class GameHarness {
   }
 
   runUntil(condition, maxFrames = 300, fps = this.defaultFps) {
-    for (let frame = 0; frame < maxFrames; frame += 1) {
+    if (!Number.isInteger(maxFrames) || maxFrames < 0) {
+      throw new RangeError("maxFrames는 0 이상의 정수여야 한다.");
+    }
+    for (let frame = 0; frame <= maxFrames; frame += 1) {
       if (condition(this.getState(), frame)) {
         return {
           matched: true,
@@ -53,7 +59,9 @@ export class GameHarness {
         };
       }
 
-      this.runForFrames(1, fps);
+      if (frame < maxFrames) {
+        this.runForFrames(1, fps);
+      }
     }
 
     return {

@@ -1,150 +1,24 @@
-# 브라우저 E2E 테스트 케이스
+# TC-GROUP-08: 브라우저 입력 연결
 
-## 개요
+검증 근거: [게임 규칙](../game-rules.md)의 RULE-STATE/RULE-JUMP/RULE-RESTART. 최신 통과 여부는 [실행 리포트](../test-report.md)에 기록한다.
 
-| 항목 | 내용 |
-| --- | --- |
-| 그룹 ID | TC-GROUP-08 |
-| 대분류 | 브라우저 E2E |
-| 우선순위 | Low |
-| 주요 기법 | 시스템 테스트 |
-| 목적 | 브라우저 UI 조작이 엔진과 화면 상태에 연결되어 있는지 검증한다. |
+## 사전조건·관찰·판단
 
-## TC-008-01 페이지 로드 시 게임 UI가 표시된다
+각 단위 테스트는 새 GameHarness를 사용하고 기본 랜덤을 고정한다. 브라우저 테스트는 새 page에서 시작한다. 절차의 행동을 수행한 뒤 기대값을 비교한다. 실패하면 입력 조건·이전/이후 상태·원본 assertion을 확보해 제품/하네스/환경을 구분한다. 단위 테스트는 자동 screenshot 저장 대상이 아니다.
 
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-008-01 |
-| 요구사항 ID | REQ-E2E-001 |
-| Test Condition | 브라우저에서 페이지를 열면 게임 화면과 조작 UI가 표시되어야 한다. |
-| 사전 조건 | E2E 전용 서버가 실행 중이다. |
-| 절차 | `/`에 접속한다. Canvas와 Start 버튼을 찾는다. |
-| Expected Result | Canvas와 Start 버튼이 표시된다. |
-| Evidence | 실패 시 `screenshot.png`, `console-log.json`, `test-info.json`, `metadata.json` |
-| PASS 기준 | UI 요소가 표시됨 |
-| FAIL 후보 | 페이지 접속 실패, UI 요소 미표시 |
-| Classification Basis | 서버 접속 실패는 `ENV_FAIL`, selector/locator 문제는 `TEST_FAIL`, UI가 렌더링되지 않았고 state 근거가 있으면 `PRODUCT_FAIL` 후보 |
-
-## TC-008-02 Start 버튼 클릭 시 게임이 running 상태가 된다
-
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-008-02 |
-| 요구사항 ID | REQ-E2E-002 |
-| Test Condition | 사용자가 Start 버튼을 클릭하면 게임 상태가 `running`으로 표시되어야 한다. |
-| 사전 조건 | 페이지 로드 완료, 초기 상태는 `ready` |
-| 절차 | Start 버튼을 클릭한다. `#state` 텍스트와 QA state를 확인한다. |
-| Expected Result | UI와 QA state 모두 `running`이다. |
-| Evidence | `screenshot.png`, `state.json`, `metadata.json`, `console-log.json` |
-| PASS 기준 | `#state === "running"`이고 `state.value.status === "running"` |
-| FAIL 후보 | 버튼 클릭 후 UI 또는 QA state가 `running`이 아님 |
-| Classification Basis | locator 오류는 `TEST_FAIL`, 클릭이 정상이고 상태 전이가 없으면 `PRODUCT_FAIL` 후보 |
-
-## TC-008-03 Space 키 입력 시 플레이어가 점프한다
-
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-008-03 |
-| 요구사항 ID | REQ-E2E-003 |
-| Test Condition | 게임 실행 중 Space 키 입력은 플레이어 점프와 연결되어야 한다. |
-| 사전 조건 | 게임 상태는 `running`, 플레이어는 지면에 있다. |
-| 절차 | 점프 전 `player.y`를 저장한다. Space 키를 입력한다. 짧은 시간 후 `player.y`를 다시 수집한다. |
-| Expected Result | 점프 후 `player.y`가 점프 전보다 작다. |
-| Evidence | `state.json`, `metadata.json`, `screenshot.png`, 필요 시 `timeline.json` |
-| PASS 기준 | `afterY < beforeY` |
-| FAIL 후보 | Space 입력 후 `player.y`가 감소하지 않음 |
-| Classification Basis | 키 입력 실패나 포커스 문제는 `TEST_FAIL` 후보, 입력이 전달됐고 상태 변화가 없으면 `PRODUCT_FAIL` 후보 |
-
-## TC-008-04 Restart 버튼 클릭 시 상태와 점수가 초기화된다
-
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-008-04 |
-| 요구사항 ID | REQ-E2E-004 |
-| Test Condition | 사용자가 Restart 버튼을 클릭하면 새 게임 세션이 시작되어야 한다. |
-| 사전 조건 | 게임은 `running` 또는 `gameOver` 상태이다. |
-| 절차 | Restart 버튼을 클릭한다. UI 상태, 점수, QA state를 확인한다. |
-| Expected Result | `status`는 `running`, `score`는 `0`이다. |
-| Evidence | `screenshot.png`, `state.json`, `metadata.json`, `console-log.json` |
-| PASS 기준 | Restart 이후 상태와 점수가 expected와 일치 |
-| FAIL 후보 | Restart 이후 상태가 바뀌지 않거나 점수가 초기화되지 않음 |
-| Classification Basis | Restart locator 문제는 `TEST_FAIL`, 클릭이 정상이고 상태 초기화가 실패하면 `PRODUCT_FAIL` 후보 |
-
-## 정상 E2E 구현 상태
-
-현재 `tests/e2e/runner.spec.js`에는 다음 정상 브라우저 E2E 테스트가 구현되어 있다.
-
-| 테스트 ID | 구현 상태 | 검증 내용 |
+| TC | 절차 | 기대결과 |
 | --- | --- | --- |
-| TC-008-01 | 완료 | 페이지 로드 시 canvas, Start, Jump, Restart UI 표시 |
-| TC-008-02 | 완료 | Start 버튼 클릭 후 UI와 QA state가 `running` |
-| TC-008-03 | 완료 | Space 키 입력 후 `player.y`가 입력 전보다 감소 |
-| TC-008-04 | 완료 | Restart 버튼 클릭 후 상태는 `running`, 점수는 `0` |
+| TC-008-01 | 페이지 진입 | canvas/버튼 표시 |
+| TC-008-02 | Start 버튼 클릭 | UI와 상태 running |
+| TC-008-03 | Space 키 입력 | 플레이어 y 감소 |
+| TC-008-04 | 점수 획득 후 Restart 버튼 | UI/상태 running, score=0 |
 
-## TC-008-EVIDENCE-001 실패 시 브라우저 evidence를 저장한다
+## 재현 근거
 
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-008-EVIDENCE-001 |
-| 요구사항 ID | REQ-EVIDENCE-001 |
-| Test Condition | Playwright E2E 실패 시 screenshot, console log, QA state, test info, metadata가 저장되어야 한다. |
-| 사전 조건 | E2E 전용 서버가 실행 중이다. |
-| 절차 | 페이지에 접속한다. console log를 남긴다. metadata를 설정한다. 의도된 assertion 실패를 발생시킨다. |
-| Expected Result | 실패 후 evidence 파일이 생성된다. |
-| Evidence | `screenshot.png`, `console-log.json`, `state.json`, `metadata.json`, `test-info.json` |
-| PASS 기준 | 이 테스트는 의도 실패 샘플이므로 Playwright 명령은 실패를 반환한다. Agent 분석은 `REVIEW_REQUIRED`와 `REVIEW`를 기록한다. |
-| FAIL 후보 | evidence 파일이 생성되지 않거나 Agent 분석이 evidence를 읽지 못함 |
-| Classification Basis | 제품 요구사항 위반을 검증하는 테스트가 아니므로 `PRODUCT_FAIL`로 단정하지 않고 `REVIEW_REQUIRED` |
+TC ID로 코드 테스트를 찾고 같은 좌표·상태·프레임으로 재실행한다. 실행별 actual은 원본 결과 또는 브라우저 evidence에서 확인하며 이 설계표에 통과값을 미리 적지 않는다.
 
-## TC-008-06 locator가 모호하면 TEST_FAIL로 분류한다
+## 제품 TC와 분리한 도구 실험
 
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-008-06 |
-| 요구사항 ID | REQ-E2E-LOCATOR-001 |
-| Test Condition | 자동화 테스트는 사용자 조작 대상 요소를 명확한 locator로 선택해야 한다. |
-| 사전 조건 | 페이지 로드 완료, Start/Jump/Restart 버튼이 모두 표시되어 있다. |
-| 절차 | `/`에 접속한다. 이름을 지정하지 않은 `button` role locator로 클릭을 시도한다. |
-| Expected Result | locator는 조작 대상 요소 하나만 선택해야 한다. |
-| Actual Result | `button` role locator가 Start, Jump, Restart 버튼을 모두 선택한다. |
-| Evidence | `screenshot.png`, `state.json`, `metadata.json`, `timeline.json`, `assertion-error.json`, `test-info.json` |
-| PASS 기준 | 자동화 locator가 단일 요소만 선택한다. |
-| FAIL 후보 | locator가 여러 요소를 동시에 선택해 Playwright strict mode violation이 발생함 |
-| Classification Basis | 제품 요구사항 위반이 아니라 테스트 자동화 코드의 locator 문제이므로 `TEST_FAIL` |
+TC-008-EVIDENCE-001(기존 증거 샘플), TC-008-06(locator 모호성), TC-008-07(연결 실패), EXP-001(충돌 결함 주입), EVID-001(페이지 종료 후 캡처 실패)을 별도 명령으로 실행한다. 정상 E2E 개수에 합산하지 않는다. [runbook](../agent-loop-runbook.md)
 
-## TC-008-07 테스트 서버에 연결할 수 없으면 ENV_FAIL로 분류한다
-
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-008-07 |
-| 요구사항 ID | REQ-E2E-ENV-001 |
-| Test Condition | 브라우저 E2E 테스트는 테스트 대상 서버에 연결할 수 있어야 한다. |
-| 사전 조건 | 잘못된 포트 또는 실행되지 않은 테스트 대상 URL을 사용한다. |
-| 절차 | `http://127.0.0.1:59999`에 접속을 시도한다. |
-| Expected Result | 테스트 대상 서버 연결이 가능해야 한다. |
-| Actual Result | 테스트 대상 서버 연결이 거부된다. |
-| Evidence | `screenshot.png`, `state.json`, `metadata.json`, `timeline.json`, `assertion-error.json`, `test-info.json` |
-| PASS 기준 | 브라우저가 테스트 대상 서버에 접속할 수 있다. |
-| FAIL 후보 | `ERR_CONNECTION_REFUSED`, `ECONNREFUSED`, `Failed to connect` 등 서버 연결 실패 |
-| Classification Basis | 제품 기능이나 테스트 locator 문제가 아니라 실행 환경 문제이므로 `ENV_FAIL` |
-
-## E2E 확장 이유
-
-브라우저 E2E는 하네스 단위 테스트와 역할이 다르다.
-
-하네스 단위 테스트는 게임 엔진 규칙을 빠르고 결정적으로 검증한다. 브라우저 E2E는 실제 사용자가 보는 UI, 버튼, 키보드 입력, QA state 노출이 엔진과 정상적으로 연결되어 있는지 검증한다.
-
-따라서 E2E 확장은 다음 목적을 가진다.
-
-- `Start`, `Space`, `Restart` 같은 실제 사용자 조작을 검증한다.
-- 화면 상태와 `window.__QA_AUTOMATION__.getState()` 결과가 일치하는지 확인한다.
-- 실패 시 `screenshot.png`, `console-log.json`, `state.json`, `timeline.json`으로 브라우저 수준 evidence를 수집할 수 있게 한다.
-- Unit/Harness 테스트에서는 발견하기 어려운 selector, focus, DOM 연결 문제를 분리한다.
-
-## E2E 실행 안정성 기준
-
-E2E 전용 서버는 테스트 시작 전 Playwright가 실행한다.
-
-서버가 너무 빨리 idle shutdown되면 Playwright가 서버 준비 확인을 마친 뒤 실제 브라우저 `page.goto("/")`를 실행하기 전에 서버가 종료될 수 있다. 이 경우 제품 문제가 아니라 테스트 환경 문제인 `ENV_FAIL`로 본다.
-
-현재 E2E 서버 idle shutdown 기본값은 `30000ms`이다. 테스트 후 서버가 남지 않게 하면서도 브라우저 기동 지연 때문에 먼저 종료되지 않도록 하기 위한 기준이다.
+TC-008-04는 browser clock을 정지하고 시작 후 200ms, 재시작 후 HUD 갱신 16ms만 진행한다. 검증 중 시간 경과로 0점이 1점이 되는 경쟁을 제거한다.

@@ -4,6 +4,7 @@ export class GameEngine {
     this.height = options.height ?? 360;
     this.groundY = options.groundY ?? 292;
     this.rng = options.rng ?? Math.random;
+    this.obstacleSequence = 0;
     this.reset();
   }
 
@@ -102,7 +103,7 @@ export class GameEngine {
     const height = 34 + Math.floor(this.rng() * 28);
     const width = 22 + Math.floor(this.rng() * 16);
     const obstacle = {
-      id: `obs-${Date.now()}-${Math.floor(this.rng() * 100000)}`,
+      id: `obs-${++this.obstacleSequence}`,
       x,
       y: this.groundY - height,
       width,

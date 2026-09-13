@@ -1,73 +1,19 @@
-# Markdown 요약 리포트
+# 실행 결과와 근거 보고
 
-## 목적
+보고서는 검증 범위, 실행 상태, 기대/실제 결과, 판단 근거, 증거 경로, 남은 확인을 보여준다.
 
-Markdown 요약 리포트는 JSON으로 저장된 evidence와 Decision Log를 사람이 읽기 쉬운 형태로 정리하기 위한 문서이다.
+## 현재 결과 집계
 
-테스트 실행 후 남는 `metadata.json`, `timeline.json`, `assertion-error.json`, `state.json`, `decision-log.jsonl`, `last-summary.json`은 자동화 도구가 읽기에는 좋지만 사람이 한눈에 흐름을 파악하기에는 어렵다.
-
-따라서 Markdown 리포트는 다음 정보를 표 형태로 정리한다.
-
-- 어떤 테스트가 실행되었는지
-- 최종 결과가 `PASS`인지 `FAIL`인지
-- 실패했다면 어떤 유형으로 분류되었는지
-- 어떤 기준을 만족하지 못했는지
-- 기대결과와 실제결과가 어떻게 달랐는지
-- Agent Loop가 다음 행동을 무엇으로 결정했는지
-- 관련 evidence 파일이 어디에 저장되었는지
-
-## 생성 명령
-
-```bash
-npm run report:markdown
+```sh
+npm test -- --reporter=default --reporter=json --outputFile=artifacts/results/unit.json
+npm run test:e2e
+node scripts/summarize-results.js
 ```
 
-기본 입력 파일은 다음과 같다.
+`artifacts/reports/verification-summary.md`는 Unit/E2E 원본 JSON을 별도로 집계한다. 누락은 미확인으로 표시한다. CI에서는 step outcome을 함께 전달한다. 로컬에서는 오래된 JSON이 남지 않도록 같은 실행에서 생성한 파일인지 시각을 확인한다.
 
-```text
-artifacts/agent/last-summary.json
-```
+기존 `npm run report:markdown`은 `artifacts/agent/last-summary.json`의 단일 분석 요약이다. 전체 TC 결과를 대표하지 않는다. 원본 assertion 오류와 QA 설명을 구분하고 분류기 판단을 확정 버그로 바꾸지 않는다.
 
-기본 출력 파일은 다음과 같다.
+공유 가능한 대표 결과는 [실행 리포트](test-report.md)와 [사례](case-study.md)에 연결한다. 파일이 없으면 존재하는 것처럼 링크하지 않는다.
 
-```text
-artifacts/reports/latest-summary.md
-```
-
-특정 summary 파일과 출력 파일을 지정할 수도 있다.
-
-```bash
-node tests/agent/generateMarkdownReport.js artifacts/agent/last-summary.json artifacts/reports/latest-summary.md
-```
-
-## 리포트 구성
-
-### 실행 요약
-
-테스트 ID, 실행 명령, 최종 결과, 최종 분류, 최종 결정, 실행 횟수를 보여준다.
-
-### 실패 기준 요약
-
-평가 대상, PASS 기준, 기대결과, 실제결과, 프레임워크 관찰값, 실패 사유를 보여준다.
-
-이 영역은 코드 위치보다 QA 판단 기준을 먼저 보여주는 것을 목표로 한다.
-
-### 판단 근거
-
-분류기가 관찰한 내용, 다음 행동, 결정 이유, 재현성, 재시도 비교 결과를 보여준다.
-
-### Attempt 기록
-
-재시도가 발생했을 경우 각 attempt의 결과, 분류, 결정, evidence 경로를 비교할 수 있게 한다.
-
-### Evidence 경로
-
-실패 분석에 사용된 evidence 디렉터리와 screenshot 경로를 보여준다.
-
-## 현재 한계
-
-리포트는 `last-summary.json`에 저장된 정보를 기반으로 생성된다.
-
-따라서 summary에 `failureSummary`, `expected`, `actual`, `screenshotPath`가 없으면 해당 항목은 `-`로 표시된다.
-
-향후에는 여러 evidence 디렉터리를 한 번에 읽어 테스트 실행 회차별 종합 리포트를 생성하는 방식으로 확장할 수 있다.
+의도 실패 spec의 JSON/HTML은 experiments-e2e.json과 artifacts/experiment-report로 분리한다. 정상 보고서와 혼합하지 않는다.

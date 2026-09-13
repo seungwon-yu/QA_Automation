@@ -1,155 +1,40 @@
-# QA_Automation
+# 러너 게임 QA 자동화 포트폴리오
 
-러너 게임과 게임 QA 하네스를 중심으로 만든 자동화 테스트 포트폴리오 프로젝트입니다.
+게임 QA 신입 지원을 위해 **무엇을 검증해야 하는지 판단하고, 문제를 재현하며, 판단 근거를 설명하는 과정**을 구현한 프로젝트입니다. 직접 만든 러너 게임은 통제 가능한 테스트 대상이며, 게임 제작 규모보다 테스트 설계와 재현성이 중심입니다.
 
-이 프로젝트는 게임 로직과 렌더링을 분리해, 자동화 테스트가 하네스를 통해 게임 루프를 제어하고 실패 evidence를 기반으로 실패 유형을 분류할 수 있도록 구성합니다.
+## 먼저 확인할 결과
 
-현재 목표는 단순히 테스트를 PASS시키는 것이 아니라, 실패가 발생했을 때 `screenshot`, `console log`, `QA state`, `metadata`, `timeline`을 저장하고 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED`로 판단할 수 있는 QA Agent Loop 기반을 만드는 것입니다.
+| 질문 | 대표 자료 |
+| --- | --- |
+| 무엇을 왜 검증하는가? | [게임 규칙](docs/game-rules.md), [리스크 분석](docs/risk-analysis.md) |
+| 경계값·상태 전이를 어떻게 검증하는가? | [충돌 TC](docs/test-cases/collision-game-over.md), [추적표](docs/traceability-matrix.md) |
+| 문제를 어떻게 재현하고 설명했는가? | [하네스 결함 개선 사례](docs/case-study.md) |
+| 현재 어디까지 완료했는가? | [현재 상태](docs/project-status.md), [실행 리포트](docs/test-report.md), [완성도 판단](docs/completion-review.md) |
 
-## 프로젝트 목적
+## 구현 범위
 
-이 프로젝트는 QA 자동화 프로젝트를 직접 설계하고 구현해보면서, 게임 QA에서 테스트 기준을 세우고 자동화 구조로 확장하는 과정을 연습하기 위한 학습 프로젝트입니다.
+- 엔진·렌더링·입력 분리와 프레임/랜덤 입력을 제어하는 하네스.
+- 초기 상태, 점프, 충돌 경계, 점수, 재시작, 브라우저 입력 연결 테스트.
+- 실패 시 screenshot·로그·상태·metadata 수집 및 캡처 실패 기록.
+- 규칙 기반 실패 분류 보조와 최대 **총 3회 실행**. AI가 원인을 독립적으로 확정하거나 코드를 자동 수정하는 구조는 아닙니다.
+- CI용 원본 결과·Markdown 요약 생성. 실제 GitHub 실행 여부는 실행 리포트에서 구분합니다.
 
-특히 하네스 엔지니어링을 기반으로 게임 상태, 입력, 시간, 프레임, 충돌 조건을 테스트가 제어할 수 있게 만들고, 그 위에 Agent Loop를 연결해 실패 발생 시 증거 수집, 실패 분류, 다음 행동 결정을 수행하는 구조를 구현해보는 것이 핵심 목표입니다.
+## 실행
 
-이 프로젝트에서 연습하는 내용은 다음과 같습니다.
+Node.js 24와 npm을 사용합니다. 저장소 루트에서 실행합니다.
 
-- 게임 QA 관점의 테스트 대분류와 TC 작성
-- ISTQB 흐름에 맞춘 Test Condition, Expected Result, Actual Result 정리
-- 하네스를 통한 게임 상태 제어와 관찰
-- 루프 엔지니어링을 통한 프레임/시간 기반 테스트
-- Playwright 기반 브라우저 E2E 테스트
-- 실패 시 screenshot, log, state, metadata, timeline evidence 저장
-- timeline 기반 PASS/FAIL 기준 불합 지점 추적
-- evidence 기반 `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED` 분류
-- Decision Log를 통한 판단 과정 기록
-
-## 로컬 실행
-
-`index.html`을 브라우저에서 직접 열거나 아래 명령으로 실행합니다.
-
-```bash
-npm install
-npm run serve
-```
-
-그 다음 `http://127.0.0.1:4173`에 접속합니다.
-
-## 자동화 핵심
-
-- `src/gameEngine.js`: 결정 가능한 게임 규칙
-- `tests/harness/gameHarness.js`: 루프와 상태 제어를 담당하는 하네스
-- `tests/unit/gameEngine.test.js`: 하네스 기반 단위 테스트
-- `tests/unit/agentLoop.test.js`: Agent Loop 실패 처리 단위 테스트
-- `tests/agent/retryEvidenceComparator.js`: 재시도 attempt별 실패 일관성 비교
-- `tests/agent/markdownReportGenerator.js`: JSON summary를 사람이 읽기 좋은 Markdown 리포트로 변환
-- `tests/e2e/runner.spec.js`: 브라우저 수준 Playwright 테스트
-- `tests/e2e/server.js`: Playwright E2E 전용 정적 서버
-- `.github/workflows/ci.yml`: GitHub Actions 자동 검증 workflow
-- `tests/e2e/evidence.spec.js`: Playwright 실패 증거 저장 검증용 의도된 실패 샘플
-- `tests/e2e/productFailEvidence.spec.js`: `TC-005-01` 기준 PRODUCT_FAIL 의도 실패 샘플
-- `tests/agent/playwrightEvidenceAnalyzer.js`: 저장된 Playwright evidence 기반 실패 분류와 Decision Log 기록
-
-## 현재 자동화 구조
-
-```text
-Game
- ↓
-GameHarness
- ↓
-Unit Test / E2E
- ↓
-Evidence
- ↓
-Failure Classification
- ↓
-Retry Evidence Comparison
- ↓
-Decision Log
-```
-
-실패 evidence에는 다음 파일을 저장합니다.
-
-```text
-screenshot.png
-console-log.json
-state.json
-metadata.json
-test-info.json
-timeline.json
-assertion-error.json
-```
-
-`metadata.json`에는 `testCaseId`, `requirementId`, `testGroupId`, `expected`, `actual`, `assertion`, `classificationBasis`를 저장합니다.
-
-`timeline.json`에는 테스트 단계와 PASS/FAIL 기준 불합 지점을 저장합니다. 실패 기준 항목에는 `comparison`, `passCriteria`, `expected`, `actual`, `failedBecause`를 기록해 “어느 기준을 만족하지 못해서 FAIL이 되었는지”를 확인할 수 있게 합니다.
-
-`comparison`은 사람이 한눈에 볼 수 있는 요약입니다. 예를 들어 기대결과는 `status=gameOver, collision=true`, 실제결과는 `status=running, collision=true`처럼 한 줄로 정리합니다.
-
-`assertion-error.json`에는 Playwright가 남긴 원본 실패 메시지와 stack trace를 내부 evidence로 저장합니다. 사람이 보는 요약에서는 코드 위치보다 `failureSummary`의 평가 기준, 기대결과, 실제결과, 실패 사유를 우선 확인합니다.
-
-## 프로젝트 문서
-
-- `AGENTS.md`: 이후 작업자와 에이전트를 위한 프로젝트 지도
-- `docs/project-status.md`: 현재 진행상황과 다음 작업
-- `docs/harness-engineering.md`: 하네스와 루프 엔지니어링 전략
-- `docs/agent-loop-design.md`: Sprint 2 QA Agent Loop 설계
-- `docs/agent-loop-runbook.md`: Agent Loop 실행 명령과 결과 해석
-- `docs/markdown-report.md`: JSON evidence 기반 Markdown 요약 리포트 생성 방법
-- `docs/ci.md`: GitHub Actions CI 구성과 결과 해석
-- `docs/sprint-2-feature-test-candidates.md`: Sprint 2 기능 테스트 후보와 우선순위
-- `docs/test-classification.md`: 테스트 대분류와 Sprint 1 범위
-- `docs/test-plan.md`: 현재 테스트 목적, 범위, 시작 조건, 완료 조건
-- `docs/test-cases.md`: 테스트 케이스 목차와 공통 metadata 기준
-- `docs/test-cases/`: 대분류별 테스트 케이스 상세 문서
-- `docs/risk-analysis.md`: 제품 리스크와 테스트 대응
-- `docs/test-guardrails.md`: 테스트 수행 중 지켜야 할 가드레일
-- `docs/test-report.md`: 테스트 실행 결과와 남은 작업
-
-## 테스트 명령
-
-```bash
+```sh
+npm ci
+npx playwright install chromium
 npm test
 npm run test:e2e
-npm run test:e2e:evidence
-npm run test:e2e:product-fail-evidence
-npm run test:e2e:test-fail-evidence
-npm run test:e2e:env-fail-evidence
-npm run test:agent:evidence
-npm run report:markdown
 ```
 
-`npm test`는 Vitest 기반 단위 테스트를 실행합니다.
-`npm run test:e2e`는 Playwright 기반 정상 브라우저 E2E를 실행합니다.
-`npm run test:e2e:evidence`는 실패 증거 저장을 확인하기 위한 의도된 실패 명령입니다.
-`npm run test:e2e:product-fail-evidence`는 `TC-005-01` 기준 PRODUCT_FAIL evidence 분류를 확인하기 위한 의도된 실패 명령입니다.
-`npm run test:e2e:test-fail-evidence`는 `TC-008-06` 기준 TEST_FAIL evidence 분류를 확인하기 위한 의도된 실패 명령입니다.
-`npm run test:e2e:env-fail-evidence`는 `TC-008-07` 기준 ENV_FAIL evidence 분류를 확인하기 위한 의도된 실패 명령입니다.
-`npm run test:agent:evidence`는 저장된 Playwright evidence를 읽어 실패 분류와 다음 행동 결정을 기록합니다.
-`npm run report:markdown`은 `artifacts/agent/last-summary.json`을 읽어 `artifacts/reports/latest-summary.md` 요약 리포트를 생성합니다.
+게임 직접 확인: `npm run serve` 후 `http://127.0.0.1:4173`에 접속합니다.
+결과 JSON과 통합 요약 명령은 [CI 문서](docs/ci.md), 의도 실패 실험은 [실행 가이드](docs/agent-loop-runbook.md)에 있습니다.
 
-## 현재 TC 문서 구조
+## 읽을 때 주의할 범위
 
-테스트 케이스는 대분류별로 분리되어 있습니다.
+단위 테스트 수는 게임 TC 수와 다릅니다. 하네스·분류기 검증을 포함합니다. EXP-001은 별도 브라우저에 결함을 주입한 검출 실험이며 실제 출시 게임의 결함 발견 사례가 아닙니다. 다중 브라우저·장시간 성능·보안 검증은 현재 제출 범위 밖입니다.
 
-```text
-docs/test-cases/
-├─ initial-state-management.md
-├─ player-input-movement.md
-├─ game-loop-progression.md
-├─ obstacle-spawn-movement.md
-├─ collision-game-over.md
-├─ score-record.md
-├─ regression-flow.md
-└─ browser-e2e.md
-```
-
-현재 `TC-GROUP-01`부터 `TC-GROUP-08`까지 모든 대분류 문서는 상세 TC 기준으로 정리되어 있습니다.
-
-## 다음 작업
-
-다음 작업은 의존성 취약점 대응 또는 여러 evidence를 묶는 종합 Markdown 리포트 확장 중 하나를 선택해 진행하는 것입니다.
-
-Markdown 요약 리포트는 현재 `last-summary.json` 단일 summary 기준으로 생성된다. 추후에는 여러 evidence 디렉터리를 한 번에 묶어 실행 회차별 종합 리포트를 만드는 방식으로 확장할 예정이다.
-
-CI는 현재 GitHub Actions로 구성되어 있으며, push 또는 pull request 시 `npm test`, `npm run test:e2e`, `npm run test:agent -- npm test`, `npm run report:markdown`을 실행한다.
+[전체 문서 지도](docs/index.md) · [작업 규칙](AGENTS.md)

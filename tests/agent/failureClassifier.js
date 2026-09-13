@@ -1,179 +1,61 @@
 import { CLASSIFICATION, RESULT } from "./failureTypes.js";
 
-const ENV_PATTERNS = [
-  "Executable doesn't exist",
-  "Failed to connect",
-  "Could not connect",
-  "ECONNREFUSED",
-  "ERR_CONNECTION_REFUSED",
-  "browserType.launch",
-  "Cannot find module",
-  "command not found",
-  "not recognized as"
-];
-
-const TEST_PATTERNS = [
-  "strict mode violation",
-  "Playwright Test did not expect test() to be called here",
-  "SyntaxError",
-  "ReferenceError",
-  "TypeError",
-  "locator.click"
-];
-
-const PRODUCT_PATTERNS = [
-  "Expected game state",
-  "Expected collision",
-  "Expected score",
-  "PRODUCT_ASSERTION"
-];
+// 도구가 보고한 구체적 오류만 사용한다. 제품 console은 원인 계층을 증명하지 않는다.
+const ENV_PATTERNS = ["Executable doesn't exist", "ECONNREFUSED", "ERR_CONNECTION_REFUSED", "Cannot find module", "command not found", "not recognized as"];
+const TEST_PATTERNS = ["strict mode violation", "Playwright Test did not expect test() to be called here"];
 
 export class FailureClassifier {
   classify(context) {
     if (context.exitCode === 0) {
-      return {
-        result: RESULT.PASS,
-        classification: null,
-        observations: ["테스트 명령이 성공 종료됨"],
-        reason: "실패 분류가 필요하지 않음"
-      };
+      return { result: RESULT.PASS, classification: null, observations: ["테스트 명령이 성공 종료됨"], reason: "실패 분류가 필요하지 않음" };
     }
-
-    const output = `${context.stdout ?? ""}\n${context.stderr ?? ""}\n${extractEvidenceText(context.evidence)}`;
-
-    if (matchesAny(output, ENV_PATTERNS)) {
-      return buildFail(CLASSIFICATION.ENV_FAIL, "실행 환경 오류 패턴이 발견됨", output, ENV_PATTERNS);
+    const evidence = context.evidence ?? {};
+    const metadata = evidence.metadata ?? {};
+    const toolErrors = (evidence.assertionError?.errors ?? []).map((error) => error.message ?? "").join("\n");
+    const output = `${context.stdout ?? ""}\n${context.stderr ?? ""}\n${toolErrors}`;
+    const candidates = new Set();
+    const observations = [];
+    for (const [classification, patterns] of [[CLASSIFICATION.ENV_FAIL, ENV_PATTERNS], [CLASSIFICATION.TEST_FAIL, TEST_PATTERNS]]) {
+      const matched = patterns.filter((pattern) => output.includes(pattern));
+      if (matched.length) {
+        candidates.add(classification);
+        observations.push(...matched.map((pattern) => `tool: ${pattern}`));
+      }
     }
-
-    if (matchesAny(output, TEST_PATTERNS)) {
-      return buildFail(CLASSIFICATION.TEST_FAIL, "테스트 코드 또는 테스트 도구 사용 오류 패턴이 발견됨", output, TEST_PATTERNS);
+    // 명시적인 fixture 계약이다. 일반 assertion 문구를 제품 원인으로 해석하지 않는다.
+    if (output.includes("PRODUCT_ASSERTION:")) {
+      candidates.add(CLASSIFICATION.PRODUCT_FAIL);
+      observations.push("fixture: PRODUCT_ASSERTION (합성 분류 검증 계약)");
     }
-
-    if (matchesAny(output, PRODUCT_PATTERNS)) {
-      return buildFail(CLASSIFICATION.PRODUCT_FAIL, "제품 기대 동작 불일치 패턴이 발견됨", output, PRODUCT_PATTERNS);
+    const basis = Array.isArray(metadata.classificationBasis) ? metadata.classificationBasis : [];
+    const supported = Object.values(CLASSIFICATION);
+    for (const item of basis) {
+      if (!supported.includes(item.supports) || !item.reason) {
+        candidates.add(CLASSIFICATION.REVIEW_REQUIRED);
+        continue;
+      }
+      const hasValues = metadata.expected != null && metadata.actual != null;
+      const differs = JSON.stringify(metadata.expected) !== JSON.stringify(metadata.actual);
+      if (item.supports === CLASSIFICATION.PRODUCT_FAIL && (!hasValues || !differs)) {
+        candidates.add(CLASSIFICATION.REVIEW_REQUIRED);
+        observations.push("제품 후보의 기대/실제 관찰값이 없거나 차이가 없음");
+      } else {
+        candidates.add(item.supports);
+        observations.push(`${item.basisType ?? "basis"}: ${item.reason}`);
+      }
     }
-
-    const metadataResult = classifyByMetadata(context.evidence);
-    if (metadataResult) {
-      return metadataResult;
+    if (metadata.testCaseId) {
+      observations.push(`testCaseId=${metadata.testCaseId}`);
+      observations.push(`testGroupId=${metadata.testGroupId ?? "UNKNOWN"}`);
     }
-
-    if (context.evidence?.testInfo?.status === "failed") {
-      return {
-        result: RESULT.FAIL,
-        classification: CLASSIFICATION.REVIEW_REQUIRED,
-        observations: [
-          "Playwright 실패 evidence가 있지만 제품, 테스트, 환경 오류로 단정할 패턴이 부족함",
-          `evidenceDir=${context.evidence.evidenceDir}`
-        ],
-        reason: "저장된 screenshot, console log, state를 사람 또는 상위 Agent가 검토해야 함"
-      };
-    }
-
+    const classification = candidates.size === 1 ? [...candidates][0] : CLASSIFICATION.REVIEW_REQUIRED;
     return {
       result: RESULT.FAIL,
-      classification: CLASSIFICATION.REVIEW_REQUIRED,
-      observations: ["실패는 발생했지만 제품, 테스트, 환경 오류로 단정할 근거가 부족함"],
-      reason: "추가 증거 또는 사람의 리뷰가 필요함"
+      classification,
+      observations: observations.length ? observations : ["실패 원인을 구분할 명시적인 근거가 부족함"],
+      reason: classification === CLASSIFICATION.REVIEW_REQUIRED
+        ? "근거가 부족하거나 충돌하여 오류 위치, 사전조건, 기대/실제 결과를 검토해야 함"
+        : "도구 오류 또는 테스트 작성자가 제공한 구조화 근거에 따른 규칙 기반 후보 분류; 독립적인 원인 확정은 아님"
     };
   }
-}
-
-function extractEvidenceText(evidence) {
-  if (!evidence) {
-    return "";
-  }
-
-  const consoleText = Array.isArray(evidence.consoleLog)
-    ? evidence.consoleLog.map((message) => message.text).join("\n")
-    : "";
-  const stateText = evidence.state?.available
-    ? JSON.stringify(evidence.state.value)
-    : JSON.stringify(evidence.state ?? {});
-  const testInfoText = JSON.stringify(evidence.testInfo ?? {});
-  const metadataText = JSON.stringify(evidence.metadata ?? {});
-  const assertionErrorText = JSON.stringify(evidence.assertionError ?? {});
-
-  return `${consoleText}\n${stateText}\n${testInfoText}\n${metadataText}\n${assertionErrorText}`;
-}
-
-function buildFail(classification, reason, output, patterns) {
-  return {
-    result: RESULT.FAIL,
-    classification,
-    observations: patterns.filter((pattern) => output.includes(pattern)),
-    reason
-  };
-}
-
-function matchesAny(output, patterns) {
-  return patterns.some((pattern) => output.includes(pattern));
-}
-
-function classifyByMetadata(evidence) {
-  const metadata = evidence?.metadata;
-
-  if (!metadata || metadata.available === false) {
-    return null;
-  }
-
-  const basis = Array.isArray(metadata.classificationBasis)
-    ? metadata.classificationBasis
-    : [];
-  const productBasis = basis.filter((item) => item.supports === CLASSIFICATION.PRODUCT_FAIL);
-  const testBasis = basis.filter((item) => item.supports === CLASSIFICATION.TEST_FAIL);
-  const envBasis = basis.filter((item) => item.supports === CLASSIFICATION.ENV_FAIL);
-
-  if (productBasis.length > 0) {
-    return {
-      result: RESULT.FAIL,
-      classification: CLASSIFICATION.PRODUCT_FAIL,
-      observations: buildMetadataObservations(metadata, productBasis),
-      reason: "metadata의 expected/actual과 대분류별 판단 근거가 제품 기대 동작 불일치를 지지함"
-    };
-  }
-
-  if (testBasis.length > 0) {
-    return {
-      result: RESULT.FAIL,
-      classification: CLASSIFICATION.TEST_FAIL,
-      observations: buildMetadataObservations(metadata, testBasis),
-      reason: "metadata의 대분류별 판단 근거가 테스트 코드 또는 테스트 도구 사용 문제를 지지함"
-    };
-  }
-
-  if (envBasis.length > 0) {
-    return {
-      result: RESULT.FAIL,
-      classification: CLASSIFICATION.ENV_FAIL,
-      observations: buildMetadataObservations(metadata, envBasis),
-      reason: "metadata의 대분류별 판단 근거가 테스트 실행 환경 문제를 지지함"
-    };
-  }
-
-  const reviewBasis = basis.filter((item) => item.supports === CLASSIFICATION.REVIEW_REQUIRED);
-
-  if (reviewBasis.length > 0) {
-    return {
-      result: RESULT.FAIL,
-      classification: CLASSIFICATION.REVIEW_REQUIRED,
-      observations: buildMetadataObservations(metadata, reviewBasis),
-      reason: "metadata가 제품, 테스트, 환경 실패로 단정하지 말아야 할 근거를 제공함"
-    };
-  }
-
-  return null;
-}
-
-function buildMetadataObservations(metadata, basis) {
-  const observations = [
-    `testCaseId=${metadata.testCaseId ?? "UNKNOWN"}`,
-    `testGroupId=${metadata.testGroupId ?? "UNKNOWN"}`
-  ];
-
-  for (const item of basis) {
-    observations.push(`${item.basisType ?? "basis"}: ${item.reason ?? "판단 근거 설명 없음"}`);
-  }
-
-  return observations;
 }

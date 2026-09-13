@@ -31,7 +31,7 @@ export class PlaywrightEvidenceReader {
       metadata,
       timeline,
       assertionError,
-      screenshotPath: testInfo.screenshotPath ?? path.join(evidenceDir, "screenshot.png")
+      screenshotPath: testInfo.screenshotAvailable === false ? null : (testInfo.screenshotPath ?? path.join(evidenceDir, "screenshot.png"))
     };
   }
 }

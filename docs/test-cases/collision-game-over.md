@@ -1,96 +1,32 @@
-# 충돌 및 게임오버 테스트 케이스
+# TC-GROUP-05: 충돌 경계와 게임오버
 
-## 개요
+검증 근거: [게임 규칙](../game-rules.md)의 RULE-COLLISION. 최신 통과 여부는 [실행 리포트](../test-report.md)에 기록한다.
 
-| 항목 | 내용 |
-| --- | --- |
-| 그룹 ID | TC-GROUP-05 |
-| 대분류 | 충돌 및 게임오버 |
-| 우선순위 | High |
-| 주요 기법 | 경계값 분석, 상태 전이 |
-| 목적 | 충돌 판정과 게임오버 상태 전이를 검증한다. |
+## 사전조건·관찰·판단
 
-## TC-005-01 장애물이 플레이어와 겹치면 게임오버가 된다
+각 단위 테스트는 새 GameHarness를 사용하고 기본 랜덤을 고정한다. 브라우저 테스트는 새 page에서 시작한다. 절차의 행동을 수행한 뒤 기대값을 비교한다. 실패하면 입력 조건·이전/이후 상태·원본 assertion을 확보해 제품/하네스/환경을 구분한다. 단위 테스트는 자동 screenshot 저장 대상이 아니다.
 
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-005-01 |
-| 요구사항 ID | REQ-COLLISION-001 |
-| Test Condition | 장애물과 플레이어 충돌이 발생하면 게임 상태가 `gameOver`로 전이되어야 한다. |
-| 사전 조건 | 게임 상태는 `running`이다. 플레이어는 지면에 있다. |
-| 절차 | 게임을 시작한다. 장애물을 플레이어 충돌 영역에 배치한다. 게임 루프를 1프레임 이상 진행한다. QA state를 수집한다. |
-| Expected Result | `status`가 `gameOver`이다. |
-| Evidence | `state.json`, `metadata.json`, `timeline.json`, 필요 시 `screenshot.png` |
-| PASS 기준 | 충돌 이후 `status === "gameOver"` |
-| FAIL 후보 | 충돌 조건이 true인데 `status`가 `running` 또는 `ready`로 유지됨 |
-| Classification Basis | 환경 오류와 테스트 코드 오류가 없고, `expected.status = "gameOver"`, `actual.status != "gameOver"`이면 `PRODUCT_FAIL` 후보 |
+| TC | 절차 | 기대결과 |
+| --- | --- | --- |
+| TC-005-01 | 플레이어와 겹치는 장애물, 1프레임 | gameOver |
+| TC-005-02 | 앞 220px 장애물, 1프레임 | running |
+| TC-005-03 | 아래 경계표, dt=0 | 각 좌표 기대와 일치 |
+| TC-005-04 | 점수 획득→충돌→Restart | running, score=0 |
+| TC-005-05 | x=130,y=238,20×20 장애물, 1프레임 | 경계 안으로 이동하여 gameOver |
 
-예상 metadata 핵심:
+## 재현 근거
 
-```json
-{
-  "testCaseId": "TC-005-01",
-  "requirementId": "REQ-COLLISION-001",
-  "testGroupId": "TC-GROUP-05",
-  "expected": {
-    "status": "gameOver",
-    "collision": true
-  },
-  "actual": {
-    "status": "running",
-    "collision": true
-  },
-  "classificationBasis": [
-    {
-      "basisType": "collisionStateMismatch",
-      "supports": "PRODUCT_FAIL",
-      "reason": "충돌 조건이 true인데 게임 상태가 gameOver로 전이되지 않음"
-    }
-  ]
-}
-```
+TC ID로 코드 테스트를 찾고 같은 좌표·상태·프레임으로 재실행한다. 실행별 actual은 원본 결과 또는 브라우저 evidence에서 확인하며 이 설계표에 통과값을 미리 적지 않는다.
 
-## TC-005-02 장애물이 플레이어와 겹치지 않으면 게임은 계속 진행된다
+## 충돌 경계값 데이터
 
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-005-02 |
-| 요구사항 ID | REQ-COLLISION-002 |
-| Test Condition | 장애물이 플레이어와 겹치지 않으면 게임 상태는 `running`으로 유지되어야 한다. |
-| 사전 조건 | 게임 상태는 `running`이다. 장애물은 플레이어 충돌 영역 밖에 있다. |
-| 절차 | 게임을 시작한다. 장애물을 비충돌 위치에 배치한다. 게임 루프를 진행한다. QA state를 수집한다. |
-| Expected Result | `status`가 `running`으로 유지된다. |
-| Evidence | `state.json`, `metadata.json`, `timeline.json` |
-| PASS 기준 | 비충돌 조건에서 `status === "running"` |
-| FAIL 후보 | 비충돌 조건인데 `status`가 `gameOver`로 전이됨 |
-| Classification Basis | 비충돌 조건이 명확하고 테스트 배치 오류가 없으면 `PRODUCT_FAIL` 후보. 장애물 위치 계산 근거가 부족하면 `REVIEW_REQUIRED` |
+플레이어 (x=86,y=238,width=44,height=54), padding=5, 장애물 20×20. 이동을 제외한 dt=0 판정이다. 내부 1px 겹침만 충돌이며 정확한 접촉은 비충돌이다.
 
-## TC-005-03 충돌 경계값은 충돌 규칙과 일치한다
+| 방향 | 공통 좌표 | 내부(충돌) | 접촉(비충돌) | 외부(비충돌) |
+| --- | --- | --- | --- | --- |
+| 오른쪽 | y=238 | x=124 | x=125 | x=126 |
+| 왼쪽 | y=238 | x=72 | x=71 | x=70 |
+| 아래 | x=100 | y=286 | y=287 | y=288 |
+| 위 | x=100 | y=224 | y=223 | y=222 |
 
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-005-03 |
-| 요구사항 ID | REQ-COLLISION-003 |
-| Test Condition | 플레이어와 장애물의 경계가 겹치는 경우 충돌 판정이 기대 규칙과 일치해야 한다. |
-| 사전 조건 | 게임 상태는 `running`이다. 플레이어와 장애물의 좌표를 제어할 수 있다. |
-| 절차 | 장애물을 충돌 경계값 위치에 배치한다. 1프레임 진행한다. 충돌 결과와 상태를 수집한다. |
-| Expected Result | 경계값 규칙에 따라 충돌이면 `gameOver`, 비충돌이면 `running`이다. |
-| Evidence | `state.json`, `metadata.json`, `timeline.json` |
-| PASS 기준 | 경계값 expected와 actual이 일치 |
-| FAIL 후보 | 경계값 expected와 actual이 불일치 |
-| Classification Basis | 경계값 좌표와 expected가 metadata에 충분히 있으면 `PRODUCT_FAIL` 후보. 좌표 근거가 부족하면 `REVIEW_REQUIRED` |
-
-## TC-005-04 충돌 후 재시작하면 새 세션이 시작된다
-
-| 항목 | 내용 |
-| --- | --- |
-| 테스트 ID | TC-005-04 |
-| 요구사항 ID | REQ-COLLISION-004 |
-| Test Condition | 게임오버 이후 재시작하면 상태와 점수가 새 세션 기준으로 초기화되어야 한다. |
-| 사전 조건 | 게임 상태는 `gameOver`이다. |
-| 절차 | 충돌을 발생시킨다. Restart를 실행한다. QA state를 수집한다. |
-| Expected Result | `status`는 `running`, `score`는 `0`, 플레이어는 시작 위치이다. |
-| Evidence | `state.json`, `metadata.json`, `timeline.json`, 필요 시 `screenshot.png` |
-| PASS 기준 | 재시작 이후 상태와 점수가 초기화됨 |
-| FAIL 후보 | 상태가 `gameOver`로 남거나 점수가 초기화되지 않음 |
-| Classification Basis | 재시작 입력이 정상 수행됐고 actual이 expected와 다르면 `PRODUCT_FAIL` 후보 |
+TC-005-05는 실제 한 프레임 이동 통합 검증으로 dt=0 경계 검증을 보완한다.

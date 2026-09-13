@@ -1,94 +1,20 @@
-# CI 구성
+# CI 검증 범위
 
-## 목적
+`.github/workflows/ci.yml`은 의존성 설치→Unit→Chromium E2E→결과 요약→artifacts 업로드 순서이다. Unit 실패 후에도 E2E를 시도하며 앞 단계 미실행/실패 여부를 요약에 전달한다. 요약과 업로드는 always 조건으로 실행한다.
 
-CI는 코드가 GitHub에 올라갔을 때 같은 기준으로 자동 검증을 실행하기 위한 구성이다.
+Unit/E2E 결과 JSON, `artifacts/playwright-evidence/`, HTML report, trace를 업로드한다. 실패 step을 continue-on-error로 통과 처리하지 않는다. screenshot 불가 시 capture-status와 남은 JSON을 보존한다.
 
-로컬에서 사람이 직접 `npm test`, `npm run test:e2e`, `npm run report:markdown`을 실행하는 대신, GitHub Actions가 push와 pull request 시점에 동일한 검증을 수행한다.
+로컬 확인:
 
-## 현재 CI 도구
-
-현재 프로젝트는 GitHub 저장소를 사용하므로 GitHub Actions를 CI 도구로 사용한다.
-
-설정 파일은 다음 위치에 있다.
-
-```text
-.github/workflows/ci.yml
-```
-
-## 실행 시점
-
-CI는 다음 상황에서 실행된다.
-
-- `main` 브랜치에 push
-- `main` 브랜치를 대상으로 pull request 생성 또는 갱신
-
-## 실행 흐름
-
-```text
-GitHub push 또는 pull request
-↓
-GitHub Actions runner 시작
-↓
+```sh
 npm ci
-↓
-Playwright Chromium 설치
-↓
-npm test
-↓
+npx playwright install chromium
+npm test -- --reporter=default --reporter=json --outputFile=artifacts/results/unit.json
 npm run test:e2e
-↓
-npm run test:agent -- npm test
-↓
-npm run report:markdown
-↓
-결과와 artifact 저장
+node scripts/summarize-results.js
 ```
 
-## 검증 범위
+의도 실패 실험은 정상 CI 필수 테스트에서 제외한다. 향후 전용 job을 만든다면 실패 exit만 허용하는 대신 실제 증거/분류도 assertion으로 검증해야 한다.
+workflow 파일이 존재하는 것과 GitHub에서 성공한 것은 다르다. 원격 실행 URL·커밋·artifact 접근은 [완성도 판단](completion-review.md)의 별도 항목이다.
 
-| 단계 | 명령 | 목적 |
-| --- | --- | --- |
-| 의존성 설치 | `npm ci` | `package-lock.json` 기준으로 동일한 의존성 설치 |
-| 브라우저 설치 | `npx playwright install --with-deps chromium` | E2E 실행에 필요한 Chromium 설치 |
-| 단위 테스트 | `npm test` | GameHarness, GameEngine, Agent Loop 단위 검증 |
-| 브라우저 E2E | `npm run test:e2e` | 실제 브라우저 UI, 버튼, 키보드 입력, QA state 연결 검증 |
-| Agent Summary | `npm run test:agent -- npm test` | CI 환경에서 `last-summary.json` 생성 |
-| Markdown 리포트 | `npm run report:markdown` | JSON summary를 사람이 읽기 좋은 리포트로 변환 |
-
-## Artifact
-
-CI가 끝나면 다음 산출물을 업로드한다.
-
-```text
-artifacts/agent/last-summary.json
-artifacts/reports/latest-summary.md
-playwright-report/
-test-results/
-```
-
-`last-summary.json`은 Agent Loop가 읽기 좋은 구조화 결과이고, `latest-summary.md`는 사람이 읽기 좋은 요약 리포트이다.
-
-## 실패 해석 기준
-
-CI 실패는 바로 제품 버그를 의미하지 않는다.
-
-실패 위치에 따라 다음처럼 구분한다.
-
-| 실패 위치 | 우선 분류 |
-| --- | --- |
-| `npm ci` | `ENV_FAIL` |
-| `npx playwright install --with-deps chromium` | `ENV_FAIL` |
-| `npm test` | `PRODUCT_FAIL`, `TEST_FAIL`, `REVIEW_REQUIRED` 후보 |
-| `npm run test:e2e` | `PRODUCT_FAIL`, `TEST_FAIL`, `ENV_FAIL`, `REVIEW_REQUIRED` 후보 |
-| `npm run report:markdown` | `TEST_FAIL` 후보 |
-
-원인이 명확하지 않은 경우에는 제품 문제로 단정하지 않고 `REVIEW_REQUIRED`로 판단한다.
-
-## 현재 한계
-
-현재 CI는 정상 테스트 흐름과 summary 리포트 생성을 검증한다.
-
-의도된 실패 샘플인 `npm run test:e2e:product-fail-evidence`, `npm run test:e2e:test-fail-evidence`, `npm run test:e2e:env-fail-evidence`는 실패 증거 생성용 명령이므로 기본 CI에는 포함하지 않는다.
-
-향후에는 별도 workflow 또는 수동 실행 workflow로 의도 실패 샘플을 분리할 수 있다.
+의도 실패 spec의 JSON/HTML은 experiments-e2e.json과 artifacts/experiment-report로 분리한다. 정상 보고서와 혼합하지 않는다.

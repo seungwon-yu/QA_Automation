@@ -1,0 +1,67 @@
+{
+  "recordedDateKST": "2026-09-14",
+  "workingTree": "미커밋 작업 트리 검증",
+  "unit": {
+    "passed": 74,
+    "failed": 0
+  },
+  "e2eBefore": {
+    "startTime": "2026-09-13T14:54:12.974Z",
+    "duration": 37663.753,
+    "expected": 11,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  },
+  "e2eAfter": {
+    "startTime": "2026-09-13T15:04:11.361Z",
+    "duration": 34947.168999999994,
+    "expected": 12,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "experiments": [
+    {
+      "testId": "EVID-001",
+      "expected": "REVIEW_REQUIRED",
+      "actual": "REVIEW_REQUIRED",
+      "capture": {
+        "screenshotAvailable": false,
+        "captureErrors": [
+          {
+            "operation": "screenshot",
+            "message": "page.screenshot: Target page, context or browser has been closed"
+          }
+        ]
+      }
+    },
+    {
+      "testId": "EXP-001",
+      "expected": "PRODUCT_FAIL",
+      "actual": "PRODUCT_FAIL",
+      "capture": {
+        "screenshotAvailable": true,
+        "captureErrors": []
+      }
+    },
+    {
+      "testId": "TC-008-06",
+      "expected": "TEST_FAIL",
+      "actual": "TEST_FAIL",
+      "capture": {
+        "screenshotAvailable": true,
+        "captureErrors": []
+      }
+    },
+    {
+      "testId": "TC-008-07",
+      "expected": "ENV_FAIL",
+      "actual": "ENV_FAIL",
+      "capture": {
+        "screenshotAvailable": true,
+        "captureErrors": []
+      }
+    }
+  ]
+}

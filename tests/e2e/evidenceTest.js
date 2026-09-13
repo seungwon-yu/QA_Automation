@@ -1,6 +1,7 @@
 import { test as base } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 
 export const test = base.extend({
   qaEvidence: async ({ page }, use, testInfo) => {
@@ -12,10 +13,15 @@ export const test = base.extend({
 
     page.on("console", (message) => {
       consoleMessages.push({
+        source: "browser-console",
         type: message.type(),
         text: message.text(),
         location: message.location()
       });
+    });
+
+    page.on("pageerror", (error) => {
+      consoleMessages.push({ source: "browser-runtime", type: "error", text: error.message, stack: error.stack });
     });
 
     await use({
@@ -41,14 +47,16 @@ export const test = base.extend({
     const evidenceDir = path.join(
       "artifacts",
       "playwright-evidence",
-      sanitize(`${testInfo.title}-retry-${testInfo.retry}`)
+      sanitize(`${testInfo.title}-retry-${testInfo.retry}-${randomUUID()}`)
     );
     await mkdir(evidenceDir, { recursive: true });
 
     const screenshotPath = path.join(evidenceDir, "screenshot.png");
-    await page.screenshot({
-      fullPage: true,
-      path: screenshotPath
+    const captureErrors = [];
+    let screenshotAvailable = true;
+    await page.screenshot({ fullPage: true, path: screenshotPath, timeout: 5000 }).catch((error) => {
+      screenshotAvailable = false;
+      captureErrors.push({ operation: "screenshot", message: error.message });
     });
 
     const state = await page.evaluate(() => {
@@ -68,6 +76,7 @@ export const test = base.extend({
       reason: error.message
     }));
 
+    await writeJson(path.join(evidenceDir, "capture-status.json"), { screenshotAvailable, captureErrors });
     await writeJson(path.join(evidenceDir, "console-log.json"), consoleMessages);
     await writeJson(path.join(evidenceDir, "state.json"), state);
     await writeJson(path.join(evidenceDir, "metadata.json"), normalizeMetadata(metadata));
@@ -80,7 +89,8 @@ export const test = base.extend({
       retry: testInfo.retry,
       project: testInfo.project.name,
       evidenceDir,
-      screenshotPath
+      screenshotPath: screenshotAvailable ? screenshotPath : null,
+      screenshotAvailable
     });
   }
 });

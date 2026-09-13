@@ -1,0 +1,16 @@
+{
+  "dateKST": "2026-09-14",
+  "versions": {
+    "vitest": "4.1.11",
+    "vite": "8.3.0",
+    "qs": "6.16.0"
+  },
+  "vulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  }
+}
