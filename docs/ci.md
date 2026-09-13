@@ -18,3 +18,7 @@ node scripts/summarize-results.js
 workflow 파일이 존재하는 것과 GitHub에서 성공한 것은 다르다. 원격 실행 URL·커밋·artifact 접근은 [완성도 판단](completion-review.md)의 별도 항목이다.
 
 의도 실패 spec의 JSON/HTML은 experiments-e2e.json과 artifacts/experiment-report로 분리한다. 정상 보고서와 혼합하지 않는다.
+
+## 게시 후 원격 검증
+
+2026-09-14: 커밋 `3d47b0d`의 [GitHub Actions 실행](https://github.com/seungwon-yu/QA_Automation/actions/runs/34767022361)이 `success`로 완료됐다. `qa-automation-evidence` artifact 생성 및 미만료 상태를 API로 확인했다. 이 실행은 단위 테스트와 Chromium의 정상 E2E를 검증하며 의도 실패 실험은 제외한다.
